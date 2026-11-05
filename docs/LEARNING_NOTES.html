@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finnie Learning Notes</title>
+<style>
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --panel-2:#f0efec; --ink:#1a1a18; --ink-2:#56544f;
+  --ink-3:#8a8781; --line:#e2e0db; --accent:#1f6f5c; --accent-soft:#e3f0ec;
+  --q:#7a3f8f; --q-soft:#f3e9f6; --code-bg:#f0efec;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141413; --panel:#1d1d1b; --panel-2:#262624; --ink:#f0efec; --ink-2:#b8b5ae;
+  --ink-3:#86837c; --line:#312f2c; --accent:#6fc0a8; --accent-soft:#1b2b27;
+  --q:#cda3dc; --q-soft:#241c28; --code-bg:#262624;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#141413; --panel:#1d1d1b; --panel-2:#262624; --ink:#f0efec; --ink-2:#b8b5ae;
+  --ink-3:#86837c; --line:#312f2c; --accent:#6fc0a8; --accent-soft:#1b2b27;
+  --q:#cda3dc; --q-soft:#241c28; --code-bg:#262624;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:48px 16px 96px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.15;margin:.3em 0 .2em;letter-spacing:-.02em}
+.sub{color:var(--ink-2);max-width:62ch;margin:0}
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);
+  color:var(--ink);border-radius:8px;padding:7px 13px;font-size:14px}
+button:hover{background:var(--panel-2)}
+input[type=search]{font:inherit;font-size:14px;padding:8px 12px;border-radius:8px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);min-width:220px;flex:1}
+input[type=search]:focus{outline:2px solid var(--accent);outline-offset:1px}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  margin:52px 0 6px;font-weight:700;border-top:1px solid var(--line);padding-top:26px}
+.mdesc{color:var(--ink-3);font-size:14px;margin:0 0 18px;max-width:60ch}
+.c{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px;
+  margin-bottom:14px;box-shadow:var(--shadow)}
+.c h3{margin:0 0 4px;font-size:19px;letter-spacing:-.01em;line-height:1.3}
+.kicker{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:9px}
+.c p{color:var(--ink-2);margin:.7em 0}
+.c ul,.c ol{color:var(--ink-2);padding-left:20px;margin:.7em 0}
+.c li{margin:5px 0}
+.c b,.c strong{color:var(--ink);font-weight:600}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;
+  background:var(--code-bg);padding:1.5px 5px;border-radius:5px;color:var(--ink)}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+  overflow-x:auto;font-size:13.5px;line-height:1.55;margin:14px 0}
+pre code{background:none;padding:0;font-size:inherit}
+.key{background:var(--accent-soft);border-radius:10px;padding:13px 16px;margin:16px 0 4px;font-size:14.5px;color:var(--ink-2)}
+.key b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.qa{margin-top:18px;border-top:1px dashed var(--line);padding-top:14px}
+.qa>.lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--q);font-weight:700;margin-bottom:8px}
+details.q{border-left:2px solid var(--line);padding:0 0 0 13px;margin:9px 0}
+details.q>summary{cursor:pointer;list-style:none;font-weight:600;font-size:15px;color:var(--ink)}
+details.q>summary::-webkit-details-marker{display:none}
+details.q>summary::before{content:"Q  ";color:var(--q);font-weight:700;letter-spacing:.05em}
+details.q[open]{border-left-color:var(--q);background:var(--q-soft);border-radius:0 8px 8px 0;padding:10px 14px 10px 13px}
+details.q .a{color:var(--ink-2);font-size:14.5px;margin-top:9px}
+details.q .a p{margin:.55em 0}
+.status{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 9px;border-radius:99px;background:var(--panel-2);color:var(--ink-3);margin-left:8px;vertical-align:2px}
+.status.done{background:var(--accent-soft);color:var(--accent)}
+.pending{border-style:dashed;box-shadow:none;background:transparent}
+.pending h3{color:var(--ink-3)}
+.pending p{font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:14px 0}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+th{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+td b{color:var(--ink)}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+.hide{display:none}
+.nores{color:var(--ink-3);font-size:14px;padding:20px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Applied Agentic AI &middot; Capstone</div>
+  <h1>Finnie &mdash; Learning Notes</h1>
+  <p class="sub">Every concept behind the build, in the order we meet it, each with the interview questions you should be able to answer cold. Sections marked <span class="status">pending</span> get filled in as we reach that phase.</p>
+  <div class="bar">
+    <input type="search" id="q" placeholder="Search concepts and questions&hellip;" autocomplete="off">
+    <button id="theme">Toggle theme</button>
+    <button id="openall">Show all answers</button>
+    <button id="shutall">Hide all answers</button>
+  </div>
+</header>
+
+<h2>Module 0 &mdash; Foundations</h2>
+<p class="mdesc">Read before we write a single line. Everything later is a consequence of these nine ideas.</p>
+
+<div class="c">
+  <div class="kicker">Concept 01</div>
+  <h3>What a large language model actually does</h3>
+  <p>An LLM is a function that takes a sequence of tokens and returns a probability distribution over the next token. That is the whole mechanism. Text generation is that function called repeatedly, each output appended to the input.</p>
+  <ul>
+    <li><b>Token</b> &mdash; a sub-word unit, roughly 4 characters of English. &ldquo;Diversification&rdquo; might be 3 tokens. Pricing, limits and context windows are all measured in tokens, never words.</li>
+    <li><b>Context window</b> &mdash; the maximum number of tokens the model can attend to in one call. GPT-4o has 128,000 &mdash; roughly a 300-page book &mdash; but it is a hard budget shared between system prompt, retrieved context, conversation history and the answer, and you pay for every token of it on every single call.</li>
+    <li><b>Temperature</b> &mdash; scales the distribution before sampling. 0 is near-deterministic (pick the most likely token); 1.0 is more varied. For a finance assistant, run low: 0.1&ndash;0.3.</li>
+    <li><b>Top-p (nucleus sampling)</b> &mdash; restricts sampling to the smallest set of tokens whose cumulative probability exceeds p. An alternative knob to temperature; tune one, not both.</li>
+    <li><b>Stateless</b> &mdash; the model remembers nothing between calls. Every &ldquo;memory&rdquo; feature in this project is us re-sending history.</li>
+  </ul>
+  <div class="key"><b>Why this matters here</b>Because the model is a next-token predictor with no notion of truth, accuracy must be engineered <i>around</i> it: retrieval for facts, Python for arithmetic, prompts for boundaries. That single realisation is what the whole architecture is for.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Why does an LLM hallucinate?</summary><div class="a"><p>Because it optimises for plausible next tokens, not for truth. It has no internal mechanism that distinguishes a fact it memorised during training from a fluent continuation that merely fits the pattern. Low-frequency facts &mdash; a specific expense ratio, yesterday's closing price &mdash; are exactly where the pattern is strong and the memory is weak, so it generates confidently and wrongly.</p></div></details>
+    <details class="q"><summary>Your users ask about today's stock prices. Why can the model not simply know them?</summary><div class="a"><p>Two reasons. The weights are frozen at training time, so anything after the cutoff was never seen. And even for in-window data, there is no retrieval step &mdash; the model cannot look anything up unless we give it a tool. Hence the market-data layer in Phase 6: prices come from an API, and the model only narrates them.</p></div></details>
+    <details class="q"><summary>Why GPT-4o, and not Gemini or Claude?</summary><div class="a"><p>Two things drove it. The router is a structured-output problem &mdash; I need a reliable JSON classification on every turn &mdash; and GPT-4o's structured outputs and function calling are the most dependable I tested for that; a router that occasionally returns prose instead of a label poisons the entire graph. Second, ecosystem: LangGraph's OpenAI integration is the best-trodden path, so I spend my time on architecture rather than adapter bugs.</p><p>The cost against it is real and I would name it: Gemini 2.0 Flash has a free tier and a far larger context window, so for a pure high-volume RAG workload it would be cheaper. I mitigated that with model tiering &mdash; <code>gpt-4o-mini</code> classifies, GPT-4o writes &mdash; which removes most of the per-turn cost, since routing is the only call that happens on literally every turn. And because every model call goes through one interface, switching provider is one adapter class, not a refactor. That seam is the actual engineering answer.</p></div></details>
+    <details class="q"><summary>What temperature did you use and why?</summary><div class="a"><p>0.2 for every agent. Financial education rewards consistency and penalises creative variation; two users asking the same question should get substantially the same explanation. I kept it non-zero only because a hard 0 makes phrasing feel mechanical across a multi-turn conversation.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 02</div>
+  <h3>Prompt, chain, agent, workflow</h3>
+  <p>These four words get used interchangeably and they are not the same thing. Being precise here is half of sounding senior in an interview.</p>
+  <table>
+    <tr><th>Term</th><th>Definition</th><th>Who decides the control flow</th></tr>
+    <tr><td><b>Prompt</b></td><td>One call: input in, text out.</td><td>Nobody &mdash; there is no flow.</td></tr>
+    <tr><td><b>Chain</b></td><td>A fixed pipeline of calls. A &rarr; B &rarr; C, always.</td><td>You, at code-writing time.</td></tr>
+    <tr><td><b>Agent</b></td><td>An LLM in a loop with tools: it decides what to call, observes the result, decides again, stops when done.</td><td>The model, at runtime.</td></tr>
+    <tr><td><b>Workflow / graph</b></td><td>Nodes with explicit edges and shared state. Some edges are conditional, decided by the model; the topology is yours.</td><td>Split &mdash; you own the topology, the model owns the branch choices.</td></tr>
+  </table>
+  <p>Finnie is a <b>workflow of agents</b>: LangGraph owns the shape, the router node lets the model pick the branch, and each agent node is itself a small bounded agent. That is deliberately <i>less</i> autonomous than a free-running ReAct agent &mdash; and in a regulated domain, less autonomy is a feature, not a limitation.</p>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Why a graph instead of a single ReAct agent with six tools?</summary><div class="a"><p>Three reasons I can defend. <b>Testability</b> &mdash; I can unit-test the router independently of the agents, and assert which node ran. <b>Bounded context</b> &mdash; each node gets only the prompt and state it needs, rather than one giant system prompt describing six domains. <b>Predictability</b> &mdash; a free-running agent can loop, re-call tools and run up cost unboundedly; a graph has a finite, inspectable set of paths, which matters when every answer is user-facing financial content.</p><p>The trade-off is honest: a single agent would handle a genuinely novel query shape more gracefully. I accepted less flexibility for more control.</p></div></details>
+    <details class="q"><summary>When would you choose CrewAI over LangGraph?</summary><div class="a"><p>When the task is naturally collaborative and loosely specified &mdash; a research crew where a writer, critic and editor iterate and the number of rounds is not known in advance. CrewAI's role-and-task abstraction expresses that in very little code. I chose LangGraph because my routing is a classification problem with a known set of destinations, and I wanted explicit state I could checkpoint and assert on.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 03</div>
+  <h3>Why multiple agents at all</h3>
+  <p>The honest answer is not &ldquo;because it is more powerful&rdquo;. One model with one long prompt can, in principle, do all six jobs. We split it for engineering reasons:</p>
+  <ol>
+    <li><b>Prompt focus.</b> A system prompt that says &ldquo;you explain tax <i>and</i> read portfolios <i>and</i> summarise news&rdquo; dilutes instruction-following. Each extra concern measurably degrades adherence to the others.</li>
+    <li><b>Context budget.</b> Only the portfolio agent needs holdings data; only the Q&amp;A agent needs retrieved articles. Narrow nodes keep each call cheap and focused.</li>
+    <li><b>Separation of concerns.</b> The rubric's own phrase. Portfolio maths changes for different reasons than news summarisation; they should be different files with different tests.</li>
+    <li><b>Independent evaluation.</b> I can measure retrieval quality on the Q&amp;A agent without market data confounding it.</li>
+    <li><b>Graceful failure.</b> If the news source dies, five agents keep working.</li>
+  </ol>
+  <div class="key"><b>The trap</b>Do not claim multi-agent systems are smarter. They are not &mdash; it is the same model behind every node. They are more <i>maintainable, testable and debuggable</i>. Say that and you sound like an engineer; say &ldquo;smarter&rdquo; and you sound like a brochure.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Isn't six agents over-engineering for this?</summary><div class="a"><p>For a weekend prototype, yes. The justification is the shape of the domain: six genuinely distinct capabilities, with different data dependencies &mdash; RAG, live prices, pure maths, external news. Those are natural seams. I would push back on splitting further; splitting the Q&amp;A agent by asset class, for instance, would be arbitrary, because every one of those would need the identical pipeline and prompt.</p></div></details>
+    <details class="q"><summary>How do your agents communicate?</summary><div class="a"><p>They don't talk to each other directly &mdash; that is deliberate. They communicate only through shared graph state: each node reads what it needs and appends an <code>AgentResult</code>. Direct agent-to-agent calls create an implicit call graph nobody can see, plus cycle risk. With a central state object and a supervisor topology, the full conversation is one inspectable dict I can log, checkpoint and assert against.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 04</div>
+  <h3>RAG &mdash; and why not fine-tuning</h3>
+  <p><b>Retrieval-Augmented Generation</b>: before answering, fetch relevant documents and place them in the prompt, so the model's answer is grounded in text you control rather than in frozen weights.</p>
+  <p>The distinction underneath it:</p>
+  <ul>
+    <li><b>Parametric knowledge</b> &mdash; baked into the weights. Fast, free at inference, impossible to audit, impossible to update without retraining, and silently wrong at the edges.</li>
+    <li><b>Non-parametric knowledge</b> &mdash; sits in an external store. Costs retrieval latency and prompt tokens, but is updatable, auditable and <i>citable</i>.</li>
+  </ul>
+  <p>Finance needs the second kind. Content changes, every claim should be traceable, and &ldquo;the model said so&rdquo; is not an acceptable provenance for financial education.</p>
+  <table>
+    <tr><th></th><th>RAG</th><th>Fine-tuning</th></tr>
+    <tr><td><b>Teaches</b></td><td>Facts</td><td>Form, style, format</td></tr>
+    <tr><td><b>Update cost</b></td><td>Re-index, seconds</td><td>Retrain, hours and money</td></tr>
+    <tr><td><b>Citable</b></td><td>Yes</td><td>No</td></tr>
+    <tr><td><b>Inference cost</b></td><td>Higher &mdash; context tokens</td><td>Lower</td></tr>
+  </table>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Why RAG rather than fine-tuning on your 100 articles?</summary><div class="a"><p>Four reasons. Citations &mdash; RAG hands me the source document, which the rubric and the compliance story both require, and fine-tuning cannot. Freshness &mdash; new content means re-indexing, not retraining. Volume &mdash; 100 articles is far below what meaningfully moves weights; I would mostly get stylistic drift, not knowledge. And auditability &mdash; when an answer is wrong I can inspect exactly which chunks were retrieved, which is the difference between a debuggable system and a black box.</p><p>I would consider fine-tuning for something else entirely: enforcing a house explanation style across every response. That is form, not facts.</p></div></details>
+    <details class="q"><summary>GPT-4o takes 128k tokens. Why not just paste all 100 articles into every prompt?</summary><div class="a"><p>They would not fit &mdash; 100 articles is well past 128k &mdash; but suppose they did. Cost scales linearly with input tokens, so every trivial question would pay for the whole corpus; on GPT-4o pricing that turns a fraction-of-a-cent question into a few cents, multiplied by every turn of every conversation. Latency rises with context length. And accuracy actually degrades &mdash; the lost-in-the-middle effect means relevant text buried in a huge context is attended to less reliably than the same text in a short, targeted one. Retrieval is also what gives me citations and a relevance threshold; a dump gives me neither.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 05</div>
+  <h3>Embeddings and vector search</h3>
+  <p>An embedding model maps text to a fixed-length vector &mdash; 384 numbers for <code>all-MiniLM-L6-v2</code> &mdash; positioned so that semantically similar text lands nearby. &ldquo;How do I spread my risk?&rdquo; and &ldquo;diversification basics&rdquo; share almost no keywords but sit close together in that space. That is the entire reason RAG beats keyword search for natural-language questions.</p>
+  <p><b>Cosine similarity</b> measures the angle between two vectors, ignoring magnitude. It runs from &minus;1 to 1; for retrieval you are looking at roughly 0.3 to 0.9. The practical trick: normalise every vector to unit length first, and then the dot product <i>is</i> the cosine. That is why we use FAISS's <code>IndexFlatIP</code> (inner product) rather than <code>IndexFlatL2</code> (Euclidean) &mdash; with normalised vectors, inner product gives cosine for free.</p>
+  <pre><code>import numpy as np, faiss
+vecs = model.encode(chunks)                 # (n, 384) float32
+faiss.normalize_L2(vecs)                    # unit length, in place
+index = faiss.IndexFlatIP(384)              # exact inner-product search
+index.add(vecs)
+
+qv = model.encode(["what is an expense ratio"])
+faiss.normalize_L2(qv)
+scores, ids = index.search(qv, k=5)         # scores are now cosines</code></pre>
+  <p>The index stores <i>only</i> vectors and integer ids. The text and metadata live in a parallel list or JSON file, keyed by the same id. Keeping them separate is standard practice &mdash; it keeps the index small and lets you change metadata without re-embedding.</p>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>FAISS versus Chroma versus Pinecone &mdash; why FAISS?</summary><div class="a"><p>FAISS is a library, not a database: in-process, no server, no network hop, and it persists as a single file. For roughly 500&ndash;1500 chunks that is strictly the right answer; a flat index searches exhaustively in under a millisecond. Chroma adds a metadata-filtering query layer and a server mode, which I did not need because my metadata store is a dict. Pinecone is a hosted service &mdash; it earns its cost at millions of vectors with multi-tenant isolation and no ops team, which describes none of this project. Choosing Pinecone here would be paying for a distributed system to search a thousand rows.</p></div></details>
+    <details class="q"><summary>When would a flat index stop being the right choice?</summary><div class="a"><p>Flat search is O(n &middot; d) per query. At a thousand chunks that is nothing. Somewhere around a hundred thousand to a million vectors, latency becomes visible and you move to an approximate index &mdash; <code>IVFFlat</code>, which clusters vectors and searches only the nearest few clusters, or <code>HNSW</code>, a navigable small-world graph. Both trade exact recall for speed, and both need tuning (<code>nprobe</code>, <code>efSearch</code>). The honest framing: ANN is a recall-for-latency trade you should only take once you have measured a latency problem.</p></div></details>
+    <details class="q"><summary>Why local embeddings rather than an embedding API?</summary><div class="a"><p>Indexing is a bulk operation &mdash; a thousand-plus chunks in one pass. Through an API that is a thousand billable calls against a rate limit; locally MiniLM does it on CPU in seconds for free, and query-time embedding adds only a few milliseconds. The constraint to respect is that the query must be embedded by the exact same model as the corpus, since two models' vector spaces are unrelated. Changing the embedding model means a full re-index &mdash; no exceptions.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 06</div>
+  <h3>Chunking &mdash; the decision that quietly determines RAG quality</h3>
+  <p>You cannot embed a whole article usefully: one vector averaging twelve topics is close to nothing in particular. So documents get split. How you split is the highest-leverage knob in the whole pipeline.</p>
+  <ul>
+    <li><b>Too small</b> (one sentence) &mdash; precise matching, but the retrieved fragment lacks the context needed to answer, and pronouns dangle.</li>
+    <li><b>Too large</b> (whole article) &mdash; rich context, but the embedding is diluted and you waste prompt tokens on irrelevant paragraphs.</li>
+    <li><b>Overlap</b> &mdash; repeating 10&ndash;20% of adjacent text across chunk boundaries, so an idea split across a boundary still appears whole in at least one chunk.</li>
+    <li><b>Structure-aware</b> &mdash; split on Markdown headings first, then by size within a section. A heading is an author-provided semantic boundary; using it beats any character count.</li>
+  </ul>
+  <p>Our starting point: split on <code>##</code> headings, then subdivide anything over ~800 characters with ~100 characters of overlap, and prepend the article title and heading to each chunk's text before embedding so an isolated chunk still carries its topic.</p>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>How did you choose your chunk size?</summary><div class="a"><p>Empirically, not from a blog post. I built a set of twenty representative questions with the answer I expected, then compared retrieval at a few configurations and looked at whether the correct chunk appeared in the top three and whether it contained enough context to stand alone. Heading-aware splitting at around 800 characters with 100 of overlap won. The point I would make in an interview is that chunk size is a function of your documents' structure &mdash; dense reference material wants smaller chunks than narrative prose &mdash; so it has to be measured per corpus.</p></div></details>
+    <details class="q"><summary>What breaks if you have no overlap?</summary><div class="a"><p>Any idea that straddles a boundary is now half in one chunk and half in another, and neither half answers the question. Classic case: a definition at the end of one chunk whose worked example starts the next &mdash; retrieve either and the user gets half an explanation. Overlap is cheap insurance; the cost is a slightly larger index and occasional near-duplicate hits, which deduplication on source offset handles.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 07</div>
+  <h3>Tool calling &mdash; how an LLM &ldquo;does&rdquo; anything</h3>
+  <p>A model cannot call a function. What it can do is emit structured text naming a function and its arguments; <i>your</i> code parses that, executes the real function, and feeds the result back in. The loop is:</p>
+  <pre><code>1. You send: prompt + JSON schemas of available tools
+2. Model returns: {"tool": "get_quote", "args": {"ticker": "AAPL"}}
+3. YOUR code runs get_quote("AAPL") -> {"price": 184.2, ...}
+4. You send that result back as a tool message
+5. Model writes prose using it</code></pre>
+  <p>Two consequences worth internalising. The tool's <b>description is a prompt</b> &mdash; it is the only thing the model uses to decide whether to call it, so vague descriptions cause mis-selection far more often than model weakness does. And step 3 is ordinary code under your control, which is exactly where validation, rate limiting and auth belong: never trust model-supplied arguments.</p>
+  <div class="key"><b>Where this shows up in Finnie</b>Twice. Inside agents, where the market agent calls the price layer. And in Phase 13, where MCP exposes those same tools to any external client &mdash; MCP is a standard protocol for the schema-and-dispatch dance above, so one server works with Claude Desktop and anything else that speaks it.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>The model keeps calling the wrong tool. How do you debug it?</summary><div class="a"><p>I treat it as a prompt bug, not a model bug. First I check the descriptions for overlap &mdash; two tools whose descriptions could both plausibly answer the query is the most common cause, and the fix is sharpening the boundary and saying explicitly when <i>not</i> to use each one. Then argument schemas: enums instead of free-form strings, required fields marked. Then I add a couple of examples. If it still mis-routes, I reduce the number of tools visible at that node &mdash; which is itself an argument for the graph architecture, because each node only ever sees its own tools.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 08</div>
+  <h3>State, memory and context preservation</h3>
+  <p>The model is stateless, so &ldquo;memory&rdquo; is entirely an engineering construct: the set of things you choose to re-send on every turn. There are distinct kinds, and conflating them is a common interview stumble.</p>
+  <ul>
+    <li><b>Short-term / conversational</b> &mdash; recent messages, replayed verbatim. Simple and lossless, but grows without bound.</li>
+    <li><b>Summarised</b> &mdash; older turns compressed by the model into a running synopsis. Constant size, lossy, and costs an extra call.</li>
+    <li><b>Profile / semantic</b> &mdash; durable extracted facts: risk tolerance moderate, horizon 15 years, beginner. Small, high value, and the thing that makes guidance feel personal across turns.</li>
+    <li><b>Checkpointed graph state</b> &mdash; LangGraph persisting the whole state object per thread id, so a conversation survives a process restart.</li>
+  </ul>
+  <p>Our policy: keep the last ten messages verbatim, maintain an extracted profile dict, and summarise beyond that window. The rubric scores &ldquo;context preservation&rdquo; under Conversational Flow, and the demo case to nail is a pronoun across a domain switch &mdash; &ldquo;is <i>that</i> too risky for me?&rdquo; three turns after the portfolio was discussed.</p>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>A conversation runs 50 turns. What happens?</summary><div class="a"><p>Naive replay would grow the prompt until cost and latency became unacceptable and the earliest turns pushed context out. So the window is bounded at ten messages; everything older is folded into a running summary, and durable facts are promoted out of the transcript into a profile dict that is always sent and is tiny. The ordering matters: profile first, then summary, then verbatim recent turns &mdash; the most important context sits where attention is most reliable.</p></div></details>
+    <details class="q"><summary>Why checkpoint graph state at all for a Streamlit app?</summary><div class="a"><p>Because <code>session_state</code> dies with the browser session and Streamlit re-runs the whole script on every interaction. A checkpointer keyed by thread id means the conversation is durable independently of the UI, which also makes the graph testable on its own &mdash; I can resume a thread in a test and assert what the next turn does. It is the difference between memory being a UI feature and memory being a system property.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 09</div>
+  <h3>Education versus advice &mdash; the constraint that shapes the prompts</h3>
+  <p>Telling an identified person what to do with their money is regulated activity in essentially every jurisdiction. Explaining how instruments work is not. Finnie must sit firmly on the education side, and that is an architectural requirement, not a footnote.</p>
+  <ul>
+    <li><b>Allowed:</b> &ldquo;An index fund holds every stock in an index; the usual argument for one is low cost and broad diversification.&rdquo;</li>
+    <li><b>Allowed:</b> &ldquo;Your portfolio is 68% in one holding. Concentration means your outcome depends heavily on a single company.&rdquo; &mdash; an observation with a definition.</li>
+    <li><b>Not allowed:</b> &ldquo;You should sell some NVDA and buy a bond fund.&rdquo; &mdash; a personalised recommendation.</li>
+  </ul>
+  <p>How we enforce it in three layers: system prompts that state the boundary and give refusal examples; a disclaimer appended to every user-facing response; and an output-side regex guard for recommendation phrasing that logs and rewrites on a hit. Defence in depth, because a prompt instruction alone is a request, not a guarantee.</p>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>How do you stop the model giving financial advice?</summary><div class="a"><p>I assume prompting will eventually fail and layer accordingly. Prompt level: every agent's system prompt defines the education/advice line and shows how to decline. Output level: a compliance wrapper every response passes through, which appends the disclaimer and pattern-matches recommendation language, logging any hit. Design level: the portfolio agent is built to report metrics and define terms, never to propose target allocations &mdash; there is simply no code path that generates a trade suggestion. I would also say plainly that regex is a blunt instrument; it is a safety net under the prompt, not the primary control.</p></div></details>
+    <details class="q"><summary>A user asks point blank: &ldquo;should I buy Tesla?&rdquo;</summary><div class="a"><p>The agent declines the recommendation and converts the question into education: it explains what one would look at to evaluate any single stock &mdash; concentration risk, the difference between single-stock and diversified exposure, valuation basics &mdash; shows the live quote and context, and states that it cannot tell them whether to buy. That is a better product answer as well as the compliant one: the beginner leaves with a framework instead of a verdict.</p></div></details>
+  </div>
+</div>
+
+<h2>Phase 0 &mdash; Environment &amp; skeleton <span class="status done" id="st0">taught</span></h2>
+<p class="mdesc">Unglamorous and worth real marks: Code Organization is 5 points, and every later phase inherits these decisions.</p>
+
+<div class="c">
+  <div class="kicker">Concept 10</div>
+  <h3>Virtual environments</h3>
+  <p>Python installs packages globally by default. Two projects that need different versions of the same library then conflict, and one breaks silently. A venv is nothing clever: a private <code>site-packages</code> directory plus a tweaked <code>sys.path</code>. <code>activate</code> merely prepends its <code>Scripts/</code> to your <code>PATH</code> so <code>python</code> and <code>pip</code> resolve to the local copies.</p>
+  <p>It matters acutely here because <code>langchain</code>, <code>langgraph</code> and <code>sentence-transformers</code> pin transitive dependencies aggressively. Resolving that inside your system Python is a day you do not get back.</p>
+  <div class="key"><b>Ranges in requirements, exact pins in a lock file</b><code>requirements.txt</code> carries ranges, because that is what you <i>intend</i>. After a successful install, <code>pip freeze &gt; requirements.lock.txt</code> records what you actually <i>got</i>, transitive dependencies included. The first documents intent; the second makes an evaluator's install reproduce yours.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>What does <code>activate</code> actually do?</summary><div class="a"><p>It edits environment variables for that shell: prepends the venv's script directory to <code>PATH</code>, sets <code>VIRTUAL_ENV</code>, and stashes the old values so <code>deactivate</code> can restore them. There is no process isolation and no containerisation &mdash; it is purely name resolution. Which is why you can skip it entirely by invoking <code>.venv/Scripts/python</code> by full path, and why activating in one terminal has no effect on another.</p></div></details>
+    <details class="q"><summary>Why not just use Docker and skip venvs?</summary><div class="a"><p>Different problems. A container pins the OS, the Python build and the system libraries &mdash; that is the deployment story, and it is in Phase 12. A venv solves the inner-loop problem: fast iteration, your debugger attached, no rebuild per edit. In practice you want both, with the Dockerfile installing from the same lock file the venv used, so dev and prod resolve identically.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 11</div>
+  <h3>Configuration: three kinds of setting, three homes</h3>
+  <table>
+    <tr><th>Kind</th><th>Example</th><th>Home</th><th>Why there</th></tr>
+    <tr><td><b>Secret</b></td><td><code>OPENAI_API_KEY</code></td><td><code>.env</code>, gitignored</td><td>A committed key is a revoked key. Also a billed one.</td></tr>
+    <tr><td><b>Behaviour</b></td><td><code>top_k</code>, <code>chunk_size</code>, cache TTL</td><td><code>config.yaml</code></td><td>Tunable without a code change or a redeploy</td></tr>
+    <tr><td><b>Logic</b></td><td>the banned-phrase matcher</td><td>Python</td><td>It is code pretending to be data</td></tr>
+  </table>
+  <p>Our loader runs in a deliberate order: <code>load_dotenv()</code>, then read YAML, then overlay <code>FINNIE_*</code> environment variables, then inject secrets, then validate. Each step is a layer that can override the one before, which is the standard precedence chain &mdash; <b>defaults &lt; file &lt; environment</b>.</p>
+  <p>Two details worth knowing. <code>load_dotenv</code> does <i>not</i> overwrite a variable already present in the real environment, so a value injected by a container or CI always beats the file &mdash; exactly right. And overlay happens <i>before</i> validation, because environment variables are always strings; pydantic coerces <code>"7"</code> to <code>7</code> and rejects <code>"99"</code> for a field bounded at 2. Validate last and you get both coercion and checking for free.</p>
+  <div class="key"><b>Fail fast</b>A bad config raises at startup, loudly, with the offending field named. It must never surface as a confusing <code>NoneType</code> error three modules downstream, forty seconds into a user's conversation. One typed, validated object built once at the boundary is what buys you that.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Why pydantic rather than just returning the dict from <code>yaml.safe_load</code>?</summary><div class="a"><p>Three things a dict cannot do. Validation: <code>temperature</code> is bounded at 0&ndash;2 and <code>chunk_overlap</code> must be smaller than <code>chunk_size</code>, and both are enforced at load time rather than discovered as a weird bug. Coercion: environment overrides arrive as strings and come out typed. And editor support: <code>cfg.rag.top_k</code> autocompletes and type-checks, whereas <code>cfg["rag"]["top_k"]</code> is a typo waiting to happen that fails at runtime, in production, on the one path you did not test.</p></div></details>
+    <details class="q"><summary>Why is <code>get_config</code> wrapped in <code>lru_cache</code>?</summary><div class="a"><p>It makes it a lazily-initialised singleton: the YAML is parsed on first call and every later caller gets the identical object. Without it, a module importing config in a loop re-reads and re-validates the file, and &mdash; worse &mdash; two parts of the system could observe different configs if the environment changed mid-run. Lazy rather than module-level so that import time does nothing surprising, and tests can call <code>cache_clear()</code> to force a fresh load.</p></div></details>
+    <details class="q"><summary>Your <code>.env</code> is gitignored. How does a new developer know what to set?</summary><div class="a"><p><code>.env.example</code>, which <i>is</i> committed, lists every variable with a placeholder and a comment on where to get it. It is the schema for the secret file. The loader also fails with a message naming the missing variable and pointing at that file, so the error teaches the fix &mdash; an error message is part of the interface.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 12</div>
+  <h3>Packages, modules and why you run from the root</h3>
+  <p>A directory containing <code>__init__.py</code> is a package. When you write <code>from src.rag.retriever import Retriever</code>, Python walks <code>sys.path</code> looking for a <code>src</code> package, then <code>rag</code> inside it, then the <code>retriever</code> module. <code>sys.path[0]</code> is the directory of the script you launched &mdash; which is why running <code>python src/web_app/app.py</code> from inside <code>src/web_app/</code> makes every <code>src.</code> import vanish.</p>
+  <p>Hence the rule: <b>always run from the project root</b>. <code>pyproject.toml</code> sets <code>pythonpath = ["."]</code> so pytest does the same thing, and no file in this project ever needs a <code>sys.path.append</code> hack. If you find yourself reaching for one, you are in the wrong directory.</p>
+  <p>The tree is created empty and complete up front, rather than grown as needed. Growing it organically is how you end up with a <code>utils/helpers.py</code> holding nine unrelated functions &mdash; and the rubric asks for this exact structure by name.</p>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Walk me through your folder layout and justify one boundary.</summary><div class="a"><p><code>core/</code> holds cross-cutting infrastructure &mdash; config, the LLM client, the compliance wrapper &mdash; and no domain logic. <code>rag/</code>, <code>data/</code>, <code>agents/</code> and <code>workflow/</code> are layers that each depend downward only: workflow knows about agents, agents know about rag and data, and nothing depends back up on workflow.</p><p>The boundary I would defend is <code>data/</code> versus <code>agents/</code>. The market agent could have called yfinance directly. Keeping the fetch-and-cache layer separate means the caching, the fallback ladder and the rate limiting are testable without an LLM in the loop, and the agent becomes a thin thing I can test with a fake feed. One-way dependencies are what make a system testable in pieces.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 13</div>
+  <h3>Logging, and the rule that no <code>print</code> survives</h3>
+  <p><code>print</code> has no severity, no timestamp, no source module and no off switch. <code>logging</code> gives all four and one place to change the format. When the router misclassifies a tax question in week three, the line you want is:</p>
+  <pre><code>2026-11-04 18:02:11 | DEBUG    | src.workflow.router | classified -&gt; portfolio (conf 0.41)</code></pre>
+  <p>Every module takes its logger as <code>get_logger(__name__)</code>. Using <code>__name__</code> names the logger after its module path, which gives you a free hierarchy: <code>logging.getLogger("src.rag").setLevel("WARNING")</code> later silences one subsystem without touching its code.</p>
+  <p>Three traps this phase defends against:</p>
+  <ul>
+    <li><b>Duplicate handlers.</b> Streamlit re-executes your whole script on every interaction. Call <code>setup_logging()</code> unguarded and you add a handler per click, so lines print twice, then three times. The <code>_CONFIGURED</code> flag is the fix, and there is a test for it.</li>
+    <li><b>Library noise.</b> At <code>DEBUG</code>, <code>httpx</code> and <code>openai</code> bury your own output in HTTP chatter. Pin them to <code>WARNING</code>.</li>
+    <li><b>Windows encoding.</b> <code>FileHandler</code> defaults to the system codepage, which raises on an em dash or a rupee sign. Always pass <code>encoding="utf-8"</code>.</li>
+  </ul>
+  <div class="key"><b>Enforced, not merely requested</b>The ruff <code>T20</code> rule in <code>pyproject.toml</code> fails the lint on any <code>print</code> inside <code>src/</code>, with exemptions for tests, scripts and the Streamlit app. A convention nothing checks is a convention that decays.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>What would you log at each level?</summary><div class="a"><p><code>DEBUG</code> for the things I need when something is wrong and nobody can reproduce it: the router's chosen label and confidence, retrieval scores per chunk, cache hit or miss. <code>INFO</code> for normal lifecycle milestones &mdash; index loaded with n chunks, request handled in m milliseconds. <code>WARNING</code> for degraded-but-working: a fallback fired, cached data served stale. <code>ERROR</code> for a failed request with the traceback.</p><p>And the discipline that matters more than the levels: never log a secret, and never log a user's full portfolio at <code>INFO</code>. Logs get shipped, aggregated and read by people who should not see either.</p></div></details>
+    <details class="q"><summary>You have an intermittent bug in production. What in your Phase 0 setup helps?</summary><div class="a"><p>Module-named loggers mean a line identifies its own origin without guessing. One format string set in config means I can switch the whole system to JSON for log aggregation in one place. A level configurable by environment variable means I can raise verbosity on a running deployment without a code change. And the router's confidence score logged at <code>DEBUG</code> means the single most likely source of weird behaviour &mdash; a borderline classification &mdash; is already recorded rather than needing to be reproduced.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 14</div>
+  <h3>load_config — step-by-step walkthrough with a real example</h3>
+  <p>Imagine your <code>.env</code> contains <code>OPENAI_API_KEY=sk-abc123</code> and you have added <code>FINNIE_LLM__TEMPERATURE=0.7</code> to test a warmer response style. Here is exactly what happens, in order, when <code>load_config()</code> is called for the first time.</p>
+
+  <table>
+    <tr><th>Step</th><th>What runs</th><th>What changes</th></tr>
+    <tr><td><b>1. load_dotenv</b></td><td><code>load_dotenv(PROJECT_ROOT / ".env")</code></td><td><code>os.environ["OPENAI_API_KEY"]</code> = <code>"sk-abc123"</code> — now live in memory. Existing env vars are NOT overwritten.</td></tr>
+    <tr><td><b>2. Read YAML</b></td><td><code>yaml.safe_load(config.yaml)</code></td><td><code>raw["llm"]["temperature"]</code> = <code>0.2</code> (from file, as a Python float)</td></tr>
+    <tr><td><b>3. Apply overrides</b></td><td><code>_apply_env_overrides(raw)</code></td><td><code>raw["llm"]["temperature"]</code> = <code>"0.7"</code> (overwritten, now a string — that's fine, Pydantic coerces it)</td></tr>
+    <tr><td><b>4. Collect secrets</b></td><td><code>os.environ.get("OPENAI_API_KEY")</code></td><td><code>raw["secrets"] = {"openai_api_key": "sk-abc123", "alpha_vantage_api_key": None}</code></td></tr>
+    <tr><td><b>5. Validate</b></td><td><code>Config(**raw)</code></td><td>Pydantic coerces <code>"0.7"</code> → <code>0.7</code>, checks <code>0.0 ≤ 0.7 ≤ 2.0</code> ✓, returns a typed <code>Config</code> object</td></tr>
+  </table>
+
+  <p>Now imagine <code>FINNIE_LLM__TEMPERATURE=99</code> instead. Steps 1–4 succeed identically. In step 5, Pydantic coerces <code>"99"</code> → <code>99.0</code>, then checks <code>99.0 ≤ 2.0</code> → <b>ValidationError</b>. The app crashes at startup, loudly, with the field name in the message. That is the right behaviour.</p>
+
+  <div class="key"><b>Precedence chain</b> defaults &lt; config.yaml &lt; FINNIE_* env vars &lt; real environment. <code>load_dotenv</code> does NOT overwrite existing env vars, so a value set by CI or a container always wins over the file — exactly right for production.</div>
+
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Why call load_dotenv before reading YAML, not after?</summary><div class="a"><p>Because step 3 reads from <code>os.environ</code>. If <code>load_dotenv</code> ran after, the FINNIE_* variables from the <code>.env</code> file would not yet be in the environment when <code>_apply_env_overrides</code> scanned it. Order here is not a style choice — it is load-order correctness.</p></div></details>
+    <details class="q"><summary>Why inject secrets in step 4 rather than letting the env-override step handle them?</summary><div class="a"><p>Two reasons. The override step writes into nested config keys; secrets live under <code>raw["secrets"]</code> and are injected as a whole sub-dict, which is cleaner. More importantly, the override step does not validate presence — it just writes if the key exists. Secrets get their own explicit check: if <code>OPENAI_API_KEY</code> is absent or blank, <code>RuntimeError</code> is raised right here with the variable name in the message, not discovered later as a <code>None</code> comparison error buried in the OpenAI client.</p></div></details>
+    <details class="q"><summary>What does <code>yaml.safe_load(file) or {}</code> handle?</summary><div class="a"><p>An empty YAML file. <code>yaml.safe_load</code> on an empty file returns <code>None</code>, not an empty dict. Without the <code>or {}</code>, the subsequent dict operations would raise <code>TypeError: 'NoneType' object is not subscriptable</code>. It is a one-token defensive guard against a valid edge case.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 15</div>
+  <h3>Phase 0 — every function and what it does</h3>
+  <p>Right now two files are live in <code>src/core/</code>. Here is what each piece does and <i>why it exists as a separate piece</i>.</p>
+
+  <p><b>src/core/config.py — the schema + loader</b></p>
+  <table>
+    <tr><th>Name</th><th>Type</th><th>What it does</th><th>Who calls it</th></tr>
+    <tr><td><code>AppConfig</code></td><td>Pydantic model</td><td>App name + environment (development/production)</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>LLMConfig</code></td><td>Pydantic model</td><td>GPT model name, temperature (0–2), retries, timeout. The schema that rejects temperature=99.</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>RateLimitConfig</code></td><td>Pydantic model</td><td>Max requests/min and tokens/min — feeds the token bucket in Phase 1</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>RAGConfig</code></td><td>Pydantic model</td><td>Chunk size, overlap, top_k, relevance threshold, FAISS index path. Has a cross-field validator: overlap must be &lt; chunk_size.</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>MarketConfig</code></td><td>Pydantic model</td><td>Primary data source (yfinance), fallback (Alpha Vantage), cache TTL and default tickers like RELIANCE.NS</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>PortfolioConfig</code></td><td>Pydantic model</td><td>Concentration warning threshold (25%), asset-class risk weights</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>GoalsConfig</code></td><td>Pydantic model</td><td>Inflation rate (6% for India) and risk-profile return/volatility pairs (conservative/moderate/aggressive)</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>MemoryConfig</code></td><td>Pydantic model</td><td>How many recent messages to keep verbatim; when to summarise</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>ComplianceConfig</code></td><td>Pydantic model</td><td>The disclaimer text and the banned-phrase list (never "you should buy")</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>LoggingConfig</code></td><td>Pydantic model</td><td>Log level (DEBUG/INFO/WARNING/ERROR), format string, optional log file path</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>Secrets</code></td><td>Pydantic model</td><td>API keys — only ever populated from <code>os.environ</code>, never from YAML</td><td>Wrapped inside <code>Config</code></td></tr>
+    <tr><td><code>Config</code></td><td>Pydantic model</td><td>The root object. Holds all eleven sub-models above. <code>resolve(p)</code> turns a relative path from YAML into an absolute one anchored at the project root.</td><td>Returned by <code>load_config</code></td></tr>
+    <tr><td><code>_apply_env_overrides</code></td><td>Function</td><td>Scans os.environ for FINNIE_* vars and writes them into the raw YAML dict. Double-underscore = nested key. Pure dict mutation — no validation.</td><td><code>load_config</code></td></tr>
+    <tr><td><code>load_config</code></td><td>Function</td><td>The 5-step pipeline: dotenv → YAML → overrides → secrets → Config(**raw). Raises FileNotFoundError or RuntimeError fast if anything is wrong.</td><td><code>get_config</code> (and tests)</td></tr>
+    <tr><td><code>get_config</code></td><td>Function (cached)</td><td>The only function the rest of the codebase should ever call. <code>@lru_cache(maxsize=1)</code> makes it a singleton — YAML is read once, forever. Tests call <code>get_config.cache_clear()</code> to force a fresh load.</td><td>Every module in src/</td></tr>
+  </table>
+
+  <p><b>src/core/logging_setup.py — the logging layer</b></p>
+  <table>
+    <tr><th>Name</th><th>What it does</th><th>Key detail</th></tr>
+    <tr><td><code>setup_logging</code></td><td>Configures the root logger once: format, StreamHandler, optional FileHandler, quiets noisy libraries</td><td>Guarded by <code>_CONFIGURED</code> flag — calling it twice is a no-op. Prevents duplicate handlers in Streamlit.</td></tr>
+    <tr><td><code>get_logger</code></td><td>Returns <code>logging.getLogger(name)</code> after ensuring setup ran</td><td>Always called as <code>get_logger(__name__)</code> — the logger name equals the module path, e.g. <code>src.agents.portfolio</code></td></tr>
+  </table>
+
+  <div class="key"><b>The rule</b>No module in <code>src/</code> ever calls <code>get_config()</code> or <code>get_logger()</code> at module import time. Both are called inside functions, on first use. This prevents circular imports (config.py logging before logging_setup.py is ready) and makes modules cheap to import in tests.</div>
+
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Why are there eleven Pydantic models instead of one flat Config dict?</summary><div class="a"><p>Each sub-model is a natural grouping with its own validation rules. <code>RAGConfig</code> has a cross-field validator (overlap &lt; chunk_size) that makes no sense on <code>LLMConfig</code>. Splitting them means each validator is local to the section it guards, and the autocomplete scope in an editor is narrow — when I type <code>cfg.rag.</code> I only see RAG fields. A flat dict of thirty keys has no such locality.</p></div></details>
+    <details class="q"><summary>What is Config.resolve() for?</summary><div class="a"><p>YAML stores paths as strings relative to the project root (e.g. <code>cache/market</code>). But Python functions need absolute paths. <code>resolve(p)</code> converts a config-relative path to absolute by joining it with <code>PROJECT_ROOT</code> if it is not already absolute. Without it, every consumer would have to know to prefix the project root, which is the kind of repeated knowledge that rots.</p></div></details>
+  </div>
+</div>
+
+<h2>Phase 1 &mdash; LLM client &amp; compliance <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 1</h3><p>Concepts: dependency inversion &middot; generation parameters &middot; exponential backoff with jitter &middot; token-bucket rate limiting &middot; RPM versus TPM on the OpenAI API &middot; model tiering and cost metering &middot; prompt injection and output-side guards.</p></div>
+
+<h2>Phase 2 &mdash; Knowledge base <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 2</h3><p>Concepts: chunk-friendly authoring &middot; metadata design for query-time filtering &middot; source attribution chains &middot; core finance: compound interest, diversification, asset classes, expense ratios.</p></div>
+
+<h2>Phase 3 &mdash; RAG pipeline <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 3</h3><p>Concepts: the full ingest pipeline in code &middot; FAISS index persistence &middot; relevance thresholds and refusal &middot; index types and the recall/latency trade &middot; retrieval evaluation.</p></div>
+
+<h2>Phase 4 &mdash; BaseAgent <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 4</h3><p>Concepts: Template Method pattern &middot; abstract base classes in Python &middot; typed result objects &middot; the registry pattern.</p></div>
+
+<h2>Phase 5 &mdash; Finance Q&amp;A Agent <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 5</h3><p>Concepts: grounded prompt construction &middot; hallucination control via refusal instructions &middot; context-window budgeting &middot; few-shot tone control.</p></div>
+
+<h2>Phase 6 &mdash; Market data <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 6</h3><p>Concepts: TTL caching and cache keys &middot; the fallback ladder and visible staleness &middot; circuit breakers &middot; moving averages and volatility.</p></div>
+
+<h2>Phase 7 &mdash; Portfolio analysis <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 7</h3><p>Concepts: weighted averages &middot; the Herfindahl&ndash;Hirschman Index as a concentration measure &middot; asset-class risk weighting &middot; boundary validation &middot; LLM as explainer, not calculator.</p></div>
+
+<h2>Phase 8 &mdash; Goal planning <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 8</h3><p>Concepts: future value and the annuity formula &middot; solving for contribution &middot; real versus nominal returns &middot; risk tolerance versus risk capacity &middot; why bands beat point estimates.</p></div>
+
+<h2>Phase 9 &mdash; News &amp; tax agents <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 9</h3><p>Concepts: map-reduce summarisation &middot; hedged sentiment labelling &middot; scope boundaries as a prompt concern &middot; near-duplicate deduplication.</p></div>
+
+<h2>Phase 10 &mdash; LangGraph orchestration <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 10</h3><p>Concepts: StateGraph, nodes, conditional edges &middot; reducers and concurrent state writes &middot; intent classification strategies &middot; the supervisor pattern &middot; checkpointing and thread ids &middot; fan-out and synthesis. The heaviest module in this document when it lands.</p></div>
+
+<h2>Phase 11 &mdash; Streamlit UI <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 11</h3><p>Concepts: the rerun execution model &middot; session_state &middot; cache_resource versus cache_data &middot; chart selection &middot; streaming and perceived latency.</p></div>
+
+<h2>Phase 12 &mdash; Testing &amp; docs <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 12</h3><p>Concepts: stub, mock and fake &middot; determinism in LLM tests &middot; pytest fixtures and parametrisation &middot; what coverage does and does not tell you.</p></div>
+
+<h2>Phase 13 &mdash; MCP &amp; innovation <span class="status">pending</span></h2>
+<div class="c pending"><h3>Awaiting Phase 13</h3><p>Concepts: the Model Context Protocol &mdash; tools, resources, prompts, transports &middot; tool schema design &middot; Monte Carlo simulation for goal probability.</p></div>
+
+<h2>System design questions</h2>
+<p class="mdesc">The whole-architecture questions that arrive at the end of an interview. Answerable now; sharper once the build is done.</p>
+<div class="c">
+  <h3>Scale, cost and failure</h3>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Walk me through what happens when a user types a question.</summary><div class="a"><p>The Streamlit callback appends the message to session state and invokes the compiled graph with a thread id. The graph loads checkpointed state, runs the memory node to assemble profile plus windowed history, then the router node classifies intent &mdash; keyword fast path first, LLM classification otherwise. A conditional edge dispatches to one agent node, or fans out to several for a cross-domain query. Each agent gathers what it needs &mdash; retrieval from FAISS, a quote from the cached market layer, pure-Python metrics &mdash; calls the LLM through the rate-limited client, and appends an <code>AgentResult</code> to state. If several ran, a synthesis node merges them. Everything exits through the compliance wrapper, which appends the disclaimer and screens for recommendation language. State is checkpointed and the response streams back with its citations.</p></div></details>
+    <details class="q"><summary>This now has ten thousand concurrent users. What breaks first?</summary><div class="a"><p>The OpenAI rate limits, immediately &mdash; and specifically tokens-per-minute before requests-per-minute, because RAG prompts are large. That becomes a higher usage tier plus a request queue with per-user fairness, and it is the first place I would spend engineering effort. Second, Streamlit: it is single-process and session-affine, so it would be replaced by a FastAPI backend with a separate frontend, which also lets me scale the graph workers independently. Third, the in-process FAISS index is duplicated in every worker's memory; at that point it becomes a shared vector service. The market cache moves from local disk to Redis so a quote is fetched once for all users rather than once per worker. Checkpointing moves to Postgres. Notably, none of that changes the graph or the agents &mdash; which is the payoff of having put every external dependency behind an interface.</p></div></details>
+    <details class="q"><summary>Where does the money go, and how would you cut it?</summary><div class="a"><p>Cost is roughly proportional to tokens, and the dominant term is retrieved context in the Q&amp;A path plus the router's own classification call. Four levers, cheapest first: the keyword fast path skips the router LLM call for obvious queries; semantic caching returns a stored answer for near-identical questions; tighter retrieval &mdash; three well-chosen chunks beat eight mediocre ones on both cost and accuracy; and model tiering, where a small model handles routing and only the final generation uses the larger one. I would instrument tokens per request per node before optimising anything, because guessing which node dominates is how you optimise the wrong one.</p></div></details>
+    <details class="q"><summary>How do you know the system is any good? What do you measure?</summary><div class="a"><p>Layer by layer, because end-to-end vibes are not a metric. Retrieval: a fixed question set with known-correct source documents, scored on recall@k and whether the right chunk makes the top three. Routing: a labelled query set scored as a classification problem, with a confusion matrix &mdash; and the diagonal mistakes matter more than the total, since routing a tax question to Q&amp;A degrades gracefully while routing it to the portfolio agent does not. Generation: faithfulness, meaning every claim is traceable to a retrieved chunk, which an LLM-as-judge can grade at scale once calibrated against my own labels. Plus operational numbers &mdash; latency percentiles, fallback rate, cache hit rate &mdash; and the compliance guard's hit count, which should be zero and is an alarm when it is not.</p></div></details>
+    <details class="q"><summary>What is the weakest part of your system, honestly?</summary><div class="a"><p>The knowledge base. Everything downstream is bounded by it: a hundred articles I curated myself is thin coverage, it reflects my own blind spots, and there is no freshness process &mdash; if tax rules change, nothing tells me. The architecture around it is sound and would support ten thousand articles unchanged, but the content is the bottleneck on answer quality today. Second weakest is routing on genuinely ambiguous multi-intent queries; fan-out helps, but the classification confidence threshold is hand-tuned rather than learned from labelled traffic I do not yet have.</p></div></details>
+  </div>
+</div>
+
+<div class="nores hide" id="nores">No concept matches that search.</div>
+<footer>Companion document: <code>ROADMAP.html</code>. Updated as each phase lands.</footer>
+</div>
+
+<script>
+var TK='finnie.theme';
+try{var t=localStorage.getItem(TK);if(t)document.documentElement.dataset.theme=t}catch(e){}
+document.getElementById('theme').onclick=function(){
+  var cur=document.documentElement.dataset.theme
+    ||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  var next=cur==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=next;
+  try{localStorage.setItem(TK,next)}catch(e){}
+};
+document.getElementById('openall').onclick=function(){
+  document.querySelectorAll('details.q').forEach(function(d){d.open=true})};
+document.getElementById('shutall').onclick=function(){
+  document.querySelectorAll('details.q').forEach(function(d){d.open=false})};
+
+var cards=[].slice.call(document.querySelectorAll('.c'));
+var heads=[].slice.call(document.querySelectorAll('h2'));
+var nores=document.getElementById('nores');
+document.getElementById('q').addEventListener('input',function(e){
+  var s=e.target.value.trim().toLowerCase();
+  var any=false;
+  cards.forEach(function(c){
+    var hit=!s||c.textContent.toLowerCase().indexOf(s)>-1;
+    c.classList.toggle('hide',!hit);
+    if(hit)any=true;
+  });
+  heads.forEach(function(h){
+    var show=!s, n=h.nextElementSibling;
+    while(n&&n.tagName!=='H2'){
+      if(n.classList&&n.classList.contains('c')&&!n.classList.contains('hide'))show=true;
+      n=n.nextElementSibling;
+    }
+    h.classList.toggle('hide',!show);
+    var d=h.nextElementSibling;
+    if(d&&d.classList&&d.classList.contains('mdesc'))d.classList.toggle('hide',!show);
+  });
+  nores.classList.toggle('hide',any);
+});
+</script>
+</body>
+</html>

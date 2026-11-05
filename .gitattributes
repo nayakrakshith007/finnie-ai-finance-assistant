@@ -1,0 +1,19 @@
+# Normalize line endings to LF on commit, convert to OS default on checkout
+* text=auto eol=lf
+
+# Force LF for Python and config files
+*.py text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+*.md text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+
+# Binary files — no line ending conversion
+*.png binary
+*.jpg binary
+*.pdf binary
+*.lock binary

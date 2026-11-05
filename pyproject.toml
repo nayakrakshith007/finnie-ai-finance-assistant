@@ -1,0 +1,145 @@
+
+# ============================================================
+# 1. PYTEST CONFIGURATION
+# ============================================================
+# Pytest is used to execute automated tests for your application.
+# These settings control test discovery, imports and execution.
+
+[tool.pytest.ini_options]
+
+# Add the project root directory to Python's import path.
+# This allows tests to import modules from the project root.
+# Example: from src.agents.finance_agent import FinanceAgent
+#
+# Run pytest from the project root for consistent imports.
+pythonpath = ["."]
+
+# Directory where pytest should look for test files.
+# Example: tests/test_config.py, tests/test_agents.py
+testpaths = ["tests"]
+
+# Default command-line options applied every time pytest runs.
+#
+# -q:
+#   Quiet mode. Displays a concise test execution report.
+#
+# --strict-markers:
+#   Raises an error if a test uses an unregistered pytest marker.
+#   Prevents spelling mistakes in marker names.
+addopts = "-q --strict-markers"
+
+
+# ============================================================
+# 2. CODE COVERAGE CONFIGURATION
+# ============================================================
+# Coverage.py measures how much of your source code is executed
+# when automated tests run.
+#
+# It helps identify application code that has not been tested.
+
+
+# ------------------------------------------------------------
+# 2A. Coverage execution settings
+# ------------------------------------------------------------
+
+[tool.coverage.run]
+
+# Measure code coverage only inside the src directory.
+# This focuses coverage measurement on application source code.
+source = ["src"]
+
+# Exclude specific files/directories from coverage calculations.
+omit = [
+    "*/__init__.py",  # Package initialization files
+    "*/web_app/*"     # Streamlit UI files
+]
+
+
+# ------------------------------------------------------------
+# 2B. Coverage report settings
+# ------------------------------------------------------------
+
+[tool.coverage.report]
+
+# Display line numbers that were not executed during testing.
+# Helps identify exactly which lines need additional tests.
+show_missing = true
+
+# Hide files that already have 100% test coverage.
+# Keeps the coverage report focused on files needing attention.
+skip_covered = true
+
+
+# ============================================================
+# 3. RUFF CONFIGURATION
+# ============================================================
+# Ruff is a Python linting and formatting tool.
+#
+# It identifies:
+# - Unused imports
+# - Undefined variables
+# - Import ordering issues
+# - Outdated Python syntax
+# - Common programming mistakes
+# - Unwanted print() statements
+
+
+# ------------------------------------------------------------
+# 3A. General Ruff settings
+# ------------------------------------------------------------
+
+[tool.ruff]
+
+# Set the preferred maximum line length to 100 characters.
+line-length = 100
+
+# Target Python 3.12.
+# Ruff uses this version when checking Python syntax and compatibility.
+target-version = "py312"
+
+
+# ------------------------------------------------------------
+# 3B. Ruff linting rules
+# ------------------------------------------------------------
+
+[tool.ruff.lint]
+
+# Select which categories of linting rules Ruff should enforce.
+select = [
+    "E",    # pycodestyle: Common Python style errors
+    "F",    # Pyflakes: Unused imports, undefined variables, etc.
+    "I",    # isort: Organizes and sorts Python imports
+    "UP",   # pyupgrade: Suggests modern Python syntax
+    "B",    # flake8-bugbear: Detects potential bugs and bad practices
+    "SIM",  # flake8-simplify: Identifies code simplification opportunities
+    "T20",  # flake8-print: Detects print() statements
+]
+
+# Ignore selected linting rules.
+ignore = [
+    "E501"  # Line-too-long rule; formatting is handled by Ruff formatter
+]
+
+
+# ------------------------------------------------------------
+# 3C. Per-file linting exceptions
+# ------------------------------------------------------------
+# Some directories have legitimate reasons to use print().
+#
+# T20 is enabled globally, but the following directories are
+# explicitly exempted from that rule.
+#
+# Important: Other Ruff rules remain active in these directories.
+
+
+[tool.ruff.lint.per-file-ignores]
+
+# Tests may use print() statements for debugging test execution.
+"tests/*" = ["T20"]
+
+# Standalone CLI scripts may use print() to display terminal output.
+"scripts/*" = ["T20"]
+
+# Streamlit has its own UI output mechanisms.
+# Allow print() statements in the web application directory.
+"src/web_app/*" = ["T20"]

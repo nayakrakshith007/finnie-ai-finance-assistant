@@ -1,0 +1,11 @@
+{
+  "// note": "VS Code shows these as 'Recommended' in the Extensions panel for this workspace.",
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+    "charliermarsh.ruff",
+    "tamasfe.even-better-toml",
+    "redhat.vscode-yaml"
+  ]
+}

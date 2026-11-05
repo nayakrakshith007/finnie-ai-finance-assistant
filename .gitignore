@@ -1,0 +1,35 @@
+# Secrets -- never commit these
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*_secret*
+*_credentials*
+secrets.yaml
+secrets.yml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Generated artifacts -- rebuildable from source, so not source
+data/indexes/*
+!data/indexes/.gitkeep
+data/cache/*
+!data/cache/.gitkeep
+logs/
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db

@@ -1,0 +1,77 @@
+# Finnie -- behavioural configuration.
+#
+# RULE: secrets go in .env, behaviour goes here, logic goes in Python.
+# If you are about to hardcode a number in src/, it probably belongs in this file.
+
+app:
+  name: Finnie
+  environment: development          # development | production
+
+llm:
+  provider: openai
+  model: gpt-4o                     # user-facing generation
+  router_model: gpt-4o-mini         # intent classification only -- runs on every turn
+  temperature: 0.2                  # low: consistency matters more than variety here
+  max_tokens: 1200
+  timeout_seconds: 60
+  max_retries: 3
+
+rate_limit:
+  requests_per_minute: 60           # keep below your OpenAI tier's RPM
+  tokens_per_minute: 150000         # TPM is the limit RAG prompts hit first
+
+rag:
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  embedding_dim: 384
+  chunk_size: 800                   # characters, not tokens
+  chunk_overlap: 100
+  top_k: 4
+  relevance_threshold: 0.35         # below this we decline instead of guessing
+  index_dir: data/indexes
+  knowledge_base_dir: data/knowledge_base
+
+market:
+  primary_source: yfinance
+  fallback_source: alpha_vantage
+  cache_ttl_minutes: 30
+  cache_dir: data/cache
+  default_tickers: [AAPL, MSFT, GOOGL, AMZN, NVDA]
+
+portfolio:
+  concentration_warning_pct: 25.0   # flag any single holding above this
+  risk_weights:                     # crude asset-class risk scores, 1 = safest
+    cash: 1
+    bond: 2
+    etf: 3
+    mutual_fund: 3
+    stock: 4
+    crypto: 5
+
+goals:
+  inflation_rate: 0.06
+  risk_profiles:
+    conservative: {expected_return: 0.07, volatility: 0.05}
+    moderate:     {expected_return: 0.11, volatility: 0.12}
+    aggressive:   {expected_return: 0.14, volatility: 0.20}
+
+memory:
+  max_recent_messages: 10           # kept verbatim; older turns get summarised
+  summarise_after_turns: 10
+
+compliance:
+  disclaimer: >
+    This is educational information, not financial advice. Finnie cannot know your
+    full circumstances. Consult a licensed financial adviser before making any
+    investment decision.
+  banned_phrases:
+    - you should buy
+    - you should sell
+    - i recommend buying
+    - i recommend selling
+    - guaranteed return
+    - risk-free profit
+
+logging:
+  level: INFO                       # DEBUG | INFO | WARNING | ERROR
+  format: "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+  file: logs/finnie.log

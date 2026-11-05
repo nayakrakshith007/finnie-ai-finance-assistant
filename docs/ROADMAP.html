@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finnie Build Roadmap</title>
+<style>
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --panel-2:#f0efec; --ink:#1a1a18; --ink-2:#5c5a55;
+  --ink-3:#8a8781; --line:#e2e0db; --accent:#1f6f5c; --accent-soft:#e3f0ec;
+  --warn:#9a5b1f; --warn-soft:#fbeedd; --stretch:#5a4a8a; --stretch-soft:#ece8f7;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141413; --panel:#1d1d1b; --panel-2:#262624; --ink:#f0efec; --ink-2:#b4b1aa;
+  --ink-3:#86837c; --line:#312f2c; --accent:#6fc0a8; --accent-soft:#1b2b27;
+  --warn:#d9a263; --warn-soft:#2d2318; --stretch:#a99ae0; --stretch-soft:#211d2e;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#141413; --panel:#1d1d1b; --panel-2:#262624; --ink:#f0efec; --ink-2:#b4b1aa;
+  --ink-3:#86837c; --line:#312f2c; --accent:#6fc0a8; --accent-soft:#1b2b27;
+  --warn:#d9a263; --warn-soft:#2d2318; --stretch:#a99ae0; --stretch-soft:#211d2e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:48px 16px 96px}
+header{margin-bottom:40px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.15;margin:.3em 0 .2em;letter-spacing:-.02em}
+.sub{color:var(--ink-2);max-width:62ch;margin:0}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:24px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);
+  color:var(--ink);border-radius:8px;padding:7px 13px;font-size:14px}
+button:hover{background:var(--panel-2)}
+.prog{margin-top:20px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.prog .top{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--ink-2)}
+.prog b{color:var(--ink);font-size:22px;font-variant-numeric:tabular-nums}
+.track{height:8px;background:var(--panel-2);border-radius:99px;margin-top:12px;overflow:hidden}
+.fill{height:100%;background:var(--accent);width:0;transition:width .3s ease;border-radius:99px}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  margin:48px 0 14px;font-weight:700;border-top:1px solid var(--line);padding-top:24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  margin-bottom:14px;box-shadow:var(--shadow);overflow:hidden}
+.card>summary{list-style:none;cursor:pointer;padding:18px 20px;display:grid;
+  grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+.card>summary::-webkit-details-marker{display:none}
+.card>summary:hover{background:var(--panel-2)}
+.num{width:34px;height:34px;flex:none;border-radius:9px;background:var(--accent-soft);color:var(--accent);
+  display:grid;place-items:center;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums}
+.card[data-kind="opt"] .num{background:var(--warn-soft);color:var(--warn)}
+.card[data-kind="stretch"] .num{background:var(--stretch-soft);color:var(--stretch)}
+.ptitle{font-weight:650;font-size:17px;letter-spacing:-.01em}
+.pmeta{font-size:13px;color:var(--ink-3);margin-top:2px}
+.chev{color:var(--ink-3);transition:transform .2s}
+.card[open] .chev{transform:rotate(90deg)}
+.body{padding:4px 20px 22px;border-top:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:18px}
+@media (max-width:720px){.grid{grid-template-columns:1fr}}
+.blk h4{margin:0 0 8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.blk ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--ink-2)}
+.blk li{margin:5px 0}
+.blk li b{color:var(--ink);font-weight:600}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;
+  background:var(--panel-2);padding:1.5px 5px;border-radius:5px;color:var(--ink)}
+.tasks{margin-top:18px;border-top:1px dashed var(--line);padding-top:16px}
+.tasks h4{margin:0 0 10px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+label.t{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:14.5px;color:var(--ink-2);cursor:pointer}
+label.t input{margin-top:4px;accent-color:var(--accent);flex:none;width:15px;height:15px}
+label.t input:checked+span{color:var(--ink-3);text-decoration:line-through}
+.done{margin-top:16px;background:var(--accent-soft);border-radius:9px;padding:11px 14px;font-size:14px;color:var(--ink-2)}
+.done b{color:var(--accent);font-size:11px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:3px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.tag{font-size:11.5px;padding:3px 9px;border-radius:99px;background:var(--accent-soft);
+  color:var(--accent);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:8px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+td{color:var(--ink-2)}
+td b{font-weight:600;color:var(--ink)}
+.pill{display:inline-block;font-size:11.5px;font-weight:650;padding:2px 8px;border-radius:6px;
+  background:var(--accent-soft);color:var(--accent);font-variant-numeric:tabular-nums}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+.note{background:var(--warn-soft);border-left:3px solid var(--warn);padding:12px 16px;
+  border-radius:0 9px 9px 0;font-size:14.5px;color:var(--ink-2);margin-top:14px}
+.note b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Applied Agentic AI &middot; Capstone</div>
+  <h1>Finnie &mdash; Build Roadmap</h1>
+  <p class="sub">A multi-agent AI finance assistant. Fourteen phases, ordered so every phase ends with something runnable, and each one maps to a line in the grading rubric. Tick items off as we go &mdash; progress saves in this browser.</p>
+  <div class="bar">
+    <button id="theme">Toggle theme</button>
+    <button id="expand">Expand all</button>
+    <button id="collapse">Collapse all</button>
+    <button id="reset">Reset progress</button>
+  </div>
+  <div class="prog">
+    <div class="top"><span>Tasks complete</span><span><b id="pc">0</b> <span id="pt">/ 0</span></span></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+</header>
+
+<h2>How we work</h2>
+<div class="card"><div class="body" style="border-top:none;padding-top:18px">
+<p style="margin-top:0;color:var(--ink-2)">Development happens in <b>VS Code</b>, in <code>ai_finance_assistant/</code>. Each phase runs in the same four beats:</p>
+<table>
+<tr><th>#</th><th>Beat</th><th>Who</th></tr>
+<tr><td><b>1</b></td><td>Concept lesson, written into <code>LEARNING_NOTES.html</code></td><td>Me</td></tr>
+<tr><td><b>2</b></td><td>Scaffold: folder layout, class skeletons, type signatures, docstring specs, and acceptance tests that fail</td><td>Me</td></tr>
+<tr><td><b>3</b></td><td>Implementation: fill the <code>TODO(you)</code> bodies until the tests pass</td><td>You</td></tr>
+<tr><td><b>4</b></td><td>Code review line by line, then an interview grilling on that phase's concepts</td><td>Me &rarr; you</td></tr>
+</table>
+<div class="note"><b>Why the tests come before your code.</b> Each phase ships with a <code>tests/</code> file that fails on <code>NotImplementedError</code>. It is your specification, your definition of done, and &mdash; by Phase 12 &mdash; most of the 80% coverage requirement, already written. Never edit a test to make it pass.</div>
+</div></div>
+
+<h2>The stack we are committing to</h2>
+<div class="card"><div class="body" style="border-top:none;padding-top:18px">
+<table>
+<tr><th>Layer</th><th>Choice</th><th>Why this one</th></tr>
+<tr><td><b>Orchestration</b></td><td>LangGraph</td><td>Explicit <code>StateGraph</code>: nodes, edges, typed state. Orchestration is the single highest-weighted rubric item, and a graph is far easier to defend in an interview than CrewAI's implicit role-play.</td></tr>
+<tr><td><b>LLM</b></td><td>GPT-4o, with <code>gpt-4o-mini</code> for routing</td><td>Strong instruction-following and reliable structured outputs, which the router depends on. Paid per token, so we tier it: the cheap model classifies intent, the big one writes user-facing answers. Hidden behind our own interface so it can be swapped.</td></tr>
+<tr><td><b>Embeddings</b></td><td><code>all-MiniLM-L6-v2</code> (local)</td><td>384-dim, CPU-friendly, zero API cost and no rate limit during indexing.</td></tr>
+<tr><td><b>Vector store</b></td><td>FAISS, flat inner-product</td><td>In-process, no server, exact search. 100 articles is far too small for an approximate index to pay off.</td></tr>
+<tr><td><b>Market data</b></td><td>yfinance primary, Alpha Vantage fallback</td><td>yfinance needs no key; Alpha Vantage gives us a genuine rate-limit problem to engineer around.</td></tr>
+<tr><td><b>UI</b></td><td>Streamlit</td><td>Four tabs, native charts, <code>session_state</code> for conversation memory. Named explicitly in the rubric.</td></tr>
+<tr><td><b>Tests</b></td><td>pytest + pytest-cov</td><td>A fake LLM and a fake price feed keep tests deterministic and offline.</td></tr>
+</table>
+<div class="note"><b>Compliance is not optional.</b> Every user-facing response carries an educational-use disclaimer, and no agent is ever permitted to say &ldquo;buy&rdquo; or &ldquo;sell&rdquo;. That is both a stated requirement of the problem statement and part of the 20% Financial Domain Knowledge score.</div>
+</div></div>
+
+<h2>Phases</h2>
+<div id="phases"></div>
+
+<h2>Rubric coverage</h2>
+<div class="card"><div class="body" style="border-top:none;padding-top:18px">
+<table>
+<tr><th>Criterion</th><th>Points</th><th>Earned in phase</th></tr>
+<tr><td><b>Multi-Agent Architecture</b></td><td><span class="pill">10</span></td><td>4, 5, 6, 7, 8, 9</td></tr>
+<tr><td><b>LangGraph Workflow</b></td><td><span class="pill">10</span></td><td>10</td></tr>
+<tr><td><b>RAG Implementation</b></td><td><span class="pill">8</span></td><td>2, 3</td></tr>
+<tr><td><b>Real-time Data Integration</b></td><td><span class="pill">7</span></td><td>6</td></tr>
+<tr><td><b>Web Interface</b></td><td><span class="pill">10</span></td><td>11</td></tr>
+<tr><td><b>Conversational Flow</b></td><td><span class="pill">8</span></td><td>10, 11</td></tr>
+<tr><td><b>Data Visualization</b></td><td><span class="pill">7</span></td><td>11</td></tr>
+<tr><td><b>Educational Content</b></td><td><span class="pill">8</span></td><td>2</td></tr>
+<tr><td><b>Portfolio Analysis</b></td><td><span class="pill">7</span></td><td>7</td></tr>
+<tr><td><b>Market Intelligence</b></td><td><span class="pill">5</span></td><td>6</td></tr>
+<tr><td><b>Code Organization</b></td><td><span class="pill">5</span></td><td>1, then every phase after</td></tr>
+<tr><td><b>Documentation</b></td><td><span class="pill">5</span></td><td>12</td></tr>
+<tr><td><b>Testing</b></td><td><span class="pill">5</span></td><td>12</td></tr>
+<tr><td><b>MCP Server</b> (bonus)</td><td><span class="pill">5</span></td><td>13</td></tr>
+<tr><td><b>Innovation</b> (bonus)</td><td><span class="pill">10</span></td><td>13</td></tr>
+</table>
+</div></div>
+
+<footer>Built from <code>AI Finance Assistant - Problem Statement.docx</code>, <code>AI Finance Assistant - Project Milestones.docx</code> and <code>Grading Rubric_AI Finance Assistant.xlsx</code>. Companion document: <code>LEARNING_NOTES.html</code>.</footer>
+</div>
+
+<script>
+const PHASES=[
+{n:0,t:"Environment &amp; project skeleton",kind:"core",meta:"A runnable repo &mdash; nothing intelligent yet",
+ build:["The exact folder tree the rubric asks for, with <code>__init__.py</code> in every package","<code>requirements.txt</code>, plus a lock file generated after install","<code>.env.example</code> and <code>.gitignore</code>, so no key is ever committed","<code>config.yaml</code> as the single source of tunables, with a typed pydantic schema","A <code>logging</code> setup that every module uses from day one","<code>pyproject.toml</code> &mdash; pytest paths, coverage scope, and a ruff rule that bans <code>print</code> inside <code>src/</code>","<code>.vscode/</code> &mdash; interpreter, test discovery, format-on-save, debug configurations"],
+ learn:["<b>Virtual environments</b> &mdash; why dependency isolation exists at all","<b>12-factor config</b> &mdash; secrets in env, behaviour in YAML, nothing in code","<b>Package vs module</b> and how Python resolves imports","<b>Structured logging</b> versus <code>print</code>"],
+ tasks:["Create the venv and activate it","Install dependencies, then <code>pip freeze &gt; requirements.lock.txt</code>","Copy <code>.env.example</code> to <code>.env</code> and add your OpenAI key","Point VS Code at <code>.venv</code> as the interpreter","Implement <code>_apply_env_overrides</code>","Implement <code>load_config</code>","Implement <code>setup_logging</code> and <code>get_logger</code>","Get all of <code>tests/test_config.py</code> green"],
+ done:"<code>pytest -v</code> passes every test in <code>tests/test_config.py</code>, and <code>ruff check src</code> is clean.",
+ tags:["Code Organization 5pt"]},
+
+{n:1,t:"Config, LLM client &amp; the compliance layer",kind:"core",meta:"One seam for every model call",
+ build:["<code>core/llm.py</code> &mdash; a thin wrapper exposing <code>generate(prompt, system)</code>","Retry with exponential backoff and jitter","A token-bucket rate limiter sized to your OpenAI tier's RPM <i>and</i> TPM","A cost meter: tokens and dollars logged per call, per node","<code>core/compliance.py</code> &mdash; disclaimer injection and a banned-phrase guard","A <code>FakeLLM</code> for offline, deterministic tests"],
+ learn:["<b>Dependency inversion</b> &mdash; agents depend on an interface, never on the OpenAI SDK directly","<b>Temperature, top-p, max tokens</b> &mdash; what each one actually changes","<b>Exponential backoff with jitter</b> &mdash; and why the jitter matters","<b>Token bucket vs leaky bucket</b> rate limiting","<b>RPM vs TPM</b> &mdash; two independent OpenAI limits, and why long RAG prompts hit the second one first","<b>Model tiering</b> &mdash; cheap model for classification, expensive model for prose","<b>Prompt injection</b> &mdash; and why the compliance guard runs on output, not input"],
+ tasks:["Implement the LLM interface and the OpenAI adapter","Add retry, rate limiting and the cost meter","Write the compliance wrapper and the banned-phrase list","Implement <code>FakeLLM</code>","Smoke test: one real call, one faked call"],
+ done:"Real and fake clients satisfy the same interface, and a response containing &ldquo;you should buy&rdquo; is caught by the guard.",
+ tags:["Code Organization 5pt"]},
+
+{n:2,t:"Knowledge base curation",kind:"core",meta:"50&ndash;100 articles plus a glossary &mdash; the data RAG feeds on",
+ build:["<code>data/knowledge_base/</code> &mdash; one Markdown file per article with YAML front matter (<code>title, category, source, tags</code>)","Categories: basics, stocks, bonds, ETFs, mutual funds, risk, diversification, retirement accounts, tax, behavioural finance","<code>glossary.json</code> &mdash; 100+ terms","<code>sample_portfolios.json</code> &mdash; three fixtures for testing","A validator script that rejects malformed front matter"],
+ learn:["<b>Chunk-friendly writing</b> &mdash; why one idea per heading beats long prose","<b>Metadata design</b> &mdash; deciding now which filter dimensions you will want at query time","<b>Source attribution</b> &mdash; the citation chain that makes the system trustworthy","Core finance: compound interest, diversification, asset classes, expense ratios, risk tolerance"],
+ tasks:["Fix the front-matter schema and write the validator","Draft 50 articles minimum, 100 for the top rubric band","Build the glossary","Create three sample portfolios at different risk levels","Get a clean validator run"],
+ done:"The validator passes on every file and reports a count of 50 or more articles.",
+ tags:["Educational Content 8pt","RAG 8pt"]},
+
+{n:3,t:"RAG pipeline",kind:"core",meta:"Chunk &rarr; embed &rarr; FAISS &rarr; retrieve &rarr; cite",
+ build:["<code>rag/chunker.py</code> &mdash; heading-aware splitting with overlap","<code>rag/embedder.py</code> &mdash; batched sentence-transformer encoding","<code>rag/vector_store.py</code> &mdash; FAISS index plus a parallel metadata store, persisted to disk","<code>rag/retriever.py</code> &mdash; top-k with a relevance floor and an optional category filter","<code>scripts/build_index.py</code> &mdash; one command rebuilds everything"],
+ learn:["<b>Embeddings</b> &mdash; text as geometry, and why cosine similarity means relatedness","<b>The chunking trade-off</b> &mdash; small chunks retrieve precisely, large chunks preserve context","<b>Normalise, then inner product</b> &mdash; how that gives you cosine similarity in FAISS","<b>Index types</b> &mdash; <code>IndexFlatIP</code> vs <code>IVF</code> vs <code>HNSW</code>, and when losing recall is worth it","<b>Relevance thresholds</b> &mdash; refusing to answer beats a confident hallucination","<b>Why the vector store holds no text</b> &mdash; ids map out to a metadata store"],
+ tasks:["Implement the chunker and eyeball five chunks for sanity","Embed, build the FAISS index, persist it","Implement retrieval with threshold and filter","Attach citation objects to results","Hand-test ten queries and record retrieval quality"],
+ done:"&ldquo;What is an expense ratio?&rdquo; returns three or more chunks above threshold with correct source titles, and an unrelated query returns nothing at all.",
+ tags:["RAG 8pt"]},
+
+{n:4,t:"BaseAgent abstraction",kind:"core",meta:"The contract all six agents obey",
+ build:["<code>agents/base.py</code> &mdash; abstract class with <code>name</code>, <code>description</code>, <code>system_prompt</code>, <code>can_handle()</code> and <code>run(state) -&gt; AgentResult</code>","An <code>AgentResult</code> dataclass: <code>answer</code>, <code>citations</code>, <code>data</code>, <code>confidence</code>, <code>agent_name</code>","Shared error handling, so one failing agent never kills a turn","A registry, so the router discovers agents instead of hardcoding them"],
+ learn:["<b>Template Method pattern</b> &mdash; the base controls the flow, subclasses fill in steps","<b>ABCs and <code>@abstractmethod</code></b> in Python","<b>Separation of concerns</b> &mdash; the rubric's exact phrase for this criterion","<b>Why a typed result object</b> beats returning a bare string","<b>Registry pattern</b> for extensibility"],
+ tasks:["Define <code>AgentResult</code>","Write the abstract base with shared logging and error capture","Build the registry","Write a trivial EchoAgent to prove the contract works","Unit-test the base through a stub subclass"],
+ done:"A stub agent registers itself and runs the whole base lifecycle against <code>FakeLLM</code>.",
+ tags:["Multi-Agent 10pt"]},
+
+{n:5,t:"Finance Q&amp;A Agent",kind:"core",meta:"The first real agent &mdash; RAG grounded",
+ build:["Retrieve, build a grounded prompt, generate, attach citations","A system prompt that forbids answering beyond the retrieved context","A graceful &ldquo;that isn't in my knowledge base&rdquo; path","A glossary short-circuit for pure definition queries"],
+ learn:["<b>Grounded prompting</b> &mdash; context, question and instructions ordered deliberately","<b>Hallucination control</b> &mdash; the refusal instruction, and why it works","<b>Context-window budgeting</b> &mdash; how many chunks actually fit","<b>Few-shot vs zero-shot</b> for controlling tone","<b>Citations as architecture</b>, not decoration"],
+ tasks:["Write and iterate on the system prompt","Wire retrieval into the prompt builder","Handle the empty-retrieval case","Add the glossary fast path","Test fifteen education questions end to end"],
+ done:"Every answer traces back to a source file, and out-of-scope questions are declined rather than invented.",
+ tags:["Multi-Agent 10pt","Educational Content 8pt"]},
+
+{n:6,t:"Market data layer + Market Analysis Agent",kind:"core",meta:"Live data, caching, and failing well",
+ build:["<code>data/market.py</code> &mdash; a yfinance adapter for quotes, history and basic fundamentals","A 30-minute TTL cache with on-disk persistence","A fallback ladder: Alpha Vantage, then stale cache, then mock data","A freshness timestamp returned with every quote","Market Analysis Agent &mdash; moving averages, percentage change, volatility, plain-English interpretation"],
+ learn:["<b>Caching strategy</b> &mdash; TTL, cache keys, cache stampede","<b>Graceful degradation</b> &mdash; the fallback ladder, and why staleness must be visible to the user","<b>Rate limits and circuit breakers</b>","<b>Deterministic maths outside the LLM</b> &mdash; compute in Python, let the model narrate","Finance: moving averages, volatility, what a 52-week range tells you"],
+ tasks:["Implement the yfinance adapter","Add the TTL cache and persistence","Build the fallback ladder, then test it by killing the network","Compute the indicator set","Build the agent and verify freshness labelling"],
+ done:"With Wi-Fi off, a quote request still returns cached data clearly marked stale instead of raising.",
+ tags:["Real-time Data 7pt","Market Intelligence 5pt"]},
+
+{n:7,t:"Portfolio Analysis Agent",kind:"core",meta:"Real maths first, narration second",
+ build:["A portfolio schema with validation: holdings, quantities, cost basis","Metrics: total value, allocation % per holding and per class, weighted expense ratio, HHI diversification score, concentration flags, a simple risk score","Live valuation through the Phase 6 layer","A narration prompt that explains the numbers and never recommends a trade"],
+ learn:["<b>Weighted averages</b> &mdash; and why naively averaging expense ratios is wrong","<b>Herfindahl&ndash;Hirschman Index</b> as a concentration measure","<b>Asset-class risk weighting</b> and its limits","<b>Validation at the boundary</b> &mdash; reject bad input before it reaches the maths","<b>The LLM explains, it does not calculate</b> &mdash; the most important design rule in this phase"],
+ tasks:["Define and validate the portfolio schema","Implement every metric as a pure function","Unit-test metrics against hand-computed fixtures","Wire in live prices","Write the narration prompt with the no-advice constraint"],
+ done:"A sample portfolio produces metrics matching hand calculations, with a readable explanation and no recommendation language anywhere.",
+ tags:["Portfolio Analysis 7pt","Multi-Agent 10pt"]},
+
+{n:8,t:"Goal Planning Agent",kind:"core",meta:"Projections that respect risk appetite",
+ build:["Future-value and required-contribution solvers","A risk questionnaire mapping to conservative / moderate / aggressive, each with an expected return and volatility band","A deterministic projection plus a low / expected / high band","Inflation adjustment and a time-horizon sanity check","The projection series returned as data for the UI to chart"],
+ learn:["<b>Compound interest and future value</b> &mdash; the formula and the assumptions buried in it","<b>Solving for contribution</b> &mdash; rearranging the annuity formula","<b>Real vs nominal returns</b>","<b>Risk tolerance vs risk capacity</b>","<b>Why a band beats a point estimate</b> &mdash; and why Monte Carlo is the Phase 13 upgrade"],
+ tasks:["Implement FV, PMT and real-return helpers","Encode the three risk profiles","Build the projection series generator","Add goal feasibility verdict logic","Check the output against a spreadsheet"],
+ done:"&ldquo;&#8377;50 lakh in 15 years, moderate risk&rdquo; returns a required monthly contribution, a feasibility verdict and a chartable series.",
+ tags:["Multi-Agent 10pt","Data Viz 7pt"]},
+
+{n:9,t:"News Synthesizer &amp; Tax Education Agents",kind:"core",meta:"Agents five and six &mdash; this reaches the top rubric band",
+ build:["News agent &mdash; fetch headlines per ticker or topic, cluster, summarise, label sentiment, always link out","Tax agent &mdash; account types, capital-gains basics, tax-loss harvesting as a concept, with a hard &ldquo;consult a professional&rdquo; boundary","Both grounded: news in the fetched articles, tax in the knowledge base"],
+ learn:["<b>Map-reduce summarisation</b> across many documents","<b>Sentiment labelling</b> &mdash; and why it has to be hedged","<b>Scope boundaries as a prompt concern</b> &mdash; education versus advice","<b>Deduplication</b> of near-identical headlines"],
+ tasks:["Wire up a news source","Implement cluster-then-summarise","Build the tax knowledge subset","Write both system prompts with explicit boundaries","Verify all six agents are registered"],
+ done:"All six agents run independently and the registry lists six distinct capabilities.",
+ tags:["Multi-Agent 10pt"]},
+
+{n:10,t:"LangGraph workflow orchestration",kind:"core",meta:"The highest-value phase in the project",
+ build:["An <code>AgentState</code> TypedDict: messages, user profile, route, agent results, citations, errors","A router node &mdash; LLM classification, with a keyword fast path and a confidence fallback","Conditional edges out to each agent node","Multi-agent fan-out plus a synthesis node for queries spanning domains","A memory node: rolling window plus profile extraction","An error/fallback node reachable from every agent","A checkpointer, so a conversation survives a rerun","A graph visualisation exported for the README"],
+ learn:["<b>StateGraph</b> &mdash; nodes, edges, conditional edges, <code>END</code>","<b>Reducers</b> &mdash; how <code>Annotated[list, add]</code> merges concurrent writes","<b>Why a state machine beats a chain</b> &mdash; inspectable, testable, resumable","<b>Intent classification</b> &mdash; LLM vs keyword vs embedding routing, and what each costs","<b>The supervisor pattern</b> &mdash; and why we fan out rather than letting agents call each other","<b>Checkpointing and thread ids</b>","<b>Context preservation</b> &mdash; what to keep, what to summarise, what to drop"],
+ tasks:["Define the state schema with reducers","Build the router and its fallback path","Add all six agent nodes and the conditional edges","Implement fan-out plus synthesis","Add memory and profile extraction","Add the error node and a checkpointer","Export the graph diagram","Test routing across 25 varied queries"],
+ done:"A five-turn conversation that switches domain mid-way keeps its context, routes correctly, and a deliberately broken agent degrades to the fallback instead of crashing.",
+ tags:["LangGraph 10pt","Conversational Flow 8pt"]},
+
+{n:11,t:"Streamlit interface",kind:"core",meta:"Four tabs, real charts",
+ build:["<b>Chat</b> &mdash; streaming responses, citation expanders, a visible routing badge","<b>Portfolio</b> &mdash; input or upload, allocation pie, holdings bar, metric cards","<b>Market</b> &mdash; ticker lookup, price history line, indicator cards, freshness badge","<b>Goals</b> &mdash; risk questionnaire, projection chart with band, contribution readout","Sidebar: profile, knowledge-base stats, disclaimer","Conversation persisted through <code>session_state</code>"],
+ learn:["<b>Streamlit's rerun model</b> &mdash; the whole script re-executes on every interaction","<b>session_state</b> as the only thing that survives a rerun","<b><code>@st.cache_resource</code> vs <code>@st.cache_data</code></b> &mdash; never re-embed the index on a click","<b>Chart choice</b> &mdash; pie for composition, line for time, bar for comparison","<b>Streaming UX</b> and perceived latency","<b>Designing for beginners</b> &mdash; progressive disclosure, no unexplained jargon"],
+ tasks:["Scaffold the four tabs and the sidebar","Cache the index and the graph as resources","Build chat with streaming and citations","Build the portfolio dashboard","Build the market and goals views","Check mobile width, empty states and error states"],
+ done:"A newcomer can move chat &rarr; portfolio &rarr; market &rarr; goal without instructions, and nothing re-indexes on a rerun.",
+ tags:["Web Interface 10pt","Data Viz 7pt","Conversational Flow 8pt"]},
+
+{n:12,t:"Tests, documentation &amp; demo",kind:"opt",meta:"15% of the grade, and the cheapest points on offer",
+ build:["Unit tests: metrics, chunker, cache, router, compliance guard","Integration tests: full graph runs against <code>FakeLLM</code> and a fake price feed","Edge cases: empty portfolio, malformed query, API down, empty retrieval","<code>pytest --cov</code> at 80% or above","README: architecture diagram, setup, API docs, usage examples, troubleshooting","<code>DESIGN.md</code>: architecture decisions, agent protocol, RAG details, performance notes","A 5&ndash;10 minute demo video","Dockerfile, <code>.env.example</code>, sample data"],
+ learn:["<b>Test doubles</b> &mdash; stub, mock, fake, and which one each case needs","<b>Determinism</b> &mdash; why you never test against a live LLM","<b>Fixtures and parametrisation</b> in pytest","<b>Coverage is a floor, not a goal</b>","<b>Writing docs for an evaluator</b> who has ten minutes"],
+ tasks:["Write unit tests per module","Write graph integration tests","Cover the edge cases","Reach 80% coverage","Write README and DESIGN.md","Record the demo","Add Docker and the env example"],
+ done:"<code>pytest --cov</code> reports 80%+ and a clean clone runs from the README alone.",
+ tags:["Testing 5pt","Documentation 5pt"]},
+
+{n:13,t:"MCP server &amp; innovation",kind:"stretch",meta:"Up to 15 bonus points",
+ build:["An MCP server exposing finance tools: <code>get_quote</code>, <code>analyze_portfolio</code>, <code>search_knowledge</code>, <code>project_goal</code>","Claude Desktop config plus protocol documentation","One innovation, done well: Monte Carlo simulation, voice input, chart-image analysis, or a behavioural-bias detector","A written technical roadmap for future work"],
+ learn:["<b>Model Context Protocol</b> &mdash; tools, resources, prompts; stdio vs SSE transport","<b>Tool schema design</b> &mdash; descriptions are prompts aimed at the calling model","<b>Monte Carlo</b> &mdash; sampling returns to get a probability of success instead of one number","<b>Why MCP generalises your work</b> &mdash; the same tools, any client"],
+ tasks:["Implement the MCP server","Wire it into Claude Desktop and document it","Build one innovation feature well","Write the future-directions roadmap"],
+ done:"Claude Desktop calls your tools successfully, and one innovation feature is demoable.",
+ tags:["MCP 5pt","Innovation 10pt"]}
+];
+
+const host=document.getElementById('phases');
+host.innerHTML=PHASES.map(function(p){return ''+
+'<details class="card" data-kind="'+p.kind+'" id="p'+p.n+'">'+
+  '<summary>'+
+    '<span class="num">'+p.n+'</span>'+
+    '<span><span class="ptitle">'+p.t+'</span><div class="pmeta">'+p.meta+'</div></span>'+
+    '<span class="chev">&#9656;</span>'+
+  '</summary>'+
+  '<div class="body">'+
+    '<div class="grid">'+
+      '<div class="blk"><h4>What we build</h4><ul>'+p.build.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div>'+
+      '<div class="blk"><h4>Concepts you will learn</h4><ul>'+p.learn.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div>'+
+    '</div>'+
+    '<div class="tasks"><h4>Checklist</h4>'+
+      p.tasks.map(function(x,i){return '<label class="t"><input type="checkbox" data-k="p'+p.n+'t'+i+'"><span>'+x+'</span></label>'}).join('')+
+    '</div>'+
+    '<div class="done"><b>Done when</b>'+p.done+'</div>'+
+    '<div class="tags">'+p.tags.map(function(t){return '<span class="tag">'+t+'</span>'}).join('')+'</div>'+
+  '</div>'+
+'</details>'}).join('');
+
+var KEY='finnie.roadmap.v1';
+var state={};
+try{state=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){state={}}
+var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox]'));
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function paint(){
+  var n=boxes.filter(function(b){return b.checked}).length;
+  document.getElementById('pc').textContent=n;
+  document.getElementById('pt').textContent='/ '+boxes.length;
+  document.getElementById('fill').style.width=(100*n/boxes.length)+'%';
+}
+boxes.forEach(function(b){
+  b.checked=!!state[b.dataset.k];
+  b.addEventListener('change',function(){state[b.dataset.k]=b.checked;save();paint()});
+});
+paint();
+document.getElementById('reset').onclick=function(){
+  if(!confirm('Clear all checkboxes?'))return;
+  state={};save();boxes.forEach(function(b){b.checked=false});paint();
+};
+document.getElementById('expand').onclick=function(){
+  document.querySelectorAll('#phases .card').forEach(function(d){d.open=true})};
+document.getElementById('collapse').onclick=function(){
+  document.querySelectorAll('#phases .card').forEach(function(d){d.open=false})};
+var TK='finnie.theme';
+try{var t=localStorage.getItem(TK);if(t)document.documentElement.dataset.theme=t}catch(e){}
+document.getElementById('theme').onclick=function(){
+  var cur=document.documentElement.dataset.theme
+    ||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  var next=cur==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=next;
+  try{localStorage.setItem(TK,next)}catch(e){}
+};
+</script>
+</body>
+</html>
