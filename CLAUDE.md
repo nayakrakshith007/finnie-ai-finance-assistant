@@ -86,7 +86,7 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 | LLM | GPT-4o, `gpt-4o-mini` for routing | Reliable structured outputs; model tiering controls cost |
 | Embeddings | OpenAI `text-embedding-3-small` @ **512-dim** | Matryoshka truncation: 67% smaller index for <5% quality loss. Costs ~$0.01 per full re-index. *(Was planned as local 384-dim MiniLM; changed deliberately on 2026-11-08 for retrieval quality — `tests/test_config.py` asserts 512)* |
 | Vector store | ChromaDB | Stores vectors + metadata together natively; simpler than FAISS + separate metadata dict |
-| Market data | yfinance primary, Alpha Vantage fallback | yfinance free; Alpha Vantage teaches real rate-limit engineering |
+| Market data | yfinance primary, Alpha Vantage fallback | yfinance free; Alpha Vantage teaches real rate-limit engineering. **Always call it "yfinance data", never "NSE data"** — yfinance reads Yahoo, a redistributor with a ~15-min delay, so "exchange data" overstates both freshness and provenance |
 | UI | Streamlit | Named in rubric; `session_state` handles conversation memory |
 | Tests | pytest + pytest-cov | FakeLLM + fake price feed = deterministic, offline |
 

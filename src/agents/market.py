@@ -1,4 +1,12 @@
-"""Market Analysis Agent — live NSE/BSE quotes, interpreted (PRD FR-011, FR-033).
+"""Market Analysis Agent — yfinance quotes, interpreted (PRD FR-011, FR-033).
+
+Terminology
+-----------
+Call it **yfinance data**, never "NSE data" or "exchange data". yfinance reads
+Yahoo Finance, which redistributes the exchange feed with a delay of roughly 15
+minutes. The listings covered are NSE and BSE ones, but the *source* is Yahoo via
+yfinance, and the difference is the whole reason `Quote` carries `as_of` and a
+provenance label: Finnie is fit for education and unfit for trading.
 
 The division of labour
 ----------------------
@@ -47,7 +55,7 @@ logger = get_logger(__name__)
 MAX_SYMBOLS = 3
 
 NO_SYMBOL_REPLY = (
-    "I can look up live prices for NSE and BSE listed companies and for the Indian "
+    "I can look up prices for NSE and BSE listed companies and for the Indian "
     "indices — NIFTY 50, SENSEX and BANK NIFTY. Which one would you like? You can "
     "give me a name (Reliance, TCS) or a ticker (RELIANCE.NS)."
 )
@@ -147,7 +155,8 @@ class MarketAnalysisAgent(BaseAgent):
 
     name = "market_analysis"
     description = (
-        "Looks up live prices, daily percentage change and 30/90-day trends for "
+        "Looks up prices (via yfinance, delayed), daily percentage change and "
+        "30/90-day trends for "
         "NSE and BSE listed companies and for the Indian indices (NIFTY 50, SENSEX, "
         "BANK NIFTY), then explains what the movement means. Use this whenever a "
         "specific company or index is named and the user wants its price, "

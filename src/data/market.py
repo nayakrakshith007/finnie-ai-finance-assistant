@@ -95,7 +95,7 @@ class Quote:
             QuoteSource.LIVE: f"as of {stamp}",
             QuoteSource.CACHE: f"as of {stamp}, cached",
             QuoteSource.STALE_CACHE: f"as of {stamp} — STALE, the live feed is unavailable",
-            QuoteSource.MOCK: "SAMPLE DATA — no live feed available, not a real price",
+            QuoteSource.MOCK: "SAMPLE DATA — no price feed available, not a real price",
         }[self.source]
 
 

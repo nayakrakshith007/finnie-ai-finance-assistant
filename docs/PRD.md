@@ -158,7 +158,7 @@ Format: `FR-ID · Priority · Requirement · Acceptance criteria`. P0 = submissi
 | ID | Pri | Agent | Requirement & acceptance criteria |
 |---|---|---|---|
 | FR-010 | P0 | **Finance Q&A** | RAG-grounded answers with ≥ 1 citation; refuses when top-k relevance is below threshold; beginner reading level |
-| FR-011 | P0 | **Market Analysis** | Live quote, % change, and 30/90-day trend for NSE/BSE tickers plus NIFTY 50 / SENSEX indices; *interprets* (what a 2% drop does and does not mean), never predicts; a non-Indian ticker returns a clear out-of-scope message |
+| FR-011 | P0 | **Market Analysis** | Quote (yfinance, ~15-min delayed — termed **yfinance data**, never "NSE data"), % change, and 30/90-day trend for NSE/BSE tickers plus NIFTY 50 / SENSEX indices; *interprets* (what a 2% drop does and does not mean), never predicts; a non-Indian ticker returns a clear out-of-scope message |
 | FR-012 | P0 | **Portfolio Analysis** | Accepts holdings; returns total value, allocation %, asset-class breakdown, concentration + diversification score, expense-ratio note, risk band; every metric a pure, hand-fixture-tested function |
 | FR-013 | P0 | **Goal Planning** | Goal amount + horizon + risk appetite → required monthly SIP, compound projection, inflation-adjusted target, allocation template; math unit-tested against hand calculations |
 | FR-014 | P1 | **News Synthesizer** | Fetches recent headlines for a ticker or theme, summarises in ≤ 5 bullets with source links, flags sentiment as uncertain |
@@ -291,7 +291,7 @@ User ──> Streamlit UI (4 tabs, session_state)
 | LLM | `gpt-4o` reasoning / `gpt-4o-mini` routing | Reliable structured outputs; model tiering cuts cost roughly 10x on the highest-frequency call |
 | Embeddings | `text-embedding-3-small` at 512-dim (matryoshka reduction) | **Correction to earlier notes:** `CLAUDE.md` claims local `all-MiniLM-L6-v2`, but `config.yaml` actually uses OpenAI `text-embedding-3-small` truncated to 512-dim — 67% smaller index for under 5% quality loss. It is an API call, but a trivially cheap one: re-embedding the whole 100-article KB costs roughly $0.01. Defence for the 512-dim choice: matryoshka embeddings degrade gracefully when truncated, unlike a naive dimensional cut |
 | Vector store | ChromaDB | Stores vectors and metadata together, enabling category-filtered retrieval; FAISS needs a parallel metadata dict |
-| Market data | yfinance primary, Alpha Vantage fallback | yfinance is free and covers NSE/BSE; Alpha Vantage's hard rate limit is the realistic place to demonstrate backoff engineering |
+| Market data | yfinance primary, Alpha Vantage fallback | **Terminology: every market number is "yfinance data", not "NSE data".** yfinance reads Yahoo Finance, a redistributor of the exchange feed with a ~15-minute delay; NSE publishes no free public API and the official route is a paid vendor licence. Calling it exchange data would overstate both its freshness and its provenance, which is why `Quote` carries `as_of` and a source label. yfinance is free and covers NSE/BSE listings; Alpha Vantage's hard rate limit is the realistic place to demonstrate backoff engineering |
 | UI | Streamlit | Named in the rubric; `session_state` is a sufficient memory substrate for a single-session app |
 | Tests | pytest + `FakeListChatModel` + fake price feed | Deterministic and offline — a grader with no API key can still run the suite |
 

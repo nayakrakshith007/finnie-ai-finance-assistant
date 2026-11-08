@@ -50,7 +50,7 @@ class FinanceQAAgent(BaseAgent):
         "Answers general questions about personal finance concepts, instruments and "
         "Indian tax rules using the curated knowledge base — what a SIP is, how PPF "
         "works, capital gains treatment, insurance basics, budgeting. Use this for "
-        "anything conceptual or definitional. Do NOT use it for live prices, a user's "
+        "anything conceptual or definitional. Do NOT use it for market prices, a user's "
         "own portfolio, or goal projections."
     )
 
