@@ -2,6 +2,8 @@
   "_about": {
     "purpose": "Labelled query set for the supervisor router gate (PRD FR-002: >= 90% accuracy).",
     "authored": "2026-11-08 by Claude, for review and acceptance by the author before it becomes the gate.",
+    "status": "ACCEPTED by the author on 2026-11-08. These labels are now the FR-002 gate: scripts/eval_router.py --strict must pass at >= 90% strict accuracy. Labels are frozen from this point — a future routing change that drops below the gate is a regression in the router, not a reason to relabel a query. Changing a label requires the same review this set got, and a note here saying what changed and why.",
+    "baseline_at_acceptance": "95.0% strict (38/40), 100% lenient (40/40), gpt-4o-mini, run 2026-11-08. Full per-query result in data/router_eval_results.json. The two non-strict results were r23 and r38, both labelled ambiguous, where the router chose a route listed in also_acceptable.",
     "how_to_read": {
       "expected": "The agent(s) a careful human would route this to. Order matters for compound queries: it is the execution order.",
       "also_acceptable": "Other routes that are defensible for a genuinely ambiguous query. Scored separately as lenient accuracy, so the strict number is never quietly inflated.",
@@ -20,15 +22,15 @@
 
     {"id": "r06", "query": "What is the price of RELIANCE today?", "expected": ["market_analysis"], "why": "Names a ticker, wants a live quote."},
     {"id": "r07", "query": "How has TCS performed over the last month?", "expected": ["market_analysis"], "why": "30-day trend on a named ticker (FR-011)."},
-    {"id": "r08", "query": "Where is the NIFTY 50 trading?", "expected": ["market_analysis"], "why": "Index quote."},
+    {"id": "r08", "query": "Where is the NIFTY 50 trading?", "expected": ["market_analysis"], "why": "An index quote. NIFTY 50 must resolve to the symbol ^NSEI, which is why the index aliases live in the market agent rather than in the router."},
     {"id": "r09", "query": "Compare HDFCBANK and ICICIBANK share prices", "expected": ["market_analysis"], "why": "Two tickers, one agent: the market agent handles up to three symbols in a turn."},
-    {"id": "r10", "query": "Is the sensex up or down today?", "expected": ["market_analysis"], "why": "Daily change on an index."},
+    {"id": "r10", "query": "Is the sensex up or down today?", "expected": ["market_analysis"], "why": "Daily change on an index, phrased as a direction rather than a price. Still the market agent: up-or-down is the percentage change it already computes."},
 
     {"id": "r11", "query": "How is my portfolio doing?", "expected": ["portfolio_analysis"], "why": "\"My portfolio\" is the signal."},
     {"id": "r12", "query": "Am I too concentrated in one stock?", "expected": ["portfolio_analysis"], "why": "Concentration is a portfolio metric (HHI, flags)."},
     {"id": "r13", "query": "What is my asset allocation?", "expected": ["portfolio_analysis"], "why": "Class breakdown of holdings the user owns."},
     {"id": "r14", "query": "How much am I paying in mutual fund fees?", "expected": ["portfolio_analysis"], "why": "Needs their actual holdings to compute the rupee cost, unlike r04."},
-    {"id": "r15", "query": "What is my total unrealised gain?", "expected": ["portfolio_analysis"], "why": "P&L against cost basis."},
+    {"id": "r15", "query": "What is my total unrealised gain?", "expected": ["portfolio_analysis"], "why": "Unrealised P&L, which needs the holdings and their purchase prices. Only the portfolio agent has a cost basis to compare the current value against."},
 
     {"id": "r16", "query": "How much should I invest monthly to reach 50 lakh in 10 years?", "expected": ["goal_planning"], "why": "Amount plus horizon: the required-SIP calculation."},
     {"id": "r17", "query": "I want 1 crore for retirement in 25 years", "expected": ["goal_planning"], "why": "A goal stated as amount and horizon, even without a question mark."},

@@ -39,7 +39,7 @@
       ],
       "strict": true,
       "lenient": true,
-      "resolved": "Is Public Provident Fund (PPF) better than Equity Linked Savings Scheme (ELSS)?",
+      "resolved": "Is PPF better than ELSS?",
       "why": "Comparison of two instruments; prompt rule 6 covers answering it without declaring a winner."
     },
     {
@@ -110,7 +110,7 @@
       "strict": true,
       "lenient": true,
       "resolved": "Where is the NIFTY 50 trading?",
-      "why": "Index quote."
+      "why": "An index quote. NIFTY 50 must resolve to the symbol ^NSEI, which is why the index aliases live in the market agent rather than in the router."
     },
     {
       "id": "r09",
@@ -138,7 +138,7 @@
       "strict": true,
       "lenient": true,
       "resolved": "Is the SENSEX up or down today?",
-      "why": "Daily change on an index."
+      "why": "Daily change on an index, phrased as a direction rather than a price. Still the market agent: up-or-down is the percentage change it already computes."
     },
     {
       "id": "r11",
@@ -208,7 +208,7 @@
       "strict": true,
       "lenient": true,
       "resolved": "What is my total unrealised gain?",
-      "why": "P&L against cost basis."
+      "why": "Unrealised P&L, which needs the holdings and their purchase prices. Only the portfolio agent has a cost basis to compare the current value against."
     },
     {
       "id": "r16",
@@ -465,7 +465,7 @@
       ],
       "strict": true,
       "lenient": true,
-      "resolved": "What is the TCS price and any recent news about it?",
+      "resolved": "What is the TCS price and what is the recent news about TCS?",
       "why": "Two distinct asks about one ticker; neither subsumes the other."
     },
     {
