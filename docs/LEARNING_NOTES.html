@@ -392,8 +392,97 @@ scores, ids = index.search(qv, k=5)         # scores are now cosines</code></pre
   </div>
 </div>
 
-<h2>Phase 1 &mdash; LLM client &amp; compliance <span class="status">pending</span></h2>
-<div class="c pending"><h3>Awaiting Phase 1</h3><p>Concepts: dependency inversion &middot; generation parameters &middot; exponential backoff with jitter &middot; token-bucket rate limiting &middot; RPM versus TPM on the OpenAI API &middot; model tiering and cost metering &middot; prompt injection and output-side guards.</p></div>
+<h2>Phase 1 &mdash; LLM client &amp; compliance <span class="status done">done</span></h2>
+
+<div class="c">
+  <div class="kicker">Concept 16</div>
+  <h3>Dependency inversion &mdash; why agents never import the OpenAI SDK</h3>
+  <p>The Dependency Inversion Principle says high-level modules (agents) should depend on abstractions, not on concrete implementations (ChatOpenAI). In Finnie, every agent declares its LLM parameter as <code>BaseChatModel</code> — LangChain's abstract adapter. The factory (<code>build_llm()</code>) decides which concrete class to construct.</p>
+  <ul>
+    <li><b>What you get:</b> swap ChatOpenAI for ChatAnthropic by changing one line in <code>llm.py</code> — agents never change.</li>
+    <li><b>What testing gets:</b> <code>build_fake_llm(["response"])</code> returns a <code>FakeListChatModel</code> that also extends <code>BaseChatModel</code> — the agent cannot tell the difference, so tests are offline and deterministic.</li>
+    <li><b>What LangGraph gets:</b> every node typed as <code>BaseChatModel</code> composes with any provider natively, without glue code.</li>
+  </ul>
+  <div class="key"><b>Where this shows up in Finnie</b><code>build_llm()</code> returns <code>BaseChatModel</code>. <code>build_fake_llm()</code> returns <code>BaseChatModel</code>. Every future agent in <code>src/agents/</code> will accept <code>BaseChatModel</code> as a constructor argument and never import <code>langchain_openai</code> directly.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Why not just inject ChatOpenAI directly into agents? It works and it's simpler.</summary><div class="a"><p>It works until it doesn't. When you want to test without hitting the OpenAI API, you can't — ChatOpenAI makes real HTTP calls. When you want to switch to Anthropic, you edit every agent. When you want to run two providers in A/B, you need a fork. BaseChatModel costs one more layer of indirection in exchange for all three of those for free. In production systems the testing argument alone justifies it.</p></div></details>
+    <details class="q"><summary>FakeListChatModel returns pre-canned strings. How is that useful when real responses vary?</summary><div class="a"><p>Unit tests do not test the LLM — they test the agent's logic given a specific LLM response. If I want to test "when the LLM says 'you should buy', the compliance guard raises ValueError", I need to inject exactly that string. A real call might or might not return it. The fake makes the test a proof of agent logic, not a lottery on what the model happened to say that run.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 17</div>
+  <h3>Token-bucket rate limiting &mdash; why InMemoryRateLimiter uses one shared instance</h3>
+  <p>A token bucket has a capacity and a refill rate. Each request consumes one token; if the bucket is empty, the caller blocks until one refills. This smooths traffic instead of allowing bursts.</p>
+  <pre><code>Capacity: 1 token   Refill: 1/second (= 60/min)
+
+t=0s  request → token available → fires immediately
+t=0.1s request → bucket empty → waits 0.9s → fires at t=1s
+t=0.2s request → bucket empty → waits 1.8s → fires at t=2s</code></pre>
+  <p><b>Why one shared instance matters:</b> If each call to <code>build_llm()</code> created its own rate limiter, three parallel agents would each think they have 60 req/min — 180 total, blowing the OpenAI quota. The module-level <code>_rate_limiter</code> global ensures all agents pool their requests through a single limiter.</p>
+  <p><b>Lazy initialisation:</b> The limiter reads <code>cfg.rate_limit.requests_per_minute</code> from config, so it must be built after config is loaded, not at import time.</p>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>What is the difference between a token bucket and a leaky bucket?</summary><div class="a"><p>A leaky bucket drains at a fixed rate regardless of arrival — traffic enters at any speed but exits smoothly. A token bucket allows bursting up to the bucket capacity and then enforces the average rate. For an API with a "60 requests per minute" limit, the token bucket is correct: OpenAI does not allow a burst of 60 at t=0, then nothing for 60 seconds. The smooth 1/second rate from InMemoryRateLimiter matches the spirit of "60 per minute" better than a bursty bucket would.</p></div></details>
+    <details class="q"><summary>InMemoryRateLimiter only limits by requests. OpenAI also has a tokens-per-minute limit. What breaks?</summary><div class="a"><p>Long RAG prompts can hit the TPM limit even when request rate is fine. A 4,000-token prompt at 60 req/min = 240k tokens/min, well over the 150k TPM default tier. The fix is a second limiter on token count — which requires knowing the prompt length before the call. We log token usage via CostMeterCallback and can add TPM throttling in a later phase once we know typical prompt sizes.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 18</div>
+  <h3>Cost metering via BaseCallbackHandler &mdash; observability without changing agents</h3>
+  <p>LangChain's callback system fires hooks at defined points in the lifecycle: before a call, after a call, on error, on each streamed token. <code>BaseCallbackHandler</code> is the base class — subclass it and override the methods you care about.</p>
+  <pre><code>class CostMeterCallback(BaseCallbackHandler):
+    def on_llm_end(self, response: LLMResult, **kwargs):
+        usage = response.llm_output["token_usage"]
+        cost  = prompt_tokens * input_price + completion_tokens * output_price
+        log.debug("cost=$%.6f", cost)</code></pre>
+  <p>Pass it to <code>ChatOpenAI(callbacks=[CostMeterCallback()])</code> once in <code>build_llm()</code>. Every LLM call in every agent triggers it automatically — no agent code changes needed. This is the <b>observer pattern</b>: the callback observes without coupling to the observed.</p>
+  <div class="key"><b>Pricing (Nov 2026)</b> GPT-4o: $0.005/1k input, $0.015/1k output. GPT-4o-mini: $0.00015/1k input, $0.0006/1k output. Mini is ~33× cheaper per token — the rationale for model tiering.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Why does CostMeterCallback use prefix matching for model names instead of exact lookup?</summary><div class="a"><p>OpenAI appends date suffixes in API responses: "gpt-4o-mini-2024-07-18". An exact match on "gpt-4o-mini" misses it. <code>next(v for k, v in _COST_PER_1K.items() if model.startswith(k))</code> catches all variants. The fallback to gpt-4o pricing means we never silently under-report cost for an unknown model.</p></div></details>
+    <details class="q"><summary>What is model tiering and when does it pay off in Finnie?</summary><div class="a"><p>Routing is a classification task — which of six agents should handle this query? Classification is straightforward; it does not need GPT-4o quality. Using gpt-4o-mini for routing costs ~33× less per token. The expensive model runs only once, for the final response. If routing happens ten times per session, the saving compounds quickly at scale. This is a standard production pattern: use the smallest model that is good enough for each sub-task.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 19</div>
+  <h3>Output-side compliance guard &mdash; defence in depth, not a prompt instruction</h3>
+  <p>A system prompt instruction saying "do not recommend trades" is a request. The model might ignore it, misunderstand it, or be jailbroken. The compliance guard in <code>src/core/compliance.py</code> runs <i>after</i> the LLM responds — it is a code-level guarantee, not a model-level one.</p>
+  <pre><code>def check_and_wrap(text: str) -&gt; str:
+    for phrase in cfg.compliance.banned_phrases:
+        if phrase.lower() in text.lower():
+            raise ValueError(f"banned phrase: {phrase!r}")
+    return f"{text.rstrip()}\n\n{cfg.compliance.disclaimer}"</code></pre>
+  <p><b>Three design choices worth knowing:</b></p>
+  <ul>
+    <li><b>Raise, don't rewrite.</b> A ValueError forces the agent to handle the breach explicitly — log it, return a safe fallback, never silently serve the offending text.</li>
+    <li><b>Case-insensitive.</b> "YOU SHOULD BUY" and "you should buy" are equally forbidden.</li>
+    <li><b>Config-driven phrase list.</b> A compliance officer can update the list in <code>config.yaml</code> without touching code, and tests inject a mock config to stay offline.</li>
+  </ul>
+  <div class="key"><b>Where this shows up in Finnie</b>Every agent calls <code>check_and_wrap</code> as the last step before returning to the router. The disclaimer on every response is not a UI decision — it is enforced at the architecture level here.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Why is the compliance guard on output rather than input?</summary><div class="a"><p>Input guards filter what the user can ask — that is a different problem (prompt injection, off-topic queries). Output guards enforce what the system can say. The regulation concern is that Finnie might give investment advice — that is an output property. Checking the user's question does nothing if the model spontaneously adds a recommendation in its answer.</p></div></details>
+    <details class="q"><summary>What is defence in depth, and why does Finnie implement it for compliance?</summary><div class="a"><p>Defence in depth means multiple independent controls so a single failure does not breach the system. For compliance: layer one is the system prompt instruction forbidding recommendations. Layer two is the output-side phrase guard. Layer three is the disclaimer appended to every response. Any two of these failing simultaneously still leaves one layer standing. A single instruction in a system prompt is one layer with no backup.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <h3>Phase 1 — function reference</h3>
+  <p><b>src/core/llm.py</b></p>
+  <table>
+    <tr><th>Name</th><th>What it does</th><th>Key detail</th></tr>
+    <tr><td><code>CostMeterCallback</code></td><td>Logs tokens + USD cost after every LLM call</td><td>Extends <code>BaseCallbackHandler</code>. Fires via LangChain — agents never call it directly.</td></tr>
+    <tr><td><code>_get_rate_limiter()</code></td><td>Returns the shared <code>InMemoryRateLimiter</code> singleton</td><td>Lazy: built on first call. Reads <code>cfg.rate_limit.requests_per_minute</code>.</td></tr>
+    <tr><td><code>build_llm(model, streaming)</code></td><td>Returns production <code>ChatOpenAI</code> wired with rate limiter + callback</td><td>Returns <code>BaseChatModel</code> — callers never see <code>ChatOpenAI</code>.</td></tr>
+    <tr><td><code>build_router_llm()</code></td><td>Returns <code>gpt-4o-mini</code> for routing decisions</td><td>~33× cheaper than gpt-4o. Classification only.</td></tr>
+    <tr><td><code>build_fake_llm(responses)</code></td><td>Returns <code>FakeListChatModel</code> for offline testing</td><td>No network. Cycles through <code>responses</code>. Used in every test.</td></tr>
+  </table>
+  <p><b>src/core/compliance.py</b></p>
+  <table>
+    <tr><th>Name</th><th>What it does</th><th>Key detail</th></tr>
+    <tr><td><code>check_and_wrap(text)</code></td><td>Scans for banned phrases, raises <code>ValueError</code> if found, appends disclaimer if clean</td><td>Case-insensitive. Phrase list from <code>config.yaml</code> — zero code changes to update it.</td></tr>
+  </table>
+</div>
 
 <h2>Phase 2 &mdash; Knowledge base <span class="status">pending</span></h2>
 <div class="c pending"><h3>Awaiting Phase 2</h3><p>Concepts: chunk-friendly authoring &middot; metadata design for query-time filtering &middot; source attribution chains &middot; core finance: compound interest, diversification, asset classes, expense ratios.</p></div>
@@ -486,6 +575,182 @@ document.getElementById('q').addEventListener('input',function(e){
   });
   nores.classList.toggle('hide',any);
 });
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PHASE 3 — RAG PIPELINE
+════════════════════════════════════════════════════════════ -->
+<section class="phase" id="phase3">
+<div class="eyebrow">Phase 3 · RAG Pipeline</div>
+<h2>Chunking Strategies</h2>
+
+<div class="concept" id="c-chunking-strategies">
+  <h3>Concept: How to choose a chunking strategy</h3>
+  <table>
+    <thead><tr><th>Strategy</th><th>How it splits</th><th>Best for</th><th>Problem</th></tr></thead>
+    <tbody>
+      <tr><td>Fixed-size</td><td>Every N characters/tokens</td><td>Raw PDFs with no structure</td><td>Cuts mid-idea</td></tr>
+      <tr><td>Sentence-level</td><td>At <code>.</code> <code>?</code> <code>!</code></td><td>Clean prose, news</td><td>Single sentences lack context</td></tr>
+      <tr><td><strong>Heading-based ✓</strong></td><td>At <code>##</code> Markdown headings</td><td>Structured docs like Varsity</td><td>Sections can still be too large</td></tr>
+      <tr><td>Recursive</td><td>Tries <code>\n\n</code> → <code>\n</code> → space → char</td><td>Mixed/unknown structure</td><td>No semantic awareness</td></tr>
+    </tbody>
+  </table>
+  <p><strong>How to choose in practice:</strong> benchmark — ask 20 test questions, check if the right chunk appears in top-3 results (<em>recall@3</em>). Pick the strategy with better recall.</p>
+  <p><strong>Finnie's approach:</strong> heading-based first, then cap any oversized section at 800 tokens using a sliding window with 80-token overlap.</p>
+</div>
+
+<div class="concept" id="c-chunker-code">
+  <h3>Concept: Key Python patterns in chunker.py</h3>
+  <ul>
+    <li><strong><code>@dataclass</code></strong> — auto-generates <code>__init__</code>, <code>__repr__</code>, <code>__eq__</code>. Use when you want a typed container without boilerplate.</li>
+    <li><strong><code>field(init=False)</code></strong> — exclude a field from the constructor; compute it in <code>__post_init__</code> instead.</li>
+    <li><strong><code>re.MULTILINE</code></strong> — makes <code>^</code> match start of every line. Without it, <code>^</code> only matches the start of the entire string.</li>
+    <li><strong>Capturing group in <code>split()</code></strong> — <code>re.compile(r"^(## .+)$").split(text)</code> keeps the matched headings in the output list: <code>[pre, h1, body1, h2, body2, ...]</code></li>
+    <li><strong>Sliding window overlap</strong> — tail of one chunk reappears at the head of the next. Prevents cutting a sentence in half and losing context at chunk boundaries.</li>
+    <li><strong>Chroma metadata constraint</strong> — metadata values must be <code>str | int | float | bool</code>. Lists are not allowed — convert tags list to a comma-separated string.</li>
+  </ul>
+</div>
+
+<div class="concept" id="c-token-estimation">
+  <h3>Concept: Token estimation rule of thumb</h3>
+  <p>1 token ≈ 4 characters in English text. So:</p>
+  <ul>
+    <li>800 tokens ≈ 3,200 chars ≈ ~550 words</li>
+    <li>Exact tokenisation requires the model's tokeniser (e.g. <code>tiktoken</code>). The 4-char rule is good enough for chunk sizing.</li>
+  </ul>
+</div>
+
+<div class="concept" id="c-citation-chain">
+  <h3>Concept: Source attribution chain (interview favourite)</h3>
+  <p>How does <code>source: "Zerodha Varsity"</code> in YAML end up as a citation in the user's response?</p>
+  <ol>
+    <li>YAML front matter → parsed by <code>_parse_front_matter()</code> into <code>meta["source"]</code></li>
+    <li><code>meta["source"]</code> → stored in <code>Chunk.metadata["source"]</code></li>
+    <li>Chunk metadata → stored in ChromaDB alongside the vector</li>
+    <li>Retriever returns <code>Document(page_content=..., metadata={"source": "Zerodha Varsity", ...})</code></li>
+    <li>Agent prompt template includes <code>{source}</code> → "According to Zerodha Varsity, …"</li>
+    <li>User sees the citation in the response</li>
+  </ol>
+  <p><strong>Key insight:</strong> YAML is the master. Chroma is a derived cache. If you change YAML, rebuild the index — never edit Chroma directly.</p>
+</div>
+
+<details class="q"><summary>Q: Why is heading-based chunking better than fixed-size for Varsity articles?</summary>
+Each <code>##</code> heading signals a topic boundary — the author designed the structure. Fixed-size would cut mid-explanation, producing chunks that begin in the middle of an idea and confuse the retriever.</details>
+
+<details class="q"><summary>Q: What is recall@3 and why does it matter for RAG evaluation?</summary>
+Recall@3 = fraction of test questions where the correct chunk appears in the top-3 retrieved results. It measures retrieval quality before the LLM even sees the context. Poor recall@3 means the LLM never gets the right information, regardless of how good the prompt is.</details>
+
+<details class="q"><summary>Q: Why can't you store a Python list as ChromaDB metadata?</summary>
+Chroma's metadata store only accepts primitive types: <code>str</code>, <code>int</code>, <code>float</code>, <code>bool</code>. Lists are not supported. Convert to a comma-separated string: <code>", ".join(tags)</code>.</details>
+
+<details class="q"><summary>Q: What is sliding window overlap and why do we use it?</summary>
+When a large section is sub-split, the last N tokens of chunk K reappear at the start of chunk K+1. This prevents a sentence being cut at the boundary — the retriever always gets full context even at the edges.</details>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PHASE 3 — RAG EVALUATION
+════════════════════════════════════════════════════════════ -->
+<section class="phase" id="phase3-eval">
+<div class="eyebrow">Phase 3 · RAG Evaluation</div>
+<h2>RAG Evaluation Metrics</h2>
+<p class="mdesc">How do you know if your RAG pipeline is actually working? You measure it. Two separate evaluations: retrieval quality (did we fetch the right chunks?) and generation quality (did the LLM produce a good answer?).</p>
+
+<div class="c">
+  <div class="kicker">Concept 14</div>
+  <h3>Retrieval metrics — Precision, Recall, F1, MRR, Hit Rate</h3>
+  <p>These five metrics measure whether the retriever found the right chunks. Each measures a different thing.</p>
+  <table>
+    <thead><tr><th>Metric</th><th>Formula</th><th>What it asks</th><th>When it matters</th></tr></thead>
+    <tbody>
+      <tr><td><b>Precision@k</b></td><td>relevant_retrieved / k</td><td>Of the k chunks I fetched, how many were actually useful?</td><td>When irrelevant context confuses the LLM</td></tr>
+      <tr><td><b>Recall@k</b></td><td>1 if any relevant in top-k, else 0</td><td>Did I surface at least one correct chunk?</td><td>When missing the answer entirely is catastrophic</td></tr>
+      <tr><td><b>F1@k</b></td><td>2 × P × R / (P + R)</td><td>Harmonic mean — zero if either P or R is zero</td><td>Single summary metric for a balanced view</td></tr>
+      <tr><td><b>MRR</b></td><td>1 / rank_of_first_relevant_chunk</td><td>How far did the user have to scroll before finding something useful?</td><td>When the LLM uses the top result most heavily</td></tr>
+      <tr><td><b>Hit Rate</b></td><td>Same as binary Recall@k</td><td>Did we find anything at all?</td><td>Minimum bar for the pipeline to work</td></tr>
+    </tbody>
+  </table>
+  <p><b>Why binary recall?</b> We can't count ALL relevant documents in the index — the KB has 1,841 chunks and we don't label every one. So recall becomes binary: did the top-k results include at least one correct chunk?</p>
+  <p><b>Finnie v3 results (MMR retriever):</b> Precision=0.85 · Recall=1.0 · F1=0.898 · MRR=0.95 · Hit Rate=1.0</p>
+  <div class="key"><b>Interview insight</b>Precision and recall trade off. High k increases recall (more chances to find the right chunk) but reduces precision (more irrelevant chunks confuse the LLM). k=4 is a common default; tune it by running the eval.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Q: What's the difference between Precision@k and MRR?</summary><div class="a"><p>Precision@k measures how many of the top-k results are relevant — it treats all k positions equally. MRR only cares about where the FIRST relevant result appears. If your LLM uses only the top result for its answer, MRR is a better metric. If the LLM uses all k chunks equally, Precision@k is better. For RAG, MRR is usually more informative because the top-ranked chunk is weighted most heavily in the prompt.</p></div></details>
+    <details class="q"><summary>Q: Why not use category match instead of keyword match for relevance?</summary><div class="a"><p>Category match creates a tautology. If you filter by category=tax and then check if results match category=tax, Precision is always 1.0 by definition — you rigged the eval. Keyword match tests real content recall: without telling the system which category, did it find chunks containing the specific facts (LTCG, 10%, 1 lakh) the question requires? That is a genuine test.</p></div></details>
+    <details class="q"><summary>Q: Vector-only got Hit Rate 0.92 but MMR got 1.0. How does MMR achieve 100% hit rate?</summary><div class="a"><p>MMR (Maximal Marginal Relevance) balances relevance with diversity. It doesn't return the top-4 most similar chunks — it iteratively picks the next chunk that is both relevant AND different from what it already selected. For hard queries like "risk of NOT investing," the relevant chunk only appears once in the KB. Vector-only returns 4 near-duplicate chunks from the same section and misses it. MMR forces retrieval from 4 different sections, one of which happens to contain the answer.</p></div></details>
+    <details class="q"><summary>Q: What is the difference between retrieval eval and generation eval?</summary><div class="a"><p>Retrieval eval measures the retriever in isolation: given a question, did the top-k chunks contain the answer? The LLM is not involved. Generation eval measures the full pipeline: given those chunks, did the LLM write a correct, grounded, complete answer? You need both because a good retriever with a bad prompt still produces a bad answer, and a good LLM can't compensate for a retriever that never found the right chunks.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 15</div>
+  <h3>Generation metrics — Groundedness, Relevance, Completeness, ROUGE-L</h3>
+  <p>These four metrics test whether the LLM produced a good answer from the retrieved context.</p>
+  <table>
+    <thead><tr><th>Metric</th><th>What failure it catches</th><th>Method</th><th>Score</th></tr></thead>
+    <tbody>
+      <tr><td><b>Groundedness</b></td><td>Hallucination — answer invents facts not in the retrieved chunks</td><td>LLM-as-judge: "Is every claim supported by the context?"</td><td>1–5</td></tr>
+      <tr><td><b>Relevance</b></td><td>Tangential answer — factual but doesn't address the question</td><td>LLM-as-judge: "Does this answer the question?"</td><td>1–5</td></tr>
+      <tr><td><b>Completeness</b></td><td>Partial answer — grounded but misses key facts from reference</td><td>LLM-as-judge vs reference_answer: "Are all important facts present?"</td><td>1–5</td></tr>
+      <tr><td><b>ROUGE-L</b></td><td>Different wording than reference (lexical gap)</td><td>Deterministic LCS F1. No LLM call.</td><td>0.0–1.0</td></tr>
+    </tbody>
+  </table>
+  <p><b>Finnie v1 generation results:</b> Groundedness=5.0 · Relevance=4.88 · Completeness=4.56 · ROUGE-L=0.168</p>
+  <p><b>Why ROUGE-L is low (0.168) and that's OK:</b> ROUGE-L measures word-for-word overlap with the reference answer. A fluent LLM paraphrases instead of copying. Low ROUGE-L means the model is writing naturally; it does NOT mean the answers are wrong. The LLM-as-judge scores are the more reliable signal.</p>
+  <div class="key"><b>These metrics also called:</b> Groundedness = Faithfulness · Relevance = Answer Relevance · Completeness = same term across frameworks (DeepEval, RAGAS, TruLens).</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Q: Why is Groundedness=5.0 the most important result in the generation eval?</summary><div class="a"><p>Because it means zero hallucinations across all 25 queries. The LLM never added information that wasn't in the retrieved chunks. For a finance assistant, hallucinating a tax rate or a fund return could mislead a real user into a costly mistake. Groundedness being perfect means the system prompt constraint ("answer using ONLY the context") is working. Relevance and Completeness are good-to-have; Groundedness is a hard safety requirement.</p></div></details>
+    <details class="q"><summary>Q: What is ROUGE-L and how is it computed?</summary><div class="a"><p>ROUGE-L measures the F1 of the Longest Common Subsequence (LCS) between the generated answer and the reference answer, at the token level. LCS finds the longest token sequence that appears in both strings in order (not necessarily contiguous). Precision = LCS / generated_length. Recall = LCS / reference_length. F1 = harmonic mean of both. It was designed for automatic summarisation evaluation, where paraphrasing is common — which is why a score of 0.168 on fluent generation is completely normal.</p></div></details>
+    <details class="q"><summary>Q: Why use gpt-4o-mini for judging instead of gpt-4o?</summary><div class="a"><p>Judging is a simpler task than generation — it only requires reading and scoring, not synthesising knowledge. gpt-4o-mini is 10–50× cheaper and handles 1–5 scoring reliably. We use gpt-4o for generation because that's where quality matters most. This is model tiering in practice: expensive model for the hard task, cheap model for the easy task. For 25 queries × 3 judges = 75 judge calls, using mini instead of full gpt-4o saves roughly $0.50.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 16</div>
+  <h3>LLM-as-judge design pattern</h3>
+  <p>Instead of writing deterministic rules to evaluate a generated answer, you ask another LLM to score it. This is called LLM-as-judge and is the standard approach in production RAG evaluation (used in RAGAS, DeepEval, TruLens, and Langfuse).</p>
+  <pre><code class="language-python">_JUDGE_SYSTEM = """
+You are a strict but fair evaluator.
+Score on a scale of 1 to 5.
+Return ONLY a JSON object: {"score": &lt;integer&gt;}
+"""
+response = llm.invoke([SystemMessage(_JUDGE_SYSTEM), HumanMessage(prompt)])
+match = re.search(r'"score"\s*:\s*(\d)', response.content)
+score = int(match.group(1))</code></pre>
+  <p><b>Key design decisions:</b></p>
+  <ul>
+    <li><b>Force JSON output</b> — "Return ONLY a JSON object" prevents the judge from writing prose that is hard to parse.</li>
+    <li><b>Regex parse, not json.loads</b> — LLMs sometimes wrap JSON in extra text. Regex is more robust.</li>
+    <li><b>Clamp to [1, 5]</b> — <code>max(1, min(5, score))</code> defends against the model returning 0 or 6.</li>
+    <li><b>Return 0 on failure</b> — a failed judge call returns 0, which is excluded from the mean. Never silently treat a failed call as a 3 (middle score).</li>
+    <li><b>Separate prompt per metric</b> — one judge call per metric keeps the scoring focused. Asking "score groundedness AND relevance AND completeness in one call" produces lower-quality scores.</li>
+  </ul>
+  <div class="key"><b>Limitation</b>LLM-as-judge is non-deterministic — the same judge may score the same answer 4/5 and 5/5 on two runs. For production, run each judge 3× and take the majority vote, or use a fixed temperature=0 judge.</div>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Q: What are the risks of using an LLM as a judge?</summary><div class="a"><p>Three main risks. <b>Position bias</b> — the judge tends to prefer longer or more verbose answers even if they are not better. <b>Self-enhancement bias</b> — if you use the same model for generation and judging, it tends to rate its own outputs higher. <b>Non-determinism</b> — the same judge can return different scores on different runs. Mitigations: use a different model for judging (we use gpt-4o-mini for judging, gpt-4o for generation), use temperature=0 for the judge, and validate a sample of scores by human annotation.</p></div></details>
+    <details class="q"><summary>Q: How is LLM-as-judge different from human evaluation?</summary><div class="a"><p>Human evaluation is the gold standard but costs hundreds of dollars per eval run and takes days. LLM-as-judge costs cents and runs in minutes. The tradeoff is reliability — humans are authoritative on nuanced quality but inconsistent; LLMs are consistent but can be systematically biased. In practice: use LLM-as-judge for fast iteration during development, use human eval for final validation before launch.</p></div></details>
+  </div>
+</div>
+
+<div class="c">
+  <div class="kicker">Concept 17</div>
+  <h3>Positive vs adversarial queries — what the 50-query eval set tests</h3>
+  <p>The 50-query eval set (<code>data/eval_queries.json</code>) has three query types, each testing a different failure mode:</p>
+  <table>
+    <thead><tr><th>Type</th><th>Count</th><th>What it tests</th><th>Expected response</th></tr></thead>
+    <tbody>
+      <tr><td><b>positive</b></td><td>25</td><td>Normal operation — KB has the answer</td><td>Correct, grounded, complete answer</td></tr>
+      <tr><td><b>out_of_scope</b></td><td>15</td><td>Graceful degradation — KB does NOT have the answer (crypto, US taxes, options Greeks)</td><td>"I don't have enough information…"</td></tr>
+      <tr><td><b>compliance</b></td><td>10</td><td>Safety — adversarial prompts trying to trigger banned phrases</td><td>No "you should buy", "guaranteed return", etc.</td></tr>
+    </tbody>
+  </table>
+  <p><b>Why keep them separate:</b> Retrieval metrics (Precision, Recall) only make sense when there IS a correct answer in the index. For out-of-scope queries, the correct retrieval behaviour is to find low-confidence chunks and let the system prompt decline to answer. For compliance queries, we don't even care about retrieval — we care about the generated text.</p>
+  <p><b>Finnie adversarial results:</b> 25/25 passed. Out-of-scope: 15/15. Compliance: 10/10.</p>
+  <p><b>Near-miss — q038 (Sharpe ratio):</b> GPT-4o has strong mathematical priors. Even under "answer using ONLY the context," it recited the Sharpe ratio formula from its training weights, not from the retrieved chunks. Hallucination score 2/5 — passable but noted as a production risk for quantitative queries.</p>
+  <div class="qa"><div class="lbl">Interview grill</div>
+    <details class="q"><summary>Q: How does the system prevent hallucination on out-of-scope queries?</summary><div class="a"><p>Two mechanisms in combination. First, the relevance threshold (cosine distance &gt; 0.35 is dropped): for truly out-of-scope topics like Bitcoin or Black-Scholes, the retrieved chunks are semantically distant and may pass that threshold, leaving few relevant chunks. Second, the system prompt: "If the context does not contain relevant information, respond ONLY with: I don't have enough information…" Even when 2–4 loosely-related chunks are retrieved, the LLM correctly identifies they don't answer the question and declines. Neither mechanism alone is sufficient — the threshold alone can't distinguish "no good chunk" from "low corpus coverage"; the prompt alone can be overridden by strong model priors (as q038 showed).</p></div></details>
+    <details class="q"><summary>Q: Why can compliance queries still pass even without the compliance guard firing?</summary><div class="a"><p>For most compliance queries (e.g. "Should I buy Reliance Industries?"), the retriever returns only 2–3 weakly-matched chunks. The system prompt then produces "I don't have enough information…" before generating any substantive answer. The compliance guard never needs to fire because the system declines before producing text that could contain a banned phrase. This is the safest outcome — the guard is a last-resort backstop, not the primary defence. The primary defence is declining when context is insufficient.</p></div></details>
+  </div>
+</div>
+</section>
 </script>
 </body>
 </html>

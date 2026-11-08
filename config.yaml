@@ -21,14 +21,24 @@ rate_limit:
   tokens_per_minute: 150000         # TPM is the limit RAG prompts hit first
 
 rag:
-  embedding_model: sentence-transformers/all-MiniLM-L6-v2
-  embedding_dim: 384
-  chunk_size: 800                   # characters, not tokens
-  chunk_overlap: 100
+  embedding_model: text-embedding-3-small
+  embedding_dim: 512                # matryoshka reduction: 67% smaller index, <5% quality loss
+  chunk_size: 500                   # tokens (not characters); sweet spot for retrieval quality
+  chunk_overlap: 50
   top_k: 4
-  relevance_threshold: 0.35         # below this we decline instead of guessing
+  relevance_threshold: 0.75         # Varsity chapters are broad; cosine dist runs 0.4-0.7 for good matches
+  use_mmr: true                     # MMR (Maximal Marginal Relevance): reduces duplicate chunks in results
+  mmr_lambda: 0.5                   # 0 = max diversity, 1 = max relevance, 0.5 = balanced
   index_dir: data/indexes
   knowledge_base_dir: data/knowledge_base
+  # Remap raw KB folder categories to 5 logical eval categories.
+  # Keeps chunks findable by expected_category without changing source files.
+  category_map:
+    behavioural: basics       # Personal Finance chapters → general basics
+    bonds: basics             # Finance math / time-value → basics
+    etfs: basics              # ETF products → basics
+    mutual-funds: retirement  # Mutual fund investing → retirement planning
+    diversification: retirement  # Portfolio building → retirement planning
 
 market:
   primary_source: yfinance

@@ -32,18 +32,15 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 0 | Environment & project skeleton | 🔨 In progress — 4 TODOs left for student |
-| 1–13 | (see ROADMAP) | Pending |
+| 0 | Environment & project skeleton | ✅ Complete — 14/14 tests pass, ruff clean |
+| 1 | LLM client + compliance guard | ✅ Complete — 11/11 tests pass, ruff clean |
+| 2–13 | (see ROADMAP) | Pending |
 
-**Phase 0 student TODOs** (in this order):
-1. `_apply_env_overrides` in `src/core/config.py`
-2. `load_config` in `src/core/config.py`
-3. `setup_logging` in `src/core/logging_setup.py`
-4. `get_logger` in `src/core/logging_setup.py`
+**Phase 0 — DONE.** All four functions implemented (`_apply_env_overrides`, `load_config`, `setup_logging`, `get_logger`). 14/14 tests pass, ruff clean, GitHub repo live.
 
-Done when: `pytest -v` passes all 14 tests in `tests/test_config.py` AND `ruff check src` is clean.
+**Phase 1 — DONE.** `src/core/llm.py` (ChatOpenAI + InMemoryRateLimiter + CostMeterCallback + FakeListChatModel) and `src/core/compliance.py` (output guard). 11/11 tests pass, ruff clean.
 
-**Phase 1 is next:** `core/llm.py` — OpenAI adapter behind an interface, retry with backoff, token-bucket rate limiting, cost meter, `core/compliance.py`, and `FakeLLM`.
+**Phase 2 is next:** LangGraph `StateGraph` — supervisor router + agent stubs.
 
 ---
 
@@ -62,7 +59,7 @@ Done when: `pytest -v` passes all 14 tests in `tests/test_config.py` AND `ruff c
 | Orchestration | LangGraph `StateGraph` | Highest-weighted rubric item; explicit, inspectable, testable |
 | LLM | GPT-4o, `gpt-4o-mini` for routing | Reliable structured outputs; model tiering controls cost |
 | Embeddings | `all-MiniLM-L6-v2` local | 384-dim, CPU-friendly, zero API cost |
-| Vector store | FAISS `IndexFlatIP` | In-process, exact search, 100 articles is too small for ANN |
+| Vector store | ChromaDB | Stores vectors + metadata together natively; simpler than FAISS + separate metadata dict |
 | Market data | yfinance primary, Alpha Vantage fallback | yfinance free; Alpha Vantage teaches real rate-limit engineering |
 | UI | Streamlit | Named in rubric; `session_state` handles conversation memory |
 | Tests | pytest + pytest-cov | FakeLLM + fake price feed = deterministic, offline |
@@ -105,7 +102,7 @@ source .venv/Scripts/activate    # Windows Git Bash; use .venv\Scripts\activate 
 pip install -r requirements.txt
 pip freeze > requirements.lock.txt
 cp .env.example .env             # then paste OPENAI_API_KEY into .env
-pytest -v                        # expect failures: NotImplementedError until Phase 0 done
+pytest -v                        # 25 tests pass (14 config + 11 llm/compliance)
 ```
 
 ---
@@ -149,4 +146,4 @@ Every phase ends with an interview grilling. The student needs to be able to exp
 - The **exact terminology** an interviewer would use
 
 ---
-*Last updated: Phase 0 scaffold complete. Student implementing config + logging.*
+*Last updated: Phase 1 complete. 25 tests pass (14 config + 11 llm/compliance), ruff clean, GitHub repo live.*

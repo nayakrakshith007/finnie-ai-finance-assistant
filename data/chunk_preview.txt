@@ -1,0 +1,59 @@
+SOURCE FILE: data\knowledge_base\stocks\01_chapter-1.md
+TOTAL CHUNKS: 4
+======================================================================
+
+──────────────────────────────────────────────────────────────────────
+CHUNK 1 of 4
+Section  : Chapter 1
+Category : stocks
+Source   : Zerodha Varsity
+Tags     : equity, portfolio, stocks
+Chars    : 2377
+~Tokens  : 594
+
+TEXT:
+Chapter 1
+
+Introduction to Fundamental Analysis 1.1 – Overview Fundamental Analysis (FA) is a holistic approach to study a business. When an investor wishes to invest in a business for the long term (say 3 – 5 years) it becomes extremely essential to understand the business from various perspectives. It is critical for an investor to separate the daily short term noise in the stock prices and concentrate on the underlying business performance. Over the long term, the stock prices of a fundamentally strong company tend to appreciate, thereby creating wealth for its investors. We have many such ...
+
+──────────────────────────────────────────────────────────────────────
+CHUNK 2 of 4
+Section  : Chapter 1
+Category : stocks
+Source   : Zerodha Varsity
+Tags     : equity, portfolio, stocks
+Chars    : 2381
+~Tokens  : 595
+
+TEXT:
+Chapter 1
+
+have a few common attributes that sets them apart. Likewise all wealth destructors have a few common traits which is clearly visible to an astute investor. Fundamental Analysis is the technique that gives you the conviction to invest for a long term by helping you identify these attributes of wealth creating companies. 1.2 – Can I be a fundamental analyst? Of course you can be. It is a common misconception that only chartered accountants and professionals from a commerce background can be good fundamental analysts. This is not true at all. A fundamental analyst just adds 2 and 2 to ...
+
+──────────────────────────────────────────────────────────────────────
+CHUNK 3 of 4
+Section  : Chapter 1
+Category : stocks
+Source   : Zerodha Varsity
+Tags     : equity, portfolio, stocks
+Chars    : 2329
+~Tokens  : 582
+
+TEXT:
+Chapter 1
+
+coexist as a part of your market strategy. In fact, this leads us to an important capital allocation strategy called “The Core Satellite Strategy”. Let us say, a market participant has a corpus of Rs.500,000/-. This corpus can be split into two unequal portions, for example the split can be 60 – 40. The 60% of capital which is Rs.300,000/- can be invested for a long term period in fundamentally strong companies. This 60% of the investment makes up the core of the portfolio. One can expect the core portfolio to grow at a rate of at least 12% to 15% CAGR year on year basis. The balanc...
+
+──────────────────────────────────────────────────────────────────────
+CHUNK 4 of 4
+Section  : Chapter 1
+Category : stocks
+Source   : Zerodha Varsity
+Tags     : equity, portfolio, stocks
+Chars    : 1003
+~Tokens  : 250
+
+TEXT:
+Chapter 1
+
+the institutional level the objective is to keep the research simple and logical. Key takeaways from this chapter 1. Fundamental Analysis is used to make long term investments 2. Investment in a company with good fundamentals creates wealth 3. Using Fundamental Analysis one can separate out an investment grade company from a junk company 4. All investment grade companies exhibit few common traits. Likewise all junk companies exhibit common traits 5. Fundamental analysis helps the analysts identify these traits 6. Both Technical analysis and fundamental analysis should coexist as a p...

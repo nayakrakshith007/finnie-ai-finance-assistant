@@ -1,0 +1,2409 @@
+{
+  "run_at": "20261107_102502",
+  "top_k": 4,
+  "n_queries": 25,
+  "vector_only": {
+    "aggregate": {
+      "precision": 0.57,
+      "recall": 0.6,
+      "f1": 0.581,
+      "mrr": 0.6,
+      "hit_rate": 0.6
+    },
+    "by_difficulty": {
+      "easy": {
+        "precision": 0.525,
+        "recall": 0.6,
+        "f1": 0.552,
+        "mrr": 0.6,
+        "hit_rate": 0.6
+      },
+      "medium": {
+        "precision": 0.6,
+        "recall": 0.6,
+        "f1": 0.6,
+        "mrr": 0.6,
+        "hit_rate": 0.6
+      },
+      "hard": {
+        "precision": 0.6,
+        "recall": 0.6,
+        "f1": 0.6,
+        "mrr": 0.6,
+        "hit_rate": 0.6
+      }
+    },
+    "per_query": [
+      {
+        "id": "q001",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is LTCG tax on equity shares and when does it apply?",
+        "question_short": "What is LTCG tax on equity shares and when does it apply?",
+        "expected_category": "tax",
+        "retrieved_categories": [
+          "tax",
+          "tax",
+          "tax",
+          "tax"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.3903,
+            "text_preview": "CHAPTER 4  considered as investments as long as fre- quency of such buy/sells is low 3. Shorter term equity delivery buy/sells ideally has to be consi…"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.3909,
+            "text_preview": "CHAPTER 4  funds. You have to now stay invested for 3 years for the investment to be considered as long term capital gain. All gains made on investmen…"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.391,
+            "text_preview": "CHAPTER 4  Rs.50,000) loss which be carried forward for another 7 years. Long term capital losses can’t be used to set off against long term gains as …"
+          },
+          {
+            "rank": 4,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.4194,
+            "text_preview": "CHAPTER 4  to his son via a ‘delivery instruction booklet’. For equity mutual funds (MF) – 0% or NIL tax Similar to equity delivery based trades, any …"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q002",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is the difference between speculative and non-speculative business income?",
+        "question_short": "What is the difference between speculative and non-speculati…",
+        "expected_category": "tax",
+        "retrieved_categories": [
+          "tax",
+          "tax",
+          "tax",
+          "tax"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "tax",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.3739,
+            "text_preview": "CHAPTER 5  be set-off only against any specula- tive gains you make in that period. Non-speculative losses can be set-off against any other business i…"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.4277,
+            "text_preview": "CHAPTER 5  pay the tax on Rs.600,000 as per the slab rates – ➡ 0 – Rs.250,000 : 0% – Nil ➡ 250,000 – Rs.500,000 : 10% – Rs. 25,000/- ➡ 500,000 – Rs.60…"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.4539,
+            "text_preview": "CHAPTER 3  the financial year my profit from trading intraday stocks was Rs. 100,000/-, and my salary for the year was Rs.400,000/-. So my total incom…"
+          },
+          {
+            "rank": 4,
+            "category": "tax",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.4557,
+            "text_preview": "CHAPTER 5  of your rent) ➡ Salary paid to anyone helping you trade ➡ Advisory fees, cost of books, newspapers, subscriptions and more… zerodha.com/var…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q003",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "If I sell my shares after holding for 8 months, what tax rate applies on the profit?",
+        "question_short": "If I sell my shares after holding for 8 months, what tax rat…",
+        "expected_category": "tax",
+        "retrieved_categories": [
+          "tax",
+          "tax",
+          "tax",
+          "tax"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.4174,
+            "text_preview": "CHAPTER 4  funds. You have to now stay invested for 3 years for the investment to be considered as long term capital gain. All gains made on investmen…"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.4203,
+            "text_preview": "CHAPTER 3  is at 0%. Do note – the purchase and sale of shares has to be conducted via a recognized exchange. Just to reemphasize – if you had bought …"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.4419,
+            "text_preview": "CHAPTER 4  pay 30% of the expected annual tax that you are likely to pay for that financial year by 15th Sept, 60% by 15th Dec, and 100% by 15th March…"
+          },
+          {
+            "rank": 4,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.458,
+            "text_preview": "CHAPTER 3  Classifying Your Market Activity 3.1 – Are you a trader or investor or both? Identifying yourself as a trader or an investor is the first s…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q004",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "Can I offset my stock market losses against future gains in India?",
+        "question_short": "Can I offset my stock market losses against future gains in …",
+        "expected_category": "tax",
+        "retrieved_categories": [
+          "tax",
+          "tax",
+          "tax",
+          "tax"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.3798,
+            "text_preview": "CHAPTER 4  Rs.50,000) loss which be carried forward for another 7 years. Long term capital losses can’t be used to set off against long term gains as …"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.4056,
+            "text_preview": "CHAPTER 4  pay 30% of the expected annual tax that you are likely to pay for that financial year by 15th Sept, 60% by 15th Dec, and 100% by 15th March…"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.4351,
+            "text_preview": "CHAPTER 3  contract (even though currently equity and currency derivatives in India are all cash settled, but by definition they give rise to giving/t…"
+          },
+          {
+            "rank": 4,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.4373,
+            "text_preview": "CHAPTER 3  speculative or intraday equity trading loss can be set-off only against any other speculative gain (note: you cannot set-off intraday equit…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q005",
+        "type": "positive",
+        "difficulty": "hard",
+        "question": "My friend made money from day trading stocks. How is his income classified for tax purposes?",
+        "question_short": "My friend made money from day trading stocks. How is his inc…",
+        "expected_category": "tax",
+        "retrieved_categories": [
+          "tax",
+          "tax",
+          "tax",
+          "tax"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.4143,
+            "text_preview": "CHAPTER 3  Classifying Your Market Activity 3.1 – Are you a trader or investor or both? Identifying yourself as a trader or an investor is the first s…"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.4508,
+            "text_preview": "CHAPTER 3  for shorter terms, it is best to declare that as non-speculative business income instead of STCG. Another thing to keep in mind is that if …"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.4519,
+            "text_preview": "CHAPTER 5  Taxation for Traders 5.1 – Quick Recap Reiterating from the previous chapter – You can classify yourself as an Investor if you hold equity …"
+          },
+          {
+            "rank": 4,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.464,
+            "text_preview": "CHAPTER 4  Taxation for Investors 4.1 – Quick recap In continuation of previous chapter: Classifying your market activity You can consider yourself an…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q006",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is position sizing and why is it important for traders?",
+        "question_short": "What is position sizing and why is it important for traders?",
+        "expected_category": "risk",
+        "retrieved_categories": [
+          "risk",
+          "risk",
+          "risk",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "risk",
+            "section": "CHAPTER 13",
+            "source": "Zerodha Varsity",
+            "distance": 0.3484,
+            "text_preview": "CHAPTER 13  Position Sizing for active traders (Part 3) 13.1 – Choose your path We addressed a very crucial concept in the previous chapter. We looked…"
+          },
+          {
+            "rank": 2,
+            "category": "risk",
+            "section": "CHAPTER 12",
+            "source": "Zerodha Varsity",
+            "distance": 0.3596,
+            "text_preview": "CHAPTER 12  Position Sizing for active traders (Part 2) 12.1 –Defining Equity Capital The last chapter we laid down few key thoughts on position sizin…"
+          },
+          {
+            "rank": 3,
+            "category": "risk",
+            "section": "CHAPTER 13",
+            "source": "Zerodha Varsity",
+            "distance": 0.3928,
+            "text_preview": "CHAPTER 13  P&L for each will be different However, from my experience, I would suggest you stick one method to estimate equity and maybe 1 or at the …"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 14",
+            "source": "Zerodha Varsity",
+            "distance": 0.4046,
+            "text_preview": "CHAPTER 14  Kelly’s Criterion 14.1 – Percentage Risk Last chapter we looked at three important position sizing techniques, all of them were unique in …"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q007",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is a stop loss and how should it be used in trading?",
+        "question_short": "What is a stop loss and how should it be used in trading?",
+        "expected_category": "risk",
+        "retrieved_categories": [
+          "risk",
+          "stocks",
+          "risk",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "risk",
+            "section": "CHAPTER 14",
+            "source": "Zerodha Varsity",
+            "distance": 0.4213,
+            "text_preview": "CHAPTER 14  is the maximum loss threshold. We know the stop loss for this trade is 390, from an entry price of 393.65, the stop loss in absolute Rupee…"
+          },
+          {
+            "rank": 2,
+            "category": "stocks",
+            "section": "Chapter 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.4888,
+            "text_preview": "Chapter 5  : Notice in the chart above, a bullish marubuzo has been encircled. The risk taker would have initiated a trade to buy the stock on the sam…"
+          },
+          {
+            "rank": 3,
+            "category": "risk",
+            "section": "CHAPTER 14",
+            "source": "Zerodha Varsity",
+            "distance": 0.4889,
+            "text_preview": "CHAPTER 14  volume retracement between 400 to 393.65 – I’ve discussed why I like trades like these in the Technical Analysis module. If you’ve not rea…"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4988,
+            "text_preview": "CHAPTER 11  losses plus reap in some profits? Which option are you likely to take? Take a minute and answer this question honestly to yourself. Having…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 3,
+        "precision": 0.75,
+        "recall": 1.0,
+        "f1": 0.857,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q008",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "How do I decide how much of my capital to risk on a single trade?",
+        "question_short": "How do I decide how much of my capital to risk on a single t…",
+        "expected_category": "risk",
+        "retrieved_categories": [
+          "risk",
+          "risk",
+          "risk",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "risk",
+            "section": "CHAPTER 13",
+            "source": "Zerodha Varsity",
+            "distance": 0.3963,
+            "text_preview": "CHAPTER 13  decide that you will not expose more than 20% as margin amount to a particular trade. This translates to a capital of Rs.100,000/- per tra…"
+          },
+          {
+            "rank": 2,
+            "category": "risk",
+            "section": "CHAPTER 13",
+            "source": "Zerodha Varsity",
+            "distance": 0.4056,
+            "text_preview": "CHAPTER 13  P&L for each will be different However, from my experience, I would suggest you stick one method to estimate equity and maybe 1 or at the …"
+          },
+          {
+            "rank": 3,
+            "category": "risk",
+            "section": "CHAPTER 14",
+            "source": "Zerodha Varsity",
+            "distance": 0.4082,
+            "text_preview": "CHAPTER 14  is the maximum loss threshold. We know the stop loss for this trade is 390, from an entry price of 393.65, the stop loss in absolute Rupee…"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 14",
+            "source": "Zerodha Varsity",
+            "distance": 0.4232,
+            "text_preview": "CHAPTER 14  Kelly’s Criterion 14.1 – Percentage Risk Last chapter we looked at three important position sizing techniques, all of them were unique in …"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q009",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "What happens to a trader's account if they never use stop losses?",
+        "question_short": "What happens to a trader's account if they never use stop lo…",
+        "expected_category": "risk",
+        "retrieved_categories": [
+          "risk",
+          "risk",
+          "risk",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4738,
+            "text_preview": "CHAPTER 11  losses plus reap in some profits? Which option are you likely to take? Take a minute and answer this question honestly to yourself. Having…"
+          },
+          {
+            "rank": 2,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4942,
+            "text_preview": "CHAPTER 11  – 10K 2. Many market participants may book profits at this point – considering it is a psychological level 3. All time high implies no res…"
+          },
+          {
+            "rank": 3,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4951,
+            "text_preview": "CHAPTER 11  play. Being completely influenced by the outcome of the previous 10 trades, you are essentially reducing your position size for the 11th t…"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 14",
+            "source": "Zerodha Varsity",
+            "distance": 0.4992,
+            "text_preview": "CHAPTER 14  is the maximum loss threshold. We know the stop loss for this trade is 390, from an entry price of 393.65, the stop loss in absolute Rupee…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q010",
+        "type": "positive",
+        "difficulty": "hard",
+        "question": "I keep winning small trades but one big loss wiped out everything. What am I doing wrong?",
+        "question_short": "I keep winning small trades but one big loss wiped out every…",
+        "expected_category": "risk",
+        "retrieved_categories": [
+          "risk",
+          "risk",
+          "risk",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.3602,
+            "text_preview": "CHAPTER 11  losses plus reap in some profits? Which option are you likely to take? Take a minute and answer this question honestly to yourself. Having…"
+          },
+          {
+            "rank": 2,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4133,
+            "text_preview": "CHAPTER 11  play. Being completely influenced by the outcome of the previous 10 trades, you are essentially reducing your position size for the 11th t…"
+          },
+          {
+            "rank": 3,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4486,
+            "text_preview": "CHAPTER 11  – 10K 2. Many market participants may book profits at this point – considering it is a psychological level 3. All time high implies no res…"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4611,
+            "text_preview": "CHAPTER 11  the ‘recovery trauma’ affects traders with smaller account size. Assume you come to the market with Rs.50,000/- capital. Now you would hav…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q011",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "Why is building an emergency fund important and how much should it cover?",
+        "question_short": "Why is building an emergency fund important and how much sho…",
+        "expected_category": "retirement",
+        "retrieved_categories": [
+          "behavioural"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 26",
+            "source": "Zerodha Varsity",
+            "distance": 0.356,
+            "text_preview": "CHAPTER 26  for these two types of risks. I want to stress that don’t buy insurance products linked to investment plans. These are not worth it. Cover…"
+          }
+        ],
+        "n_retrieved": 1,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q012",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is a Systematic Investment Plan and how does it work?",
+        "question_short": "What is a Systematic Investment Plan and how does it work?",
+        "expected_category": "retirement",
+        "retrieved_categories": [
+          "behavioural"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 18",
+            "source": "Zerodha Varsity",
+            "distance": 0.5341,
+            "text_preview": "CHAPTER 18  investment performance Mutual fund investors o\u0000en get confused with the way returns are measured across investments. Most investors apply …"
+          }
+        ],
+        "n_retrieved": 1,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q013",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "What are the advantages of starting to invest early in life?",
+        "question_short": "What are the advantages of starting to invest early in life?",
+        "expected_category": "retirement",
+        "retrieved_categories": [
+          "retirement"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "retirement",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.4088,
+            "text_preview": "CHAPTER 5  years old. This means you have a long runway before you retire. Even if you retire by 60, you mostly have 35 years to retire. Out of these …"
+          }
+        ],
+        "n_retrieved": 1,
+        "n_relevant": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q014",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "I have ₹5000 per month to save. Should I keep it in a savings account or invest it?",
+        "question_short": "I have ₹5000 per month to save. Should I keep it in a saving…",
+        "expected_category": "retirement",
+        "retrieved_categories": [
+          "diversification"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "diversification",
+            "section": "CHAPTER 26",
+            "source": "Zerodha Varsity",
+            "distance": 0.444,
+            "text_preview": "CHAPTER 26  to deal with this is to start to shi\u0000 the corpus funds to a debt fund as and when you start approaching the target year. For example, from…"
+          }
+        ],
+        "n_retrieved": 1,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q015",
+        "type": "positive",
+        "difficulty": "hard",
+        "question": "My parents say investing is risky. How do I explain the risk of NOT investing?",
+        "question_short": "My parents say investing is risky. How do I explain the risk…",
+        "expected_category": "retirement",
+        "retrieved_categories": [
+          "bonds"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "bonds",
+            "section": "CHAPTER 28",
+            "source": "Zerodha Varsity",
+            "distance": 0.4758,
+            "text_preview": "CHAPTER 28  described above is called “asset allocation.” Prediction is impossible If you knew which of the assets discussed above would give the best…"
+          }
+        ],
+        "n_retrieved": 1,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q016",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is market capitalisation of a company?",
+        "question_short": "What is market capitalisation of a company?",
+        "expected_category": "stocks",
+        "retrieved_categories": [
+          "behavioural"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 30",
+            "source": "Zerodha Varsity",
+            "distance": 0.4973,
+            "text_preview": "CHAPTER 30  Whether this will pan out as per estimates or not is an unknown. But the stock markets at least seem to factor this Anyway, at this point,…"
+          }
+        ],
+        "n_retrieved": 1,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q017",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What does the P/E ratio of a stock tell me?",
+        "question_short": "What does the P/E ratio of a stock tell me?",
+        "expected_category": "stocks",
+        "retrieved_categories": [
+          "stocks",
+          "stocks",
+          "stocks",
+          "stocks"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.391,
+            "text_preview": "Chapter 11  is trading over 8.3 times its book value. A high ratio could indicate the firm is overvalued relative to the equity/ book value of the com…"
+          },
+          {
+            "rank": 2,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4032,
+            "text_preview": "Chapter 11  to acquire the share. Now assume, ARBL’s price jumps to Rs.750 while the EPS remains at Rs.21.49, the new P/E would be: = 750/21.49 = 34.9…"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4445,
+            "text_preview": "Chapter 11  participants. Here is the historical chart of Nifty 50 P/E ratio* – * Source – Creytheon From the P/E chart above, we can make a few impor…"
+          },
+          {
+            "rank": 4,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.445,
+            "text_preview": "Chapter 11  in comparison to the sales of a company with lower profit margins 5. If a company is going bankrupt, the ‘Book Value’ of a firm is simply …"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q018",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "What is the difference between investing in large-cap and small-cap stocks?",
+        "question_short": "What is the difference between investing in large-cap and sm…",
+        "expected_category": "stocks",
+        "retrieved_categories": [
+          "retirement"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "retirement",
+            "section": "CHAPTER 9",
+            "source": "Zerodha Varsity",
+            "distance": 0.3949,
+            "text_preview": "CHAPTER 9  any short term cycle) will always be bad. It depends on the market; however, for a common man, it is nearly impossible to time the market a…"
+          }
+        ],
+        "n_retrieved": 1,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q019",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "A company's stock is at ₹500 and EPS is ₹25. Is this stock expensive?",
+        "question_short": "A company's stock is at ₹500 and EPS is ₹25. Is this stock e…",
+        "expected_category": "stocks",
+        "retrieved_categories": [
+          "stocks",
+          "stocks",
+          "stocks",
+          "stocks"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4211,
+            "text_preview": "Chapter 11  to acquire the share. Now assume, ARBL’s price jumps to Rs.750 while the EPS remains at Rs.21.49, the new P/E would be: = 750/21.49 = 34.9…"
+          },
+          {
+            "rank": 2,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4583,
+            "text_preview": "Chapter 11  is trading over 8.3 times its book value. A high ratio could indicate the firm is overvalued relative to the equity/ book value of the com…"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4871,
+            "text_preview": "Chapter 11  participants. Here is the historical chart of Nifty 50 P/E ratio* – * Source – Creytheon From the P/E chart above, we can make a few impor…"
+          },
+          {
+            "rank": 4,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4947,
+            "text_preview": "Chapter 11  in comparison to the sales of a company with lower profit margins 5. If a company is going bankrupt, the ‘Book Value’ of a firm is simply …"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q020",
+        "type": "positive",
+        "difficulty": "hard",
+        "question": "Two companies in the same sector: one has P/E of 10, another P/E of 40. Which should I research further and why?",
+        "question_short": "Two companies in the same sector: one has P/E of 10, another…",
+        "expected_category": "stocks",
+        "retrieved_categories": [
+          "stocks",
+          "stocks",
+          "stocks",
+          "stocks"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4669,
+            "text_preview": "Chapter 11  to acquire the share. Now assume, ARBL’s price jumps to Rs.750 while the EPS remains at Rs.21.49, the new P/E would be: = 750/21.49 = 34.9…"
+          },
+          {
+            "rank": 2,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4844,
+            "text_preview": "Chapter 11  participants. Here is the historical chart of Nifty 50 P/E ratio* – * Source – Creytheon From the P/E chart above, we can make a few impor…"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 12",
+            "source": "Zerodha Varsity",
+            "distance": 0.4932,
+            "text_preview": "Chapter 12  amongst all the cement companies are well positioned to leverage this macro trend. 4. Sectoral Trends – This is sector specific. One needs…"
+          },
+          {
+            "rank": 4,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4933,
+            "text_preview": "Chapter 11  in comparison to the sales of a company with lower profit margins 5. If a company is going bankrupt, the ‘Book Value’ of a firm is simply …"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q021",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is compound interest and why is it called the eighth wonder of the world?",
+        "question_short": "What is compound interest and why is it called the eighth wo…",
+        "expected_category": "basics",
+        "retrieved_categories": [
+          "bonds"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "bonds",
+            "section": "CHAPTER 2",
+            "source": "Zerodha Varsity",
+            "distance": 0.5338,
+            "text_preview": "CHAPTER 2  more than a year, you will use CAGR or the c ompounded annual growth rate, to measure returns. I guess the difference in absolute and CAGR …"
+          }
+        ],
+        "n_retrieved": 1,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q022",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is inflation and how does it affect the value of my savings?",
+        "question_short": "What is inflation and how does it affect the value of my sav…",
+        "expected_category": "basics",
+        "retrieved_categories": [
+          "basics",
+          "tax",
+          "basics",
+          "stocks"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "basics",
+            "section": "CHAPTER 12",
+            "source": "Zerodha Varsity",
+            "distance": 0.5683,
+            "text_preview": "CHAPTER 12  – Reverse Repo rate is the rate at which RBI borrows money from banks. When banks lend money to RBI they are certain that RBI will not def…"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.5913,
+            "text_preview": "CHAPTER 4  But in the same period assume purchasing value of money is dropped by 18k because of inflation. Should you still pay long term capital gain…"
+          },
+          {
+            "rank": 3,
+            "category": "basics",
+            "section": "CHAPTER 12",
+            "source": "Zerodha Varsity",
+            "distance": 0.6165,
+            "text_preview": "CHAPTER 12  price increase or decrease when they are sold between organizations as opposed to actual consumers. WPI is an easy and convenient method t…"
+          },
+          {
+            "rank": 4,
+            "category": "stocks",
+            "section": "Chapter 2",
+            "source": "Zerodha Varsity",
+            "distance": 0.6191,
+            "text_preview": "Chapter 2  compounding effect To appreciate why Girish decided to stay invested and not really react to short term market movement, one has to underst…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 2,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.667,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q023",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "What is the difference between investing in a mutual fund versus buying individual stocks?",
+        "question_short": "What is the difference between investing in a mutual fund ve…",
+        "expected_category": "basics",
+        "retrieved_categories": [
+          "behavioural"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 16",
+            "source": "Zerodha Varsity",
+            "distance": 0.4611,
+            "text_preview": "CHAPTER 16  Index Funds 16.1 Overview In chapter 6 & 7, we discussed the basics of a mutual fund and how a fund works. Just to recap, a mutual fund is…"
+          }
+        ],
+        "n_retrieved": 1,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q024",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "My friend says a Nifty index fund is better than picking stocks. Is that true?",
+        "question_short": "My friend says a Nifty index fund is better than picking sto…",
+        "expected_category": "basics",
+        "retrieved_categories": [
+          "bonds"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "bonds",
+            "section": "CHAPTER 16",
+            "source": "Zerodha Varsity",
+            "distance": 0.4311,
+            "text_preview": "CHAPTER 16  fund, on the other hand, simply tracks the performance of a benchmark as closely as possible. It does not try to outperform or underperfor…"
+          }
+        ],
+        "n_retrieved": 1,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q025",
+        "type": "positive",
+        "difficulty": "hard",
+        "question": "If the market falls 30%, should I panic and sell, or keep investing?",
+        "question_short": "If the market falls 30%, should I panic and sell, or keep in…",
+        "expected_category": "basics",
+        "retrieved_categories": [
+          "stocks",
+          "risk",
+          "stocks",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "stocks",
+            "section": "Chapter 6",
+            "source": "Zerodha Varsity",
+            "distance": 0.4924,
+            "text_preview": "Chapter 6  respect to the trend in the chart it gives out a really powerful message based on which you can position your stance in the markets. 6.2 – …"
+          },
+          {
+            "rank": 2,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4944,
+            "text_preview": "CHAPTER 11  – 10K 2. Many market participants may book profits at this point – considering it is a psychological level 3. All time high implies no res…"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 16",
+            "source": "Zerodha Varsity",
+            "distance": 0.5034,
+            "text_preview": "Chapter 16  close to Rs.730/- per share. This translates to an absolute return of 192%. A great rate of return by any yardstick (considering the retur…"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.5037,
+            "text_preview": "CHAPTER 11  play. Being completely influenced by the outcome of the previous 10 trades, you are essentially reducing your position size for the 11th t…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      }
+    ]
+  },
+  "mmr": {
+    "aggregate": {
+      "precision": 0.52,
+      "recall": 0.68,
+      "f1": 0.567,
+      "mrr": 0.64,
+      "hit_rate": 0.68
+    },
+    "by_difficulty": {
+      "easy": {
+        "precision": 0.55,
+        "recall": 0.7,
+        "f1": 0.592,
+        "mrr": 0.65,
+        "hit_rate": 0.7
+      },
+      "medium": {
+        "precision": 0.475,
+        "recall": 0.7,
+        "f1": 0.54,
+        "mrr": 0.65,
+        "hit_rate": 0.7
+      },
+      "hard": {
+        "precision": 0.55,
+        "recall": 0.6,
+        "f1": 0.571,
+        "mrr": 0.6,
+        "hit_rate": 0.6
+      }
+    },
+    "per_query": [
+      {
+        "id": "q001",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is LTCG tax on equity shares and when does it apply?",
+        "question_short": "What is LTCG tax on equity shares and when does it apply?",
+        "expected_category": "tax",
+        "retrieved_categories": [
+          "tax",
+          "tax",
+          "tax",
+          "tax"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.3903,
+            "text_preview": "CHAPTER 4  considered as investments as long as fre- quency of such buy/sells is low 3. Shorter term equity delivery buy/sells ideally has to be consi…"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.391,
+            "text_preview": "CHAPTER 4  Rs.50,000) loss which be carried forward for another 7 years. Long term capital losses can’t be used to set off against long term gains as …"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.3909,
+            "text_preview": "CHAPTER 4  funds. You have to now stay invested for 3 years for the investment to be considered as long term capital gain. All gains made on investmen…"
+          },
+          {
+            "rank": 4,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.4194,
+            "text_preview": "CHAPTER 4  to his son via a ‘delivery instruction booklet’. For equity mutual funds (MF) – 0% or NIL tax Similar to equity delivery based trades, any …"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q002",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is the difference between speculative and non-speculative business income?",
+        "question_short": "What is the difference between speculative and non-speculati…",
+        "expected_category": "tax",
+        "retrieved_categories": [
+          "tax",
+          "tax",
+          "tax",
+          "tax"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "tax",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.3739,
+            "text_preview": "CHAPTER 5  be set-off only against any specula- tive gains you make in that period. Non-speculative losses can be set-off against any other business i…"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.5408,
+            "text_preview": "CHAPTER 3  no need to fear the taxman. Before we wrap this chapter, here are some interesting links that you should read through. CBDT circular on dis…"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.4277,
+            "text_preview": "CHAPTER 5  pay the tax on Rs.600,000 as per the slab rates – ➡ 0 – Rs.250,000 : 0% – Nil ➡ 250,000 – Rs.500,000 : 10% – Rs. 25,000/- ➡ 500,000 – Rs.60…"
+          },
+          {
+            "rank": 4,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.4539,
+            "text_preview": "CHAPTER 3  the financial year my profit from trading intraday stocks was Rs. 100,000/-, and my salary for the year was Rs.400,000/-. So my total incom…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q003",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "If I sell my shares after holding for 8 months, what tax rate applies on the profit?",
+        "question_short": "If I sell my shares after holding for 8 months, what tax rat…",
+        "expected_category": "tax",
+        "retrieved_categories": [
+          "tax",
+          "tax",
+          "tax",
+          "tax"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.4174,
+            "text_preview": "CHAPTER 4  funds. You have to now stay invested for 3 years for the investment to be considered as long term capital gain. All gains made on investmen…"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.4419,
+            "text_preview": "CHAPTER 4  pay 30% of the expected annual tax that you are likely to pay for that financial year by 15th Sept, 60% by 15th Dec, and 100% by 15th March…"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.477,
+            "text_preview": "CHAPTER 5  pay the tax on Rs.600,000 as per the slab rates – ➡ 0 – Rs.250,000 : 0% – Nil ➡ 250,000 – Rs.500,000 : 10% – Rs. 25,000/- ➡ 500,000 – Rs.60…"
+          },
+          {
+            "rank": 4,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.458,
+            "text_preview": "CHAPTER 3  Classifying Your Market Activity 3.1 – Are you a trader or investor or both? Identifying yourself as a trader or an investor is the first s…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q004",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "Can I offset my stock market losses against future gains in India?",
+        "question_short": "Can I offset my stock market losses against future gains in …",
+        "expected_category": "tax",
+        "retrieved_categories": [
+          "tax",
+          "behavioural",
+          "tax",
+          "behavioural"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.3798,
+            "text_preview": "CHAPTER 4  Rs.50,000) loss which be carried forward for another 7 years. Long term capital losses can’t be used to set off against long term gains as …"
+          },
+          {
+            "rank": 2,
+            "category": "behavioural",
+            "section": "CHAPTER 28",
+            "source": "Zerodha Varsity",
+            "distance": 0.4571,
+            "text_preview": "CHAPTER 28  described above is called “asset allocation.” Prediction is impossible If you knew which of the assets discussed above would give the best…"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.4373,
+            "text_preview": "CHAPTER 3  speculative or intraday equity trading loss can be set-off only against any other speculative gain (note: you cannot set-off intraday equit…"
+          },
+          {
+            "rank": 4,
+            "category": "behavioural",
+            "section": "CHAPTER 26",
+            "source": "Zerodha Varsity",
+            "distance": 0.4611,
+            "text_preview": "CHAPTER 26  to deal with this is to start to shi\u0000 the corpus funds to a debt fund as and when you start approaching the target year. For example, from…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 2,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.667,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q005",
+        "type": "positive",
+        "difficulty": "hard",
+        "question": "My friend made money from day trading stocks. How is his income classified for tax purposes?",
+        "question_short": "My friend made money from day trading stocks. How is his inc…",
+        "expected_category": "tax",
+        "retrieved_categories": [
+          "tax",
+          "tax",
+          "tax",
+          "tax"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.4143,
+            "text_preview": "CHAPTER 3  Classifying Your Market Activity 3.1 – Are you a trader or investor or both? Identifying yourself as a trader or an investor is the first s…"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.5015,
+            "text_preview": "CHAPTER 5  pay the tax on Rs.600,000 as per the slab rates – ➡ 0 – Rs.250,000 : 0% – Nil ➡ 250,000 – Rs.500,000 : 10% – Rs. 25,000/- ➡ 500,000 – Rs.60…"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.4707,
+            "text_preview": "CHAPTER 3  the financial year my profit from trading intraday stocks was Rs. 100,000/-, and my salary for the year was Rs.400,000/-. So my total incom…"
+          },
+          {
+            "rank": 4,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.4951,
+            "text_preview": "CHAPTER 4  funds. You have to now stay invested for 3 years for the investment to be considered as long term capital gain. All gains made on investmen…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q006",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is position sizing and why is it important for traders?",
+        "question_short": "What is position sizing and why is it important for traders?",
+        "expected_category": "risk",
+        "retrieved_categories": [
+          "risk",
+          "risk",
+          "risk",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "risk",
+            "section": "CHAPTER 13",
+            "source": "Zerodha Varsity",
+            "distance": 0.3484,
+            "text_preview": "CHAPTER 13  Position Sizing for active traders (Part 3) 13.1 – Choose your path We addressed a very crucial concept in the previous chapter. We looked…"
+          },
+          {
+            "rank": 2,
+            "category": "risk",
+            "section": "CHAPTER 14",
+            "source": "Zerodha Varsity",
+            "distance": 0.4722,
+            "text_preview": "CHAPTER 14  is the maximum loss threshold. We know the stop loss for this trade is 390, from an entry price of 393.65, the stop loss in absolute Rupee…"
+          },
+          {
+            "rank": 3,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4471,
+            "text_preview": "CHAPTER 11  the ‘recovery trauma’ affects traders with smaller account size. Assume you come to the market with Rs.50,000/- capital. Now you would hav…"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 13",
+            "source": "Zerodha Varsity",
+            "distance": 0.4098,
+            "text_preview": "CHAPTER 13  is assigning an equal weight to both the contracts, ignoring the implicit ‘riskiness’ of the asset. To give you a perspective, Nifty Futur…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q007",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is a stop loss and how should it be used in trading?",
+        "question_short": "What is a stop loss and how should it be used in trading?",
+        "expected_category": "risk",
+        "retrieved_categories": [
+          "risk",
+          "stocks",
+          "stocks",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "risk",
+            "section": "CHAPTER 14",
+            "source": "Zerodha Varsity",
+            "distance": 0.4213,
+            "text_preview": "CHAPTER 14  is the maximum loss threshold. We know the stop loss for this trade is 390, from an entry price of 393.65, the stop loss in absolute Rupee…"
+          },
+          {
+            "rank": 2,
+            "category": "stocks",
+            "section": "Chapter 7",
+            "source": "Zerodha Varsity",
+            "distance": 0.5096,
+            "text_preview": "Chapter 7  it appears 6. The low of the hammer acts as the stop loss price trade 7. The hanging man is a bearish pattern which appears at the top end …"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.4888,
+            "text_preview": "Chapter 5  : Notice in the chart above, a bullish marubuzo has been encircled. The risk taker would have initiated a trade to buy the stock on the sam…"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 2",
+            "source": "Zerodha Varsity",
+            "distance": 0.5042,
+            "text_preview": "CHAPTER 2  Risk (Part 1) 2.1. Warming up to risk For every rupee of profit made by a trader, there must be a trader losing that rupee. As an extension…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 2,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.667,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q008",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "How do I decide how much of my capital to risk on a single trade?",
+        "question_short": "How do I decide how much of my capital to risk on a single t…",
+        "expected_category": "risk",
+        "retrieved_categories": [
+          "risk",
+          "risk",
+          "risk",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "risk",
+            "section": "CHAPTER 13",
+            "source": "Zerodha Varsity",
+            "distance": 0.3963,
+            "text_preview": "CHAPTER 13  decide that you will not expose more than 20% as margin amount to a particular trade. This translates to a capital of Rs.100,000/- per tra…"
+          },
+          {
+            "rank": 2,
+            "category": "risk",
+            "section": "CHAPTER 14",
+            "source": "Zerodha Varsity",
+            "distance": 0.4082,
+            "text_preview": "CHAPTER 14  is the maximum loss threshold. We know the stop loss for this trade is 390, from an entry price of 393.65, the stop loss in absolute Rupee…"
+          },
+          {
+            "rank": 3,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4255,
+            "text_preview": "CHAPTER 11  play. Being completely influenced by the outcome of the previous 10 trades, you are essentially reducing your position size for the 11th t…"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 12",
+            "source": "Zerodha Varsity",
+            "distance": 0.4306,
+            "text_preview": "CHAPTER 12  Position Sizing for active traders (Part 2) 12.1 –Defining Equity Capital The last chapter we laid down few key thoughts on position sizin…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q009",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "What happens to a trader's account if they never use stop losses?",
+        "question_short": "What happens to a trader's account if they never use stop lo…",
+        "expected_category": "risk",
+        "retrieved_categories": [
+          "risk",
+          "tax",
+          "stocks",
+          "tax"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4738,
+            "text_preview": "CHAPTER 11  losses plus reap in some profits? Which option are you likely to take? Take a minute and answer this question honestly to yourself. Having…"
+          },
+          {
+            "rank": 2,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.544,
+            "text_preview": "CHAPTER 4  Rs.50,000) loss which be carried forward for another 7 years. Long term capital losses can’t be used to set off against long term gains as …"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 7",
+            "source": "Zerodha Varsity",
+            "distance": 0.537,
+            "text_preview": "Chapter 7  The risk averse trader should evaluate the OHLC data on the 2nd If it’s a blue candle, the trade is valid and hence he can go long 3. The l…"
+          },
+          {
+            "rank": 4,
+            "category": "tax",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.5048,
+            "text_preview": "CHAPTER 3  speculative or intraday equity trading loss can be set-off only against any other speculative gain (note: you cannot set-off intraday equit…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 1,
+        "precision": 0.25,
+        "recall": 1.0,
+        "f1": 0.4,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q010",
+        "type": "positive",
+        "difficulty": "hard",
+        "question": "I keep winning small trades but one big loss wiped out everything. What am I doing wrong?",
+        "question_short": "I keep winning small trades but one big loss wiped out every…",
+        "expected_category": "risk",
+        "retrieved_categories": [
+          "risk",
+          "risk",
+          "stocks",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.3602,
+            "text_preview": "CHAPTER 11  losses plus reap in some profits? Which option are you likely to take? Take a minute and answer this question honestly to yourself. Having…"
+          },
+          {
+            "rank": 2,
+            "category": "risk",
+            "section": "CHAPTER 16",
+            "source": "Zerodha Varsity",
+            "distance": 0.54,
+            "text_preview": "CHAPTER 16  Trading Biases (Part 2) 16.1 – Anchoring Bias I’ve spent close to about 13 years participating in the stock markets. I’ve spent these year…"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 18",
+            "source": "Zerodha Varsity",
+            "distance": 0.548,
+            "text_preview": "Chapter 18  of risk they would expect at least Rs.2 as reward. A trade must qualify the trader’s RRR requirement. Remember a low RRR is just not worth…"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 14",
+            "source": "Zerodha Varsity",
+            "distance": 0.4766,
+            "text_preview": "CHAPTER 14  is the maximum loss threshold. We know the stop loss for this trade is 390, from an entry price of 393.65, the stop loss in absolute Rupee…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 3,
+        "precision": 0.75,
+        "recall": 1.0,
+        "f1": 0.857,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q011",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "Why is building an emergency fund important and how much should it cover?",
+        "question_short": "Why is building an emergency fund important and how much sho…",
+        "expected_category": "retirement",
+        "retrieved_categories": [
+          "behavioural",
+          "behavioural"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 26",
+            "source": "Zerodha Varsity",
+            "distance": 0.356,
+            "text_preview": "CHAPTER 26  for these two types of risks. I want to stress that don’t buy insurance products linked to investment plans. These are not worth it. Cover…"
+          },
+          {
+            "rank": 2,
+            "category": "behavioural",
+            "section": "CHAPTER 26",
+            "source": "Zerodha Varsity",
+            "distance": 0.4763,
+            "text_preview": "CHAPTER 26  The M utual F und Portfolio 26.1 – Assumptions We have reached a stage where we have discussed almost everything related to Mutual funds, …"
+          }
+        ],
+        "n_retrieved": 2,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q012",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is a Systematic Investment Plan and how does it work?",
+        "question_short": "What is a Systematic Investment Plan and how does it work?",
+        "expected_category": "retirement",
+        "retrieved_categories": [
+          "behavioural",
+          "bonds"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 18",
+            "source": "Zerodha Varsity",
+            "distance": 0.5341,
+            "text_preview": "CHAPTER 18  investment performance Mutual fund investors o\u0000en get confused with the way returns are measured across investments. Most investors apply …"
+          },
+          {
+            "rank": 2,
+            "category": "bonds",
+            "section": "CHAPTER 8",
+            "source": "Zerodha Varsity",
+            "distance": 0.5594,
+            "text_preview": "CHAPTER 8  to receive these dividends right? Likewise, when the fund manager buys the stock of a company, and the company issues a dividend, then the …"
+          }
+        ],
+        "n_retrieved": 2,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q013",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "What are the advantages of starting to invest early in life?",
+        "question_short": "What are the advantages of starting to invest early in life?",
+        "expected_category": "retirement",
+        "retrieved_categories": [
+          "retirement",
+          "retirement"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "retirement",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.4088,
+            "text_preview": "CHAPTER 5  years old. This means you have a long runway before you retire. Even if you retire by 60, you mostly have 35 years to retire. Out of these …"
+          },
+          {
+            "rank": 2,
+            "category": "retirement",
+            "section": "CHAPTER 1",
+            "source": "Zerodha Varsity",
+            "distance": 0.4327,
+            "text_preview": "CHAPTER 1  the salary money and had nothing le\u0000 to save. No points of guessing, this continued for years and I never saved a dime. Even today, I regre…"
+          }
+        ],
+        "n_retrieved": 2,
+        "n_relevant": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q014",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "I have ₹5000 per month to save. Should I keep it in a savings account or invest it?",
+        "question_short": "I have ₹5000 per month to save. Should I keep it in a saving…",
+        "expected_category": "retirement",
+        "retrieved_categories": [
+          "behavioural",
+          "retirement"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 26",
+            "source": "Zerodha Varsity",
+            "distance": 0.444,
+            "text_preview": "CHAPTER 26  to deal with this is to start to shi\u0000 the corpus funds to a debt fund as and when you start approaching the target year. For example, from…"
+          },
+          {
+            "rank": 2,
+            "category": "retirement",
+            "section": "CHAPTER 5",
+            "source": "Zerodha Varsity",
+            "distance": 0.4527,
+            "text_preview": "CHAPTER 5  for the year, i.e. Rs.5000/-. Retirement is now 299 months away. I want you to recognize the fact that the ‘months away’ can be looked at f…"
+          }
+        ],
+        "n_retrieved": 2,
+        "n_relevant": 1,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.667,
+        "mrr": 0.5,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q015",
+        "type": "positive",
+        "difficulty": "hard",
+        "question": "My parents say investing is risky. How do I explain the risk of NOT investing?",
+        "question_short": "My parents say investing is risky. How do I explain the risk…",
+        "expected_category": "retirement",
+        "retrieved_categories": [
+          "behavioural",
+          "risk",
+          "behavioural",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 28",
+            "source": "Zerodha Varsity",
+            "distance": 0.4758,
+            "text_preview": "CHAPTER 28  described above is called “asset allocation.” Prediction is impossible If you knew which of the assets discussed above would give the best…"
+          },
+          {
+            "rank": 2,
+            "category": "risk",
+            "section": "CHAPTER 2",
+            "source": "Zerodha Varsity",
+            "distance": 0.5014,
+            "text_preview": "CHAPTER 2  Risk (Part 1) 2.1. Warming up to risk For every rupee of profit made by a trader, there must be a trader losing that rupee. As an extension…"
+          },
+          {
+            "rank": 3,
+            "category": "behavioural",
+            "section": "CHAPTER 3",
+            "source": "Zerodha Varsity",
+            "distance": 0.5143,
+            "text_preview": "CHAPTER 3  and of course for more serious things in life as investment planning J The discussion we are about to have is a core financial concept call…"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 2",
+            "source": "Zerodha Varsity",
+            "distance": 0.5092,
+            "text_preview": "CHAPTER 2  diversifiable, this is evident as the graph starts to flatten out after 20 stocks. In fact, the risk that remains even after diversificatio…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q016",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is market capitalisation of a company?",
+        "question_short": "What is market capitalisation of a company?",
+        "expected_category": "stocks",
+        "retrieved_categories": [
+          "behavioural",
+          "stocks",
+          "stocks",
+          "stocks"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 30",
+            "source": "Zerodha Varsity",
+            "distance": 0.4973,
+            "text_preview": "CHAPTER 30  Whether this will pan out as per estimates or not is an unknown. But the stock markets at least seem to factor this Anyway, at this point,…"
+          },
+          {
+            "rank": 2,
+            "category": "stocks",
+            "section": "Chapter 6",
+            "source": "Zerodha Varsity",
+            "distance": 0.5896,
+            "text_preview": "Chapter 6  company as it rightfully belongs to the company’s shareholders’. Hence from the company’s perspective the shareholders’ funds are an obliga…"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 15",
+            "source": "Zerodha Varsity",
+            "distance": 0.5567,
+            "text_preview": "Chapter 15  From the total net present value of cash flows, the net debt has to be adjusted. Dividing this by the total number of shares gives us the …"
+          },
+          {
+            "rank": 4,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.5795,
+            "text_preview": "Chapter 11  to acquire the share. Now assume, ARBL’s price jumps to Rs.750 while the EPS remains at Rs.21.49, the new P/E would be: = 750/21.49 = 34.9…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 3,
+        "precision": 0.75,
+        "recall": 1.0,
+        "f1": 0.857,
+        "mrr": 0.5,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q017",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What does the P/E ratio of a stock tell me?",
+        "question_short": "What does the P/E ratio of a stock tell me?",
+        "expected_category": "stocks",
+        "retrieved_categories": [
+          "stocks",
+          "stocks",
+          "stocks",
+          "stocks"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.391,
+            "text_preview": "Chapter 11  is trading over 8.3 times its book value. A high ratio could indicate the firm is overvalued relative to the equity/ book value of the com…"
+          },
+          {
+            "rank": 2,
+            "category": "stocks",
+            "section": "Chapter 15",
+            "source": "Zerodha Varsity",
+            "distance": 0.5385,
+            "text_preview": "Chapter 15  From the total net present value of cash flows, the net debt has to be adjusted. Dividing this by the total number of shares gives us the …"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 9",
+            "source": "Zerodha Varsity",
+            "distance": 0.5378,
+            "text_preview": "Chapter 9  is best to study the ratio’s recent trend or compare it with the company’s peers to develop an opinion 3. Financial ratios can be categoriz…"
+          },
+          {
+            "rank": 4,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4445,
+            "text_preview": "Chapter 11  participants. Here is the historical chart of Nifty 50 P/E ratio* – * Source – Creytheon From the P/E chart above, we can make a few impor…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q018",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "What is the difference between investing in large-cap and small-cap stocks?",
+        "question_short": "What is the difference between investing in large-cap and sm…",
+        "expected_category": "stocks",
+        "retrieved_categories": [
+          "retirement",
+          "behavioural"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "retirement",
+            "section": "CHAPTER 9",
+            "source": "Zerodha Varsity",
+            "distance": 0.3949,
+            "text_preview": "CHAPTER 9  any short term cycle) will always be bad. It depends on the market; however, for a common man, it is nearly impossible to time the market a…"
+          },
+          {
+            "rank": 2,
+            "category": "behavioural",
+            "section": "CHAPTER 9",
+            "source": "Zerodha Varsity",
+            "distance": 0.4334,
+            "text_preview": "CHAPTER 9  funds for the same category, how would one narrow down on a single fund to invest in? Well, this is a different topic altogether, and it in…"
+          }
+        ],
+        "n_retrieved": 2,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q019",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "A company's stock is at ₹500 and EPS is ₹25. Is this stock expensive?",
+        "question_short": "A company's stock is at ₹500 and EPS is ₹25. Is this stock e…",
+        "expected_category": "stocks",
+        "retrieved_categories": [
+          "stocks",
+          "risk",
+          "stocks",
+          "basics"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4211,
+            "text_preview": "Chapter 11  to acquire the share. Now assume, ARBL’s price jumps to Rs.750 while the EPS remains at Rs.21.49, the new P/E would be: = 750/21.49 = 34.9…"
+          },
+          {
+            "rank": 2,
+            "category": "risk",
+            "section": "CHAPTER 2",
+            "source": "Zerodha Varsity",
+            "distance": 0.5475,
+            "text_preview": "CHAPTER 2  Rs.1,00,000/-. You decide to invest this money in HCL Technologies Limited. A few months 4 zerodha.com/varsity later HCL declares that thei…"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 15",
+            "source": "Zerodha Varsity",
+            "distance": 0.5152,
+            "text_preview": "Chapter 15  Error & the intrinsic value band The DCF model though quite scientific is built on a bunch of assumptions. Making assumptions, especially …"
+          },
+          {
+            "rank": 4,
+            "category": "basics",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.5352,
+            "text_preview": "CHAPTER 11  Five Corporate Actions and its Impact on Stock Prices 11.1 - Overview Corporate actions are initiatives taken up by a corporate entity tha…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 2,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.667,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q020",
+        "type": "positive",
+        "difficulty": "hard",
+        "question": "Two companies in the same sector: one has P/E of 10, another P/E of 40. Which should I research further and why?",
+        "question_short": "Two companies in the same sector: one has P/E of 10, another…",
+        "expected_category": "stocks",
+        "retrieved_categories": [
+          "stocks",
+          "stocks",
+          "stocks",
+          "stocks"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "stocks",
+            "section": "Chapter 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.4669,
+            "text_preview": "Chapter 11  to acquire the share. Now assume, ARBL’s price jumps to Rs.750 while the EPS remains at Rs.21.49, the new P/E would be: = 750/21.49 = 34.9…"
+          },
+          {
+            "rank": 2,
+            "category": "stocks",
+            "section": "Chapter 13",
+            "source": "Zerodha Varsity",
+            "distance": 0.5088,
+            "text_preview": "Chapter 13  for new companies 16 new participants to enter the to enter the market and eat away the margins industry? Is the company manufacturing If …"
+          },
+          {
+            "rank": 3,
+            "category": "stocks",
+            "section": "Chapter 9",
+            "source": "Zerodha Varsity",
+            "distance": 0.5013,
+            "text_preview": "Chapter 9  is best to study the ratio’s recent trend or compare it with the company’s peers to develop an opinion 3. Financial ratios can be categoriz…"
+          },
+          {
+            "rank": 4,
+            "category": "stocks",
+            "section": "Chapter 12",
+            "source": "Zerodha Varsity",
+            "distance": 0.4932,
+            "text_preview": "Chapter 12  amongst all the cement companies are well positioned to leverage this macro trend. 4. Sectoral Trends – This is sector specific. One needs…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q021",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is compound interest and why is it called the eighth wonder of the world?",
+        "question_short": "What is compound interest and why is it called the eighth wo…",
+        "expected_category": "basics",
+        "retrieved_categories": [
+          "behavioural",
+          "retirement"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 2",
+            "source": "Zerodha Varsity",
+            "distance": 0.5338,
+            "text_preview": "CHAPTER 2  more than a year, you will use CAGR or the c ompounded annual growth rate, to measure returns. I guess the difference in absolute and CAGR …"
+          },
+          {
+            "rank": 2,
+            "category": "retirement",
+            "section": "CHAPTER 2",
+            "source": "Zerodha Varsity",
+            "distance": 0.5365,
+            "text_preview": "CHAPTER 2  need to understand the compound interest in conjunction with time. Compounding in the finance world refers to the ability of money to grow,…"
+          }
+        ],
+        "n_retrieved": 2,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q022",
+        "type": "positive",
+        "difficulty": "easy",
+        "question": "What is inflation and how does it affect the value of my savings?",
+        "question_short": "What is inflation and how does it affect the value of my sav…",
+        "expected_category": "basics",
+        "retrieved_categories": [
+          "basics",
+          "behavioural",
+          "tax",
+          "stocks"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "basics",
+            "section": "CHAPTER 12",
+            "source": "Zerodha Varsity",
+            "distance": 0.5683,
+            "text_preview": "CHAPTER 12  – Reverse Repo rate is the rate at which RBI borrows money from banks. When banks lend money to RBI they are certain that RBI will not def…"
+          },
+          {
+            "rank": 2,
+            "category": "behavioural",
+            "section": "CHAPTER 1",
+            "source": "Zerodha Varsity",
+            "distance": 0.6195,
+            "text_preview": "CHAPTER 1  time and return, both of these when concocted together, works in a beautiful nonlinear way. So, here are how the numbers stack up for the 3…"
+          },
+          {
+            "rank": 3,
+            "category": "tax",
+            "section": "CHAPTER 4",
+            "source": "Zerodha Varsity",
+            "distance": 0.5913,
+            "text_preview": "CHAPTER 4  But in the same period assume purchasing value of money is dropped by 18k because of inflation. Should you still pay long term capital gain…"
+          },
+          {
+            "rank": 4,
+            "category": "stocks",
+            "section": "Chapter 2",
+            "source": "Zerodha Varsity",
+            "distance": 0.6191,
+            "text_preview": "Chapter 2  compounding effect To appreciate why Girish decided to stay invested and not really react to short term market movement, one has to underst…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 1,
+        "precision": 0.25,
+        "recall": 1.0,
+        "f1": 0.4,
+        "mrr": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "id": "q023",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "What is the difference between investing in a mutual fund versus buying individual stocks?",
+        "question_short": "What is the difference between investing in a mutual fund ve…",
+        "expected_category": "basics",
+        "retrieved_categories": [
+          "behavioural",
+          "behavioural"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 16",
+            "source": "Zerodha Varsity",
+            "distance": 0.4611,
+            "text_preview": "CHAPTER 16  Index Funds 16.1 Overview In chapter 6 & 7, we discussed the basics of a mutual fund and how a fund works. Just to recap, a mutual fund is…"
+          },
+          {
+            "rank": 2,
+            "category": "behavioural",
+            "section": "CHAPTER 16",
+            "source": "Zerodha Varsity",
+            "distance": 0.4719,
+            "text_preview": "CHAPTER 16  with the letter G and then launch a fund tracking that index. But the very first index fund was tracked the S&P 500 which is a market capi…"
+          }
+        ],
+        "n_retrieved": 2,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q024",
+        "type": "positive",
+        "difficulty": "medium",
+        "question": "My friend says a Nifty index fund is better than picking stocks. Is that true?",
+        "question_short": "My friend says a Nifty index fund is better than picking sto…",
+        "expected_category": "basics",
+        "retrieved_categories": [
+          "behavioural",
+          "behavioural"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "behavioural",
+            "section": "CHAPTER 16",
+            "source": "Zerodha Varsity",
+            "distance": 0.4311,
+            "text_preview": "CHAPTER 16  fund, on the other hand, simply tracks the performance of a benchmark as closely as possible. It does not try to outperform or underperfor…"
+          },
+          {
+            "rank": 2,
+            "category": "behavioural",
+            "section": "CHAPTER 16",
+            "source": "Zerodha Varsity",
+            "distance": 0.4335,
+            "text_preview": "CHAPTER 16  and history would have been much different. Even though it was launched in 1976, the Vanguard 500 Index Fund didn’t reach the $1 billion m…"
+          }
+        ],
+        "n_retrieved": 2,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      },
+      {
+        "id": "q025",
+        "type": "positive",
+        "difficulty": "hard",
+        "question": "If the market falls 30%, should I panic and sell, or keep investing?",
+        "question_short": "If the market falls 30%, should I panic and sell, or keep in…",
+        "expected_category": "basics",
+        "retrieved_categories": [
+          "stocks",
+          "stocks",
+          "retirement",
+          "risk"
+        ],
+        "retrieved_chunks": [
+          {
+            "rank": 1,
+            "category": "stocks",
+            "section": "Chapter 6",
+            "source": "Zerodha Varsity",
+            "distance": 0.4924,
+            "text_preview": "Chapter 6  respect to the trend in the chart it gives out a really powerful message based on which you can position your stance in the markets. 6.2 – …"
+          },
+          {
+            "rank": 2,
+            "category": "stocks",
+            "section": "Chapter 16",
+            "source": "Zerodha Varsity",
+            "distance": 0.5082,
+            "text_preview": "Chapter 16  I exercise the ‘Margin of Safety’ principle in my own investment practice. Consider the case of Amara Raja Batteries Limited; the intrinsi…"
+          },
+          {
+            "rank": 3,
+            "category": "retirement",
+            "section": "CHAPTER 9",
+            "source": "Zerodha Varsity",
+            "distance": 0.5113,
+            "text_preview": "CHAPTER 9  opinion). Anything lower than this can be a futile attempt at wealth creation. Why not short term? – One of the common follow up questions …"
+          },
+          {
+            "rank": 4,
+            "category": "risk",
+            "section": "CHAPTER 11",
+            "source": "Zerodha Varsity",
+            "distance": 0.5037,
+            "text_preview": "CHAPTER 11  play. Being completely influenced by the outcome of the previous 10 trades, you are essentially reducing your position size for the 11th t…"
+          }
+        ],
+        "n_retrieved": 4,
+        "n_relevant": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mrr": 0.0,
+        "hit_rate": 0.0
+      }
+    ]
+  }
+}

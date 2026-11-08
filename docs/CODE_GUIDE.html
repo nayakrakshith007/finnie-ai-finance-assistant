@@ -40,30 +40,68 @@ body{margin:0;background:var(--bg);color:var(--ink);
 .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
 h1{font-size:clamp(28px,5vw,42px);line-height:1.15;margin:.3em 0 .2em;letter-spacing:-.02em}
 .sub{color:var(--ink-2);max-width:62ch;margin:0}
-.bar{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
 button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);
-  color:var(--ink);border-radius:8px;padding:7px 13px;font-size:14px}
+  color:var(--ink);border-radius:8px;padding:7px 13px;font-size:13.5px}
 button:hover{background:var(--panel-2)}
-h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
-  margin:52px 0 6px;font-weight:700;border-top:1px solid var(--line);padding-top:26px}
-.mdesc{color:var(--ink-3);font-size:14px;margin:0 0 18px;max-width:60ch}
-.c{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px;
-  margin-bottom:14px;box-shadow:var(--shadow)}
-.c h3{margin:0 0 4px;font-size:19px;letter-spacing:-.01em;line-height:1.3}
-.kicker{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:9px}
-.filepath{font-size:12px;font-family:ui-monospace,monospace;color:var(--ink-3);margin-bottom:14px;background:var(--panel-2);padding:4px 10px;border-radius:6px;display:inline-block}
-.c p{color:var(--ink-2);margin:.7em 0}
-.c ul,.c ol{color:var(--ink-2);padding-left:20px;margin:.7em 0}
-.c li{margin:5px 0}
-.c b,.c strong{color:var(--ink);font-weight:600}
+
+/* ── Tabs ──────────────────────────────────────────────── */
+.tabs{display:flex;gap:4px;margin:32px 0 0;border-bottom:2px solid var(--line);flex-wrap:wrap}
+.tab{font:inherit;cursor:pointer;border:1px solid transparent;border-bottom:2px solid transparent;
+  background:transparent;color:var(--ink-3);border-radius:9px 9px 0 0;
+  padding:9px 18px;font-size:14px;font-weight:500;position:relative;bottom:-2px;
+  transition:color .15s,background .15s}
+.tab:hover{color:var(--ink);background:var(--panel-2)}
+.tab.active{background:var(--panel);border:1px solid var(--line);border-bottom:2px solid var(--panel);
+  color:var(--ink);font-weight:700}
+.tbadge{display:inline-block;font-size:10px;padding:1px 7px;border-radius:99px;
+  margin-left:6px;vertical-align:2px;font-weight:700;letter-spacing:.04em}
+.tbadge.done{background:var(--done-soft);color:var(--done)}
+.tbadge.pend{background:var(--pending-soft);color:var(--pending)}
+
+/* ── Phase panes ───────────────────────────────────────── */
+.phase-pane{display:none;padding-top:28px}
+.phase-pane.active{display:block}
+.phase-head{margin-bottom:18px}
+.phase-head h2{font-size:22px;letter-spacing:-.01em;margin:0 0 4px;font-weight:700;
+  border:none;padding:0;text-transform:none;color:var(--ink)}
+.phase-head p{color:var(--ink-3);font-size:14px;margin:4px 0 0;max-width:60ch}
+
+/* ── Collapsible cards ─────────────────────────────────── */
+details.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden}
+details.card>summary{
+  cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;
+  padding:15px 20px;user-select:none;-webkit-user-select:none}
+details.card>summary::-webkit-details-marker{display:none}
+.card-arrow{font-size:11px;color:var(--accent);transition:transform .2s;
+  display:inline-block;width:16px;flex-shrink:0}
+details.card[open]>summary .card-arrow{transform:rotate(90deg)}
+.card-kicker{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);font-weight:700;flex-shrink:0}
+.card-title{font-weight:600;font-size:16px;color:var(--ink);flex:1;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.card-title.prose{font-family:inherit;font-size:17px}
+.card-file{font-size:11.5px;font-family:ui-monospace,monospace;color:var(--ink-3);
+  background:var(--panel-2);padding:2px 9px;border-radius:6px;white-space:nowrap}
+.card-body{padding:4px 20px 22px;border-top:1px solid var(--line)}
+
+/* ── Inside card body ──────────────────────────────────── */
+.card-body .kicker{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:14px 0 6px}
+.card-body h3{margin:0 0 4px;font-size:19px;letter-spacing:-.01em;line-height:1.3}
+.card-body p{color:var(--ink-2);margin:.7em 0}
+.card-body ul,.card-body ol{color:var(--ink-2);padding-left:20px;margin:.7em 0}
+.card-body li{margin:5px 0}
+.card-body b,.card-body strong{color:var(--ink);font-weight:600}
 code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;
   background:var(--code-bg);padding:1.5px 5px;border-radius:5px;color:var(--ink)}
 pre{border-radius:10px;padding:0;overflow:hidden;margin:14px 0;position:relative;border:1px solid #282c34}
 pre code.hljs{padding:18px 20px;font-size:13.5px;line-height:1.75;border-radius:10px}
-/* light-mode: keep hljs dark (atom-one-dark) — code is always dark */
-.ann{display:flex;gap:16px;margin:10px 0;border-left:3px solid var(--accent);padding:10px 14px;background:var(--accent-soft);border-radius:0 8px 8px 0;font-size:14px;color:var(--ink-2)}
+.ann{display:flex;gap:16px;margin:10px 0;border-left:3px solid var(--accent);
+  padding:10px 14px;background:var(--accent-soft);border-radius:0 8px 8px 0;font-size:14px;color:var(--ink-2)}
 .ann .num{font-weight:700;color:var(--accent);font-size:13px;min-width:24px;padding-top:1px}
-.warn-box{background:var(--warn-soft);border-left:3px solid var(--warn);padding:10px 14px;border-radius:0 8px 8px 0;font-size:14px;color:var(--ink-2);margin:14px 0}
+.warn-box{background:var(--warn-soft);border-left:3px solid var(--warn);padding:10px 14px;
+  border-radius:0 8px 8px 0;font-size:14px;color:var(--ink-2);margin:14px 0}
 .warn-box b{color:var(--warn)}
 .key{background:var(--accent-soft);border-radius:10px;padding:13px 16px;margin:16px 0 4px;font-size:14.5px;color:var(--ink-2)}
 .key b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
@@ -90,12 +128,10 @@ th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);verti
 th{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
 td b{color:var(--ink)}
 td code{font-size:.85em}
+.filepath{font-size:12px;font-family:ui-monospace,monospace;color:var(--ink-3);margin-bottom:14px;background:var(--panel-2);padding:4px 10px;border-radius:6px;display:inline-block}
 footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
-.hide{display:none}
-.nores{color:var(--ink-3);font-size:14px;padding:20px 0}
-.pending-card{border:1px dashed var(--line);border-radius:14px;padding:22px 24px;margin-bottom:14px;background:transparent}
-.pending-card h3{color:var(--ink-3);margin:0 0 4px;font-size:19px}
-.pending-card p{color:var(--ink-3);font-size:14px;margin:.5em 0}
+.pending-pane{border:1px dashed var(--line);border-radius:14px;padding:28px 24px;text-align:center;color:var(--ink-3)}
+.pending-pane h3{margin:0 0 8px;color:var(--ink-3)}
 </style>
 </head>
 <body>
@@ -103,27 +139,84 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-si
 <header>
   <div class="eyebrow">Applied Agentic AI &middot; Capstone &middot; Code Walkthrough</div>
   <h1>Finnie &mdash; Code Guide</h1>
-  <p class="sub">Every function we write, explained line by line. Read this alongside the code — if you can explain each annotation out loud, you can defend it in an interview.</p>
+  <p class="sub">Every function we write, explained line by line. Each phase is a tab. Click any card to expand it.</p>
   <div class="bar">
     <button id="theme">Toggle theme</button>
-    <button id="openall">Show all answers</button>
-    <button id="shutall">Hide all answers</button>
+    <button id="openall">Expand all cards</button>
+    <button id="shutall">Collapse all cards</button>
+    <button id="showq">Show all Q&amp;A</button>
+    <button id="hideq">Hide all Q&amp;A</button>
   </div>
 </header>
 
-<!-- ═══════════════════════════════════════════ PHASE 0 ═══ -->
-<h2>Phase 0 &mdash; Config &amp; Logging <span class="status done">done</span></h2>
-<p class="mdesc">The foundation every later module depends on. No business logic here — only config loading and structured logging.</p>
+<!-- ══════════════════════ TAB BAR ══════════════════════ -->
+<div class="tabs" role="tablist">
+  <button class="tab active" data-tab="p0" role="tab">Phase 0 — Config &amp; Logging <span class="tbadge done">done</span></button>
+  <button class="tab" data-tab="p1" role="tab">Phase 1 — LLM &amp; Compliance <span class="tbadge done">done</span></button>
+  <button class="tab" data-tab="p2" role="tab">Phase 2+ <span class="tbadge pend">pending</span></button>
+</div>
 
-<!-- ─── _apply_env_overrides ─── -->
-<div class="c">
-  <div class="kicker">Function 1 of 4</div>
-  <h3>_apply_env_overrides</h3>
-  <div class="filepath">src/core/config.py</div>
-  <p><b>What it does in one sentence:</b> Scans every environment variable that starts with <code>FINNIE_</code> and writes its value into the raw YAML dictionary before Pydantic validates it.</p>
-  <p><b>Why it exists:</b> In production or CI you cannot edit a YAML file — you inject config via environment variables. This function is the bridge that maps those vars onto the config tree.</p>
+<!-- ══════════════════════ PHASE 0 ══════════════════════ -->
+<div id="p0" class="phase-pane active">
+  <div class="phase-head">
+    <h2>Phase 0 &mdash; Config &amp; Logging <span class="status done">done</span></h2>
+    <p>The foundation every later module depends on. No business logic — only config loading and structured logging.</p>
+  </div>
 
-  <pre><code class="language-python">def _apply_env_overrides(raw: dict[str, Any]) -> dict[str, Any]:
+  <!-- ── Overview ── open by default -->
+  <details class="card" open>
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Phase 0 overview</span>
+      <span class="card-title prose">What are we doing in Phase 0?</span>
+    </summary>
+    <div class="card-body">
+      <p>Before any agent can run, two questions must be answered: <b>where does config come from?</b> and <b>how does the app log what it is doing?</b> Phase 0 answers both, in a way every later module relies on.</p>
+      <table>
+        <thead><tr><th>File</th><th>Functions written</th><th>Responsibility</th></tr></thead>
+        <tbody>
+          <tr><td><code>src/core/config.py</code></td><td><code>_apply_env_overrides</code>, <code>load_config</code>, <code>get_config</code></td><td>Read YAML + env vars → validated Pydantic <code>Config</code> object</td></tr>
+          <tr><td><code>src/core/logging_setup.py</code></td><td><code>setup_logging</code>, <code>get_logger</code></td><td>Configure the root logger once; give every module a named logger</td></tr>
+        </tbody>
+      </table>
+      <p><b>The 12-factor config pattern (the "why"):</b></p>
+      <ul>
+        <li><b>Secrets in <code>.env</code></b> — API keys, tokens. Gitignored. Never in YAML.</li>
+        <li><b>Behaviour in <code>config.yaml</code></b> — model names, thresholds, paths. Committed. No secrets.</li>
+        <li><b>Structure in Python</b> — Pydantic models validate everything and give you typed autocomplete.</li>
+      </ul>
+      <p><b>How the config flows — step by step:</b></p>
+      <div class="flow">
+        <div class="flow-step"><div class="n">1</div><div class="body"><b>load_dotenv()</b> — reads <code>.env</code> into <code>os.environ</code>. Does NOT overwrite existing vars (CI values win).</div></div>
+        <div class="flow-step"><div class="n">2</div><div class="body"><b>yaml.safe_load()</b> — reads <code>config.yaml</code> into a plain Python dict. All values are still strings or numbers, not validated yet.</div></div>
+        <div class="flow-step"><div class="n">3</div><div class="body"><b>_apply_env_overrides()</b> — scans <code>FINNIE_*</code> vars. <code>FINNIE_LLM__MODEL=gpt-4o-mini</code> writes <code>raw["llm"]["model"] = "gpt-4o-mini"</code>.</div></div>
+        <div class="flow-step"><div class="n">4</div><div class="body"><b>OPENAI_API_KEY check</b> — if missing, raise <code>RuntimeError</code> with the exact env var name. App cannot start without it.</div></div>
+        <div class="flow-step"><div class="n">5</div><div class="body"><b>Config(**raw)</b> — Pydantic coerces types, runs field validators, returns a fully-typed object. <code>ValidationError</code> is intentionally not caught — a bad config must crash at startup.</div></div>
+        <div class="flow-step"><div class="n">6</div><div class="body"><b>get_config()</b> — <code>lru_cache</code> singleton. YAML is parsed on the first call only. Tests call <code>get_config.cache_clear()</code> to force a fresh load.</div></div>
+      </div>
+      <p><b>Logging rules (applies to every <code>src/</code> module):</b></p>
+      <ul>
+        <li>No <code>print()</code> anywhere in <code>src/</code> — ruff will reject it.</li>
+        <li>Every module: <code>log = get_logger(__name__)</code></li>
+        <li><code>__name__</code> gives the full module path: <code>src.agents.portfolio</code>. This creates a hierarchy — silence one subsystem without touching its code.</li>
+        <li><code>_CONFIGURED</code> flag prevents duplicate handlers in Streamlit.</li>
+      </ul>
+      <div class="key"><b>Done when</b><code>pytest -v</code> passes all 14 tests in <code>tests/test_config.py</code> and <code>ruff check src</code> is clean. ✅ 14/14 pass.</div>
+    </div>
+  </details>
+
+  <!-- ── Function 1: _apply_env_overrides ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 1 of 4</span>
+      <span class="card-title">_apply_env_overrides</span>
+      <span class="card-file">src/core/config.py</span>
+    </summary>
+    <div class="card-body">
+      <p><b>What it does in one sentence:</b> Scans every environment variable that starts with <code>FINNIE_</code> and writes its value into the raw YAML dictionary before Pydantic validates it.</p>
+      <p><b>Why it exists:</b> In production or CI you cannot edit a YAML file — you inject config via environment variables. This function is the bridge that maps those vars onto the config tree.</p>
+      <pre><code class="language-python">def _apply_env_overrides(raw: dict[str, Any]) -> dict[str, Any]:
     """
     Overlay FINNIE_* environment variables onto the raw YAML dict.
 
@@ -131,276 +224,214 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-si
       - FINNIE_LLM__MODEL        → raw["llm"]["model"]       (double __ = nesting)
       - FINNIE_LOG_LEVEL         → raw["logging"]["level"]   (special case)
       - Values are always written as strings — Pydantic coerces them later.
-
-    Args:
-        raw: The dict produced by yaml.safe_load(config.yaml).
-
-    Returns:
-        The same dict, mutated in-place, with env overrides applied.
     """
     for key, value in os.environ.items():
         # ── Skip anything that isn't ours ──────────────────────────────────
-        # os.environ contains PATH, PYTHONPATH, OPENAI_API_KEY, everything.
-        # The FINNIE_ prefix is our namespace — ignore all other vars.
         if not key.startswith(ENV_PREFIX):
             continue
 
         # ── Strip prefix, lowercase ────────────────────────────────────────
         # "FINNIE_LLM__MODEL" → "llm__model"
-        # Lowercase so it matches YAML keys (which are conventionally lowercase).
         env_key = key[len(ENV_PREFIX):].lower()
 
         # ── Build the navigation path ──────────────────────────────────────
         # Special case: FINNIE_LOG_LEVEL → ["logging", "level"]
-        # Without this, the __ rule would give ["log", "level"] — wrong key.
         if env_key == "log_level":
             path = ["logging", "level"]
         else:
             # Double underscore = one nesting level deeper.
             # "llm__model" → ["llm", "model"]
-            # "rag__top_k" → ["rag", "top_k"]
             path = env_key.split("__")
 
         # ── Navigate to the parent dict ────────────────────────────────────
-        # path[:-1] = all parts except the final key (the navigation).
-        # path[-1]  = the final key (the destination).
         current = raw
         for part in path[:-1]:
-            # Create intermediate dicts if they don't exist in the YAML.
-            # Also handles the edge case where YAML has a scalar where we
-            # expect a dict — we replace it rather than crashing.
             if part not in current or not isinstance(current[part], dict):
                 current[part] = {}
             current = current[part]
 
         # ── Write the value ────────────────────────────────────────────────
-        # Always a string — env vars have no type system.
-        # Pydantic will coerce "0.7" → 0.7, "99" → ValidationError, etc.
+        # Always a string — Pydantic coerces later ("0.7" → 0.7)
         current[path[-1]] = value
 
     return raw</code></pre>
+      <div class="ann"><span class="num">A</span><span>Iterates every variable in the current process environment — PATH, PYTHONPATH, everything. We filter in the next line.</span></div>
+      <div class="ann"><span class="num">B</span><span>Skip anything that doesn't begin with <code>FINNIE_</code>. This is the namespace that separates our vars from every other tool's vars.</span></div>
+      <div class="ann"><span class="num">C</span><span>Strip the prefix and lowercase: <code>FINNIE_LLM__MODEL</code> → <code>llm__model</code>. Lowercase so it matches YAML keys.</span></div>
+      <div class="ann"><span class="num">D</span><span>Special case: <code>FINNIE_LOG_LEVEL</code> maps to <code>raw["logging"]["level"]</code>. Without this, the double-underscore rule would map it to <code>raw["log"]["level"]</code> — wrong.</span></div>
+      <div class="ann"><span class="num">E</span><span>Double underscore = nesting level. <code>llm__model</code> → <code>["llm", "model"]</code>. One underscore = part of a word, two = go deeper.</span></div>
+      <div class="ann"><span class="num">F</span><span>Walk to the parent dict, creating intermediate dicts if they don't exist. <code>path[:-1]</code> is the navigation; <code>path[-1]</code> is the destination.</span></div>
+      <div class="ann"><span class="num">G</span><span>Write the value. Always a string — env vars have no types. Pydantic coerces it in the next step.</span></div>
+      <div class="warn-box"><b>What this function does NOT do:</b> validate anything. It is dumb by design — it just writes. <code>FINNIE_LLM__TEMPERATURE=99</code> writes <code>"99"</code> without complaint. Pydantic catches it in the next step.</div>
+      <div class="key"><b>Real example trace</b><code>FINNIE_LLM__TEMPERATURE=0.7</code> → strip prefix → <code>"llm__temperature"</code> → split → <code>["llm", "temperature"]</code> → navigate to <code>raw["llm"]</code> → write <code>raw["llm"]["temperature"] = "0.7"</code></div>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th>Env var set</th><th>raw dict before call</th><th>raw dict after call</th></tr></thead>
+        <tbody>
+          <tr><td><code>FINNIE_LLM__MODEL=gpt-4o-mini</code></td><td><code>{"llm": {"model": "gpt-4o"}}</code></td><td><code>{"llm": {"model": "gpt-4o-mini"}}</code></td></tr>
+          <tr><td><code>FINNIE_LLM__TEMPERATURE=0.7</code></td><td><code>{"llm": {}}</code></td><td><code>{"llm": {"temperature": "0.7"}}</code> (string! Pydantic coerces later)</td></tr>
+          <tr><td><code>FINNIE_LOG_LEVEL=DEBUG</code></td><td><code>{"logging": {"level": "INFO"}}</code></td><td><code>{"logging": {"level": "DEBUG"}}</code> (special-case path)</td></tr>
+          <tr><td><code>PATH=/usr/bin</code> (not FINNIE_)</td><td><code>{}</code></td><td><code>{}</code> — skipped immediately, dict unchanged</td></tr>
+          <tr><td>No FINNIE_* vars set at all</td><td><code>{"llm": {"model": "gpt-4o"}}</code></td><td><code>{"llm": {"model": "gpt-4o"}}</code> — returned as-is</td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Interview grill</div>
+        <details class="q"><summary>Why does the function return raw instead of modifying it in-place and returning None?</summary><div class="a"><ul><li>Dicts are passed by reference — the in-place mutation already affects the caller's dict</li><li>Returning it lets you write <code>raw = _apply_env_overrides(raw)</code>, making the data flow explicit at the call site</li><li>The return style documents intent: this function transforms the dict</li></ul></div></details>
+        <details class="q"><summary>What happens if two env vars write to the same key?</summary><div class="a"><ul><li>The last one wins — it's a simple dict assignment with no conflict detection</li><li>In practice this can't happen because env var names are unique within a process</li></ul></div></details>
+        <details class="q"><summary>Why <code>isinstance(current[part], dict)</code> check?</summary><div class="a"><ul><li>Defensive guard against <code>config.yaml</code> having a scalar (e.g. <code>llm: "some-string"</code>) where a nested dict is expected</li><li>Without it, an env var navigating through that scalar would crash with a string subscript error</li><li>The check detects that case and replaces the scalar with an empty dict</li></ul></div></details>
+      </div>
+    </div>
+  </details>
 
-  <div class="ann"><span class="num">A</span><span>Iterates every variable in the current process environment — PATH, PYTHONPATH, OPENAI_API_KEY, everything. We filter in the next line.</span></div>
-  <div class="ann"><span class="num">B</span><span>Skip anything that doesn't begin with <code>FINNIE_</code>. This is the namespace that separates our vars from every other tool's vars.</span></div>
-  <div class="ann"><span class="num">C</span><span>Strip the prefix and lowercase: <code>FINNIE_LLM__MODEL</code> → <code>llm__model</code>. Lowercase so it matches YAML keys, which are conventionally lowercase.</span></div>
-  <div class="ann"><span class="num">D</span><span>Special case: <code>FINNIE_LOG_LEVEL</code> maps to <code>raw["logging"]["level"]</code>. Without this, the double-underscore rule would map it to <code>raw["log"]["level"]</code> — wrong.</span></div>
-  <div class="ann"><span class="num">E</span><span>Double underscore = nesting level. <code>llm__model</code> → <code>["llm", "model"]</code>. This is the convention: one underscore = part of a word, two = go deeper.</span></div>
-  <div class="ann"><span class="num">F</span><span>Walk to the parent dict, creating intermediate dicts if they don't exist. <code>path[:-1]</code> is everything except the final key — the navigation, not the destination.</span></div>
-  <div class="ann"><span class="num">G</span><span>Write the value at the final key. The value is always a string — env vars have no types. Pydantic coerces it in the next step (<code>"0.7"</code> → <code>0.7</code>).</span></div>
-
-  <div class="warn-box"><b>What this function does NOT do:</b> validate anything. It is dumb by design — it just writes. If you set <code>FINNIE_LLM__TEMPERATURE=99</code>, this writes <code>"99"</code> into <code>raw["llm"]["temperature"]</code> without complaint. Pydantic catches it in the next step.</div>
-
-  <div class="key"><b>Real example trace</b>
-    <code>FINNIE_LLM__TEMPERATURE=0.7</code> in environment →
-    key: <code>"FINNIE_LLM__TEMPERATURE"</code> → strip prefix → <code>"llm__temperature"</code> → split on <code>__</code> → <code>["llm", "temperature"]</code> → navigate to <code>raw["llm"]</code> → write <code>raw["llm"]["temperature"] = "0.7"</code>
-  </div>
-
-  <div class="qa"><div class="lbl">Interview grill</div>
-    <details class="q"><summary>Why does the function return raw instead of modifying it in-place and returning None?</summary><div class="a"><p>It does both — dicts are passed by reference in Python so the in-place mutation already affects the caller's dict. Returning it lets you write <code>raw = _apply_env_overrides(raw)</code>, which makes the data flow explicit at the call site. Neither is "wrong" but the return style documents intent: this function transforms the dict.</p></div></details>
-    <details class="q"><summary>What happens if two env vars write to the same key?</summary><div class="a"><p>The last one wins — it's a simple dict assignment with no conflict detection. In practice this can't happen because env var names are unique within a process. But it's worth knowing: if you somehow had both <code>FINNIE_LLM__MODEL</code> and a custom mechanism writing to the same path, the iteration order of <code>os.environ</code> would decide the winner, which is undefined.</p></div></details>
-    <details class="q"><summary>Why <code>isinstance(current[part], dict)</code> check?</summary><div class="a"><p>Defensive guard. If <code>config.yaml</code> has <code>llm: "some-string"</code> at a key where we expect a nested dict, and then an env var tries to navigate through it, we'd crash with a string subscript error. The check detects that case and replaces the scalar with an empty dict. It's trading "surprising override" for "crash" — usually the right call in a config loader.</p></div></details>
-  </div>
-</div>
-
-<!-- ─── load_config ─── -->
-<div class="c">
-  <div class="kicker">Function 2 of 4</div>
-  <h3>load_config</h3>
-  <div class="filepath">src/core/config.py</div>
-  <p><b>What it does in one sentence:</b> Runs the five-step pipeline — dotenv → YAML → env overrides → secrets → Pydantic validation — and returns a fully-typed <code>Config</code> object or raises loudly.</p>
-  <p><b>Why it exists:</b> Every module in the app needs config. This function is the single place that touches files, environment, and validation. Everything else just calls <code>get_config()</code>.</p>
-
-  <div class="flow">
-    <div class="flow-step"><span class="n">1</span><span class="body"><b>load_dotenv(PROJECT_ROOT / ".env")</b> — loads your .env file into os.environ. Does NOT overwrite vars already in the environment. So a container or CI value always beats the file.</span></div>
-    <div class="flow-step"><span class="n">2</span><span class="body"><b>yaml.safe_load(config.yaml) or {}</b> — reads the YAML into a plain Python dict. The <code>or {}</code> handles an empty file (safe_load returns None on empty, which would crash the next step).</span></div>
-    <div class="flow-step"><span class="n">3</span><span class="body"><b>_apply_env_overrides(raw)</b> — overlays FINNIE_* vars onto the dict. Values are still strings here.</span></div>
-    <div class="flow-step"><span class="n">4</span><span class="body"><b>Collect secrets</b> — reads OPENAI_API_KEY from env. If missing or blank → RuntimeError right here, with the variable name in the message. Alpha Vantage is optional.</span></div>
-    <div class="flow-step"><span class="n">5</span><span class="body"><b>Config(**raw)</b> — Pydantic coerces types ("0.7" → 0.7), runs field validators (temperature ≤ 2.0, overlap &lt; chunk_size), and raises ValidationError if anything is wrong.</span></div>
-  </div>
-
-  <pre><code class="language-python">def load_config(path: Path | None = None) -> Config:
+  <!-- ── Function 2: load_config ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 2 of 4</span>
+      <span class="card-title">load_config</span>
+      <span class="card-file">src/core/config.py</span>
+    </summary>
+    <div class="card-body">
+      <p><b>What it does in one sentence:</b> Runs the five-step pipeline — dotenv → YAML → env overrides → secrets → Pydantic validation — and returns a fully-typed <code>Config</code> object or raises loudly.</p>
+      <div class="flow">
+        <div class="flow-step"><span class="n">1</span><span class="body"><b>load_dotenv(PROJECT_ROOT / ".env")</b> — loads your .env file into os.environ. Does NOT overwrite vars already in the environment. So a container or CI value always beats the file.</span></div>
+        <div class="flow-step"><span class="n">2</span><span class="body"><b>yaml.safe_load(config.yaml) or {}</b> — reads the YAML into a plain Python dict. The <code>or {}</code> handles an empty file (safe_load returns None on empty).</span></div>
+        <div class="flow-step"><span class="n">3</span><span class="body"><b>_apply_env_overrides(raw)</b> — overlays FINNIE_* vars onto the dict. Values are still strings here.</span></div>
+        <div class="flow-step"><span class="n">4</span><span class="body"><b>Collect secrets</b> — reads OPENAI_API_KEY from env. If missing or blank → RuntimeError with the variable name in the message. Alpha Vantage is optional.</span></div>
+        <div class="flow-step"><span class="n">5</span><span class="body"><b>Config(**raw)</b> — Pydantic coerces types ("0.7" → 0.7), runs field validators (temperature ≤ 2.0), and raises ValidationError if anything is wrong.</span></div>
+      </div>
+      <pre><code class="language-python">def load_config(path: Path | None = None) -> Config:
     """
     Load, overlay, and validate application configuration.
-
-    Execution order (each step can override the previous one):
-        1. load_dotenv  — reads .env into os.environ
-        2. YAML         — reads config.yaml into a plain dict
-        3. env override — FINNIE_* vars overwrite YAML values
-        4. secrets      — API keys injected from os.environ
-        5. validation   — Pydantic coerces types and checks constraints
-
-    Args:
-        path: Optional path to a custom config file.
-              Used by tests to inject a temporary config.
-              Defaults to PROJECT_ROOT/config.yaml.
-
-    Returns:
-        A fully-validated, fully-typed Config object.
-
-    Raises:
-        FileNotFoundError: config.yaml does not exist.
-        RuntimeError:      OPENAI_API_KEY is missing or blank.
-        ValidationError:   Any field fails Pydantic's schema rules.
+    Raises FileNotFoundError, RuntimeError, or ValidationError on bad input.
     """
-
-    # ── STEP 1: Load .env into os.environ ─────────────────────────────────
-    # load_dotenv does NOT overwrite vars already set in the environment.
-    # So a value injected by CI or Docker always beats the .env file.
-    # Precedence:  system env  >  .env file  >  config.yaml  >  schema defaults
+    # STEP 1 — load .env (does NOT overwrite existing env vars)
     load_dotenv(PROJECT_ROOT / ".env")
 
-    # ── STEP 2: Read the YAML config file ─────────────────────────────────
-    # Accept a custom path so tests can pass a temp file without touching
-    # the real config.yaml.
+    # STEP 2 — read YAML
     config_path = path if path is not None else CONFIG_PATH
-
     if not config_path.is_file():
-        # Fail fast with a message that tells the developer exactly what to do.
-        # An opaque FileNotFoundError from deep inside PyYAML is useless.
         raise FileNotFoundError(
             f"Config file not found: {config_path}. "
             "Create config.yaml from the template before starting."
         )
-
     with config_path.open("r", encoding="utf-8") as fh:
-        # yaml.safe_load returns None for an empty file — the `or {}` turns
-        # that into an empty dict so the subsequent dict ops don't crash.
-        # encoding="utf-8" is explicit: Windows defaults to cp1252, which
-        # raises on a rupee sign (₹) or an em dash in a compliance string.
         raw: dict[str, Any] = yaml.safe_load(fh) or {}
 
-    # ── STEP 3: Apply FINNIE_* env var overrides ───────────────────────────
-    # Values are still strings here — e.g. raw["llm"]["temperature"] = "0.7"
-    # Pydantic coerces them in step 5.
+    # STEP 3 — apply FINNIE_* env var overrides
     raw = _apply_env_overrides(raw)
 
-    # ── STEP 4: Collect API secrets ────────────────────────────────────────
-    # Secrets NEVER come from YAML — only from the real environment.
-    # This keeps them out of version control even if someone commits config.yaml.
-
+    # STEP 4 — collect API secrets (never from YAML)
     openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not openai_key:
-        # .strip() catches a key set to whitespace only (a common copy-paste error).
-        # Raise here, not inside Pydantic, so the error names the env var and
-        # points at .env.example — not a generic "field required" message.
         raise RuntimeError(
             "Missing required env var OPENAI_API_KEY. "
             "Add it to .env — see .env.example."
         )
-
     raw["secrets"] = {
         "openai_api_key": openai_key,
-        # Alpha Vantage is optional. `or None` converts an empty string to None
-        # so the Pydantic field (str | None) gets None, not "".
         "alpha_vantage_api_key": os.environ.get("ALPHA_VANTAGE_API_KEY") or None,
     }
 
-    # ── STEP 5: Validate and return ────────────────────────────────────────
-    # Pydantic:
-    #   - coerces types: "0.7" → float 0.7
-    #   - checks constraints: temperature le=2.0, chunk_overlap < chunk_size
-    #   - raises ValidationError with field names if anything is wrong
-    #
-    # ValidationError is intentionally NOT caught here.
-    # A bad config must crash the app at startup, not propagate as a
-    # mysterious NoneType error three modules downstream.
+    # STEP 5 — validate (ValidationError intentionally not caught)
     return Config(**raw)</code></pre>
+      <div class="ann"><span class="num">2a</span><span>Accept an optional custom path so tests can pass a temp config file without touching the real one.</span></div>
+      <div class="ann"><span class="num">2b</span><span>Fail fast with a helpful message. Without this check, the error would be an opaque <code>FileNotFoundError</code> from deep inside PyYAML.</span></div>
+      <div class="ann"><span class="num">2c</span><span><code>encoding="utf-8"</code> is explicit. Windows defaults to cp1252, which crashes on a rupee sign (₹).</span></div>
+      <div class="ann"><span class="num">4</span><span><code>.strip()</code> catches a key set to whitespace only. An empty string is falsy, so <code>if not openai_key</code> catches both None and blank.</span></div>
+      <div class="ann"><span class="num">5</span><span>ValidationError is intentionally not caught. A bad config must crash at startup, not propagate as a None error three modules downstream.</span></div>
+      <div class="key"><b>Precedence chain</b>Pydantic defaults &lt; config.yaml &lt; FINNIE_* env overrides &lt; real environment (CI/container)</div>
+      <table>
+        <tr><th>What you set</th><th>Where</th><th>Pydantic sees</th><th>Result</th></tr>
+        <tr><td><code>FINNIE_LLM__TEMPERATURE=0.7</code></td><td>env override</td><td>string "0.7"</td><td>coerced → float 0.7 ✓</td></tr>
+        <tr><td><code>FINNIE_LLM__TEMPERATURE=99</code></td><td>env override</td><td>string "99"</td><td>coerced → 99.0 → ValidationError (le=2) ✗</td></tr>
+        <tr><td>nothing (YAML has 0.2)</td><td>config.yaml</td><td>float 0.2</td><td>passes ✓</td></tr>
+        <tr><td><code>OPENAI_API_KEY</code> absent</td><td>—</td><td>—</td><td>RuntimeError at step 4, before Pydantic</td></tr>
+      </table>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th>Call</th><th>Env / file state</th><th>Return value / exception</th></tr></thead>
+        <tbody>
+          <tr><td><code>load_config()</code></td><td>Valid <code>config.yaml</code>, <code>OPENAI_API_KEY=sk-…</code> set</td><td><code>Config(llm=LLMConfig(model="gpt-4o", temperature=0.2, …), secrets=…)</code></td></tr>
+          <tr><td><code>load_config()</code></td><td><code>OPENAI_API_KEY</code> not set</td><td><code>RuntimeError: "Missing required env var OPENAI_API_KEY. Add it to .env"</code></td></tr>
+          <tr><td><code>load_config()</code></td><td><code>config.yaml</code> missing</td><td><code>FileNotFoundError: "Config file not found: …/config.yaml"</code></td></tr>
+          <tr><td><code>load_config()</code></td><td><code>FINNIE_LLM__TEMPERATURE=99</code> in env</td><td><code>ValidationError: temperature — Input should be less than or equal to 2</code></td></tr>
+          <tr><td><code>load_config(Path("/tmp/test.yaml"))</code></td><td>Custom path, valid file</td><td><code>Config(…)</code> built from that file (used in tests)</td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Interview grill</div>
+        <details class="q"><summary>Why does load_config inject secrets in step 4 instead of letting _apply_env_overrides handle them?</summary><div class="a"><ul><li>The override step writes into nested config keys; secrets live under <code>raw["secrets"]</code> as a whole sub-dict</li><li>The override step does not validate presence — it just writes if the key exists</li><li>Secrets get their own explicit check: if <code>OPENAI_API_KEY</code> is absent or blank, <code>RuntimeError</code> is raised right here, not buried in OpenAI client code</li></ul></div></details>
+        <details class="q"><summary>What does yaml.safe_load(fh) or {} protect against?</summary><div class="a"><ul><li>An empty YAML file — <code>yaml.safe_load</code> returns <code>None</code> on an empty file, not an empty dict</li><li>Without <code>or {}</code>, the next dict operations would raise <code>TypeError: 'NoneType' object is not subscriptable</code></li><li>One-token defensive guard against a valid edge case</li></ul></div></details>
+        <details class="q"><summary>Why is load_dotenv called before reading YAML, not after?</summary><div class="a"><ul><li>Step 3 (<code>_apply_env_overrides</code>) reads from <code>os.environ</code></li><li>If <code>load_dotenv</code> ran after, the FINNIE_* variables from <code>.env</code> would not yet be in the environment when step 3 scanned it</li><li>Order here is not a style choice — it is load-order correctness</li></ul></div></details>
+      </div>
+    </div>
+  </details>
 
-  <div class="ann"><span class="num">2a</span><span>Accept an optional custom path so tests can pass a temp config file without touching the real one. Default is the project-level <code>config.yaml</code>.</span></div>
-  <div class="ann"><span class="num">2b</span><span>Fail fast with a helpful message. Without this check, the error would be an opaque <code>FileNotFoundError</code> from deep inside PyYAML with no guidance on what to do.</span></div>
-  <div class="ann"><span class="num">2c</span><span><code>encoding="utf-8"</code> is explicit. Windows defaults to cp1252, which crashes on a rupee sign (₹) or an em dash. Always name the encoding when opening text files.</span></div>
-  <div class="ann"><span class="num">4</span><span><code>.strip()</code> catches a key set to whitespace only — a common copy-paste error. An empty string is falsy, so <code>if not openai_key</code> catches both None and blank.</span></div>
-  <div class="ann"><span class="num">5</span><span>ValidationError is intentionally not caught. A bad config must crash the app at startup, not propagate as a None reference error three modules downstream during a user's conversation.</span></div>
-
-  <div class="key"><b>Precedence chain</b>defaults in Pydantic schema &lt; config.yaml values &lt; FINNIE_* env overrides &lt; real environment (CI/container). Each layer can override the one before. This is the standard 12-factor config pattern.</div>
-
-  <table>
-    <tr><th>What you set</th><th>Where it comes from</th><th>What Pydantic sees</th><th>Result</th></tr>
-    <tr><td><code>FINNIE_LLM__TEMPERATURE=0.7</code></td><td>env override</td><td>string "0.7"</td><td>coerced → float 0.7 ✓</td></tr>
-    <tr><td><code>FINNIE_LLM__TEMPERATURE=99</code></td><td>env override</td><td>string "99"</td><td>coerced → 99.0 → ValidationError (le=2) ✗</td></tr>
-    <tr><td>nothing (YAML has 0.2)</td><td>config.yaml</td><td>float 0.2</td><td>passes ✓</td></tr>
-    <tr><td><code>OPENAI_API_KEY</code> absent</td><td>—</td><td>—</td><td>RuntimeError at step 4, before Pydantic</td></tr>
-  </table>
-
-  <div class="qa"><div class="lbl">Interview grill</div>
-    <details class="q"><summary>Why does load_config inject secrets in step 4 instead of letting _apply_env_overrides handle them?</summary><div class="a"><p>Two reasons. The override step writes into nested config keys; secrets live under <code>raw["secrets"]</code> as a whole sub-dict, which is cleaner to inject at once. More importantly, the override step does not validate presence — it just writes if the key exists. Secrets get their own explicit check: if <code>OPENAI_API_KEY</code> is absent or blank, RuntimeError is raised right here, not discovered later as a None comparison error buried in the OpenAI client code.</p></div></details>
-    <details class="q"><summary>What does yaml.safe_load(fh) or {} protect against?</summary><div class="a"><p>An empty YAML file. <code>yaml.safe_load</code> returns None on an empty file, not an empty dict. Without the <code>or {}</code>, the next dict operations would raise <code>TypeError: 'NoneType' object is not subscriptable</code>. It is a one-token defensive guard against a valid edge case.</p></div></details>
-    <details class="q"><summary>Why is load_dotenv called before reading YAML, not after?</summary><div class="a"><p>Because step 3 reads from <code>os.environ</code>. If <code>load_dotenv</code> ran after, the FINNIE_* variables from the <code>.env</code> file would not yet be in the environment when <code>_apply_env_overrides</code> scanned it. Order here is not a style choice — it is load-order correctness.</p></div></details>
-  </div>
-</div>
-
-<!-- ─── get_config ─── -->
-<div class="c">
-  <div class="kicker">Function 3 of 4 (pre-written)</div>
-  <h3>get_config</h3>
-  <div class="filepath">src/core/config.py</div>
-  <p><b>What it does:</b> The only config accessor the rest of the codebase should ever call. Wraps <code>load_config()</code> in an <code>lru_cache</code> so YAML is parsed exactly once per process.</p>
-
-  <pre><code class="language-python">@lru_cache(maxsize=1)
+  <!-- ── Function 3: get_config ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 3 of 4 — pre-written</span>
+      <span class="card-title">get_config</span>
+      <span class="card-file">src/core/config.py</span>
+    </summary>
+    <div class="card-body">
+      <p><b>What it does:</b> The only config accessor the rest of the codebase should ever call. Wraps <code>load_config()</code> in an <code>lru_cache</code> so YAML is parsed exactly once per process.</p>
+      <pre><code class="language-python">@lru_cache(maxsize=1)
 def get_config() -> Config:
     """
-    The only config accessor the rest of the codebase should ever call.
-
     @lru_cache makes this a lazily-initialised singleton:
       - First call  → runs load_config(), caches the result
       - Every later call → returns the cached object instantly (no I/O)
       - Tests → call get_config.cache_clear() to force a fresh load
-
-    Why not just call load_config() at module level?
-      Module-level code runs at *import* time, which breaks tests,
-      docs generators, and causes circular import issues.
-      Lazy init via lru_cache is strictly better.
     """
     return load_config()</code></pre>
+      <div class="ann"><span class="num">@lru_cache</span><span>Python's built-in memoisation decorator. <code>maxsize=1</code> stores exactly one result. Every call after the first returns the same cached object instantly, with no file I/O.</span></div>
+      <p>Three things this guarantees:</p>
+      <ul>
+        <li><b>Singleton</b> — every module that calls <code>get_config()</code> gets the same object.</li>
+        <li><b>Lazy</b> — YAML is not read at import time. Cheap imports, predictable startup.</li>
+        <li><b>Testable</b> — tests call <code>get_config.cache_clear()</code> before each test to force a fresh load.</li>
+      </ul>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th>Call</th><th>Cache state</th><th>Return value / side effect</th></tr></thead>
+        <tbody>
+          <tr><td><code>get_config()</code> — 1st call</td><td>Empty (cold start)</td><td>Calls <code>load_config()</code>, caches result, returns <code>Config</code> object</td></tr>
+          <tr><td><code>get_config()</code> — 2nd call</td><td>Warm (cached)</td><td>Returns the same <code>Config</code> object instantly — no file I/O</td></tr>
+          <tr><td><code>get_config.cache_clear()</code> then <code>get_config()</code></td><td>Cleared by test</td><td>Re-runs <code>load_config()</code>, picks up fresh <code>.env</code> / YAML changes</td></tr>
+          <tr><td><code>get_config()</code> from two different modules</td><td>Warm after first</td><td>Both get the <b>exact same object</b> (<code>id(cfg1) == id(cfg2)</code>)</td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Interview grill</div>
+        <details class="q"><summary>Why not just put load_config() at module level and read it once on import?</summary><div class="a"><ul><li>Module-level code runs at import time — <code>.env</code> must exist and be valid the moment anyone does <code>import src.core.config</code></li><li>That breaks tests that want to override config, docs generation tools that import but never run, and can cause circular imports</li><li><code>lru_cache</code> is strictly better: the work happens on first use, not on import</li></ul></div></details>
+      </div>
+    </div>
+  </details>
 
-  <div class="ann"><span class="num">@lru_cache</span><span>Python's built-in memoisation decorator. <code>maxsize=1</code> means it stores exactly one result — the first call's return value. Every call after that returns the same cached object instantly, with no file I/O.</span></div>
-
-  <p>Three things this guarantees:</p>
-  <ul>
-    <li><b>Singleton</b> — every module that calls <code>get_config()</code> gets the same object. No two parts of the app can observe different configs during a run.</li>
-    <li><b>Lazy</b> — YAML is not read at import time. The first call that actually needs config triggers the load. Cheap imports, predictable startup.</li>
-    <li><b>Testable</b> — tests call <code>get_config.cache_clear()</code> before each test to force a fresh load with a different temp config. Without this, test isolation would be impossible.</li>
-  </ul>
-
-  <div class="qa"><div class="lbl">Interview grill</div>
-    <details class="q"><summary>Why not just put load_config() at module level and read it once on import?</summary><div class="a"><p>Module-level execution runs at import time, which means the .env file must exist and be valid the moment anyone does <code>import src.core.config</code>. That breaks tests that want to override config, breaks docs generation tools that import but never run, and can cause circular import issues if any other module also imports config at module level. Lazy initialisation via lru_cache is strictly better: the work happens on first use, not on import.</p></div></details>
-  </div>
-</div>
-
-<!-- ─── setup_logging ─── -->
-<div class="c">
-  <div class="kicker">Function 4 of 4</div>
-  <h3>setup_logging</h3>
-  <div class="filepath">src/core/logging_setup.py</div>
-  <p><b>What it does in one sentence:</b> Configures the Python root logger exactly once — sets the format, attaches a StreamHandler (always) and an optional FileHandler, then quiets noisy third-party libraries.</p>
-  <p><b>Why it exists:</b> Every module in the app needs a logger. This is the one place that sets up the entire logging system. It runs on first use, not at import time.</p>
-
-  <pre><code class="language-python">_CONFIGURED = False   # module-level flag — survives across function calls
+  <!-- ── Function 4: setup_logging ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 4 of 5</span>
+      <span class="card-title">setup_logging</span>
+      <span class="card-file">src/core/logging_setup.py</span>
+    </summary>
+    <div class="card-body">
+      <p><b>What it does in one sentence:</b> Configures the Python root logger exactly once — sets the format, attaches a StreamHandler (always) and an optional FileHandler, then quiets noisy third-party libraries.</p>
+      <pre><code class="language-python">_CONFIGURED = False   # module-level flag — survives across function calls
 
 
 def setup_logging(level: str | None = None) -> None:
-    """
-    Configure the root logger once for the whole process.
-
-    Safe to call multiple times — the _CONFIGURED guard makes every call
-    after the first a no-op. This matters in Streamlit, which re-executes
-    the entire script on every user interaction; without the guard, each
-    interaction adds a duplicate handler and log lines multiply.
-
-    Args:
-        level: Optional override (e.g. "DEBUG"). Wins over config.yaml.
-    """
+    """Configure the root logger once. Safe to call multiple times."""
     global _CONFIGURED
     if _CONFIGURED:
         return   # ← second call → silent no-op (Streamlit safety)
 
-    # Deferred import — avoids circular dependency.
-    # config.py may call get_logger() during its own init; a top-level
-    # import here would create a cycle that crashes at startup.
+    # Deferred import — avoids circular dependency with config.py
     from src.core.config import get_config
     cfg = get_config()
 
-    # level argument > config.yaml > Python's default WARNING
     effective_level = level or cfg.logging.level
     fmt = logging.Formatter(cfg.logging.format)
 
@@ -408,8 +439,7 @@ def setup_logging(level: str | None = None) -> None:
     root.setLevel(effective_level)
 
     # ── StreamHandler — always present ────────────────────────────────────
-    # Writes to sys.stdout so pytest captures it correctly.
-    # (pytest captures stdout, not stderr, by default)
+    # sys.stdout so pytest captures it correctly (pytest captures stdout)
     sh = logging.StreamHandler(sys.stdout)
     sh.setLevel(effective_level)
     sh.setFormatter(fmt)
@@ -418,109 +448,476 @@ def setup_logging(level: str | None = None) -> None:
     # ── FileHandler — optional ─────────────────────────────────────────────
     if cfg.logging.file:
         log_path = cfg.resolve(cfg.logging.file)
-        log_path.parent.mkdir(parents=True, exist_ok=True)   # create logs/ dir
-        # encoding="utf-8" is mandatory — Windows defaults to cp1252,
-        # which raises on a rupee sign (₹) in a compliance disclaimer.
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        # encoding="utf-8" mandatory — Windows cp1252 raises on ₹
         fh = logging.FileHandler(log_path, encoding="utf-8")
         fh.setLevel(effective_level)
         fh.setFormatter(fmt)
         root.addHandler(fh)
 
     # ── Quiet noisy libraries ──────────────────────────────────────────────
-    # At DEBUG, httpx and openai flood the terminal with HTTP wire logs.
-    # Pinning them to WARNING keeps YOUR debug output readable.
     for noisy in ("httpx", "httpcore", "openai", "urllib3",
                   "sentence_transformers", "yfinance"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
     _CONFIGURED = True</code></pre>
+      <div class="ann"><span class="num">global</span><span><code>global _CONFIGURED</code> tells Python we want to write to the module-level variable, not create a local one. Without this, the assignment would silently create a local that disappears when the function returns.</span></div>
+      <div class="ann"><span class="num">root logger</span><span><code>logging.getLogger()</code> with no argument returns the root logger. All named loggers are children of the root. One handler on root → universal effect across the whole app.</span></div>
+      <div class="ann"><span class="num">StreamHandler</span><span>Writes to <code>sys.stdout</code> not stderr — pytest captures stdout, so your log output stays visible in test results.</span></div>
+      <div class="ann"><span class="num">FileHandler</span><span>Optional — only if <code>config.yaml</code> sets <code>logging.file</code>. <code>mkdir(parents=True, exist_ok=True)</code> creates <code>logs/</code> on first run.</span></div>
+      <div class="warn-box"><b>The Streamlit bug this prevents:</b> Without the _CONFIGURED guard, every button click re-runs the script → setup_logging() runs again → adds another handler. After 5 clicks: 5 handlers → every log line prints 5 times.</div>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th>Call</th><th>Config / state</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td><code>setup_logging()</code> — 1st call</td><td><code>cfg.logging.level = "INFO"</code>, no log file</td><td>Root logger → INFO, one StreamHandler on stdout attached</td></tr>
+          <tr><td><code>setup_logging("DEBUG")</code></td><td>Arg overrides config level</td><td>Root logger → DEBUG (arg wins over <code>config.yaml</code> value)</td></tr>
+          <tr><td><code>setup_logging()</code> — 2nd call</td><td><code>_CONFIGURED = True</code></td><td>Returns immediately — no-op, no duplicate handler added</td></tr>
+          <tr><td><code>setup_logging()</code></td><td><code>cfg.logging.file = "logs/app.log"</code></td><td>StreamHandler + FileHandler both attached; <code>logs/</code> dir created if missing</td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Interview grill</div>
+        <details class="q"><summary>Why import get_config inside the function instead of at the top of the file?</summary><div class="a"><ul><li>Prevents a circular import</li><li><code>config.py</code> may call <code>get_logger()</code> during its own initialisation</li><li>Module-level import would cause: import <code>logging_setup</code> → import <code>config</code> → import <code>logging_setup</code> (already importing!) → crash</li><li>Deferring to inside the function breaks the cycle — Python resolves it at call time, after <code>config.py</code> has finished loading</li></ul></div></details>
+        <details class="q"><summary>What's the difference between setLevel on the root logger vs on each handler?</summary><div class="a"><ul><li>Two independent filters, not one</li><li>Root logger's level is the first gate: a message below root's level is discarded immediately, never reaching any handler</li><li>Each handler then has its own level as a second filter</li><li>Example: root=DEBUG + FileHandler=WARNING → everything in the terminal, only warnings in the log file</li></ul></div></details>
+      </div>
+    </div>
+  </details>
 
-  <div class="ann"><span class="num">global</span><span><code>global _CONFIGURED</code> tells Python we want to write to the module-level variable, not create a new local one. Without this, the assignment inside the function would silently create a local <code>_CONFIGURED</code> that disappears when the function returns — the flag would never be set.</span></div>
-  <div class="ann"><span class="num">root logger</span><span><code>logging.getLogger()</code> with no argument returns the root logger. All named loggers (like <code>src.agents.portfolio</code>) are children of the root. Setting a handler on root means every child logger in the whole app writes to it automatically — one setup, universal effect.</span></div>
-  <div class="ann"><span class="num">StreamHandler</span><span>Writes log lines to the terminal. <code>sys.stdout</code> instead of <code>sys.stderr</code> because pytest captures stdout — if you used stderr, your log output would be invisible in test output.</span></div>
-  <div class="ann"><span class="num">FileHandler</span><span>Optional — only created if <code>config.yaml</code> sets <code>logging.file</code>. <code>mkdir(parents=True, exist_ok=True)</code> creates the <code>logs/</code> directory on first run so the app doesn't crash on a missing folder.</span></div>
-
-  <div class="warn-box"><b>The Streamlit bug this prevents:</b> Without the _CONFIGURED guard, every button click re-runs the script → setup_logging() runs again → adds another handler. After 5 clicks: 5 handlers → every log line prints 5 times. The guard is a one-line fix for a subtle production bug.</div>
-
-  <div class="qa"><div class="lbl">Interview grill</div>
-    <details class="q"><summary>Why import get_config inside the function instead of at the top of the file?</summary><div class="a"><p>To prevent a circular import. <code>config.py</code> may call <code>get_logger()</code> during its own initialisation. If <code>logging_setup.py</code> had <code>from src.core.config import get_config</code> at module level, Python would see: import logging_setup → import config → import logging_setup (already importing!) → crash. The deferred import breaks the cycle: Python only resolves it when <code>setup_logging()</code> is actually called, by which time config.py has already finished loading.</p></div></details>
-    <details class="q"><summary>What's the difference between setLevel on the root logger vs on each handler?</summary><div class="a"><p>Two independent filters. The root logger's level is the first gate: if a message is below root's level, it is discarded immediately and never reaches any handler. Each handler then has its own level as a second filter. In practice we set them to the same value here, but you could set root to DEBUG and a FileHandler to WARNING to get everything in the terminal but only warnings in the log file — two different views from one stream of events.</p></div></details>
-  </div>
-</div>
-
-<!-- ─── get_logger ─── -->
-<div class="c">
-  <div class="kicker">Function 5 of 5</div>
-  <h3>get_logger</h3>
-  <div class="filepath">src/core/logging_setup.py</div>
-  <p><b>What it does:</b> Returns a named logger for a module, ensuring setup has run. Two lines of logic. Called as <code>get_logger(__name__)</code> at the top of every <code>src/</code> file.</p>
-
-  <pre><code class="language-python">def get_logger(name: str) -> logging.Logger:
+  <!-- ── Function 5: get_logger ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 5 of 5</span>
+      <span class="card-title">get_logger</span>
+      <span class="card-file">src/core/logging_setup.py</span>
+    </summary>
+    <div class="card-body">
+      <p><b>What it does:</b> Returns a named logger for a module, ensuring setup has run. Two lines of logic. Called as <code>get_logger(__name__)</code> at the top of every <code>src/</code> file.</p>
+      <pre><code class="language-python">def get_logger(name: str) -> logging.Logger:
     """
     Return a module-named logger, configuring logging on first use.
 
     Usage in every src/ module:
-        from src.core.logging_setup import get_logger
         log = get_logger(__name__)   # ← always use __name__
 
-    Using __name__ names the logger after its module path, e.g.:
-        src.agents.portfolio
-        src.rag.retriever
-        src.workflow.router
-
-    This gives a free hierarchy: you can silence one noisy subsystem
-    without touching any of its code:
+    __name__ gives the full module path, e.g. src.agents.portfolio.
+    This creates a hierarchy — silence one subsystem with one line:
         logging.getLogger("src.rag").setLevel("WARNING")
     """
     if not _CONFIGURED:
         setup_logging()                    # configure on first use
     return logging.getLogger(name)         # return the named logger</code></pre>
+      <div class="ann"><span class="num">__name__</span><span>When a module calls <code>get_logger(__name__)</code>, <code>__name__</code> is the module's import path: <code>"src.agents.portfolio"</code>. Using a hardcoded string breaks the hierarchy.</span></div>
+      <div class="ann"><span class="num">hierarchy</span><span>Python loggers form a tree by dot-separated name. <code>src.agents.portfolio</code> is a child of <code>src.agents</code>, which is a child of <code>src</code>. A handler on any ancestor catches all descendant logs.</span></div>
+      <div class="key"><b>The rule that never breaks</b>Every file in <code>src/</code> has exactly these two lines at the top:<br><code>from src.core.logging_setup import get_logger</code><br><code>log = get_logger(__name__)</code><br>Then uses <code>log.debug()</code>, <code>log.info()</code>, <code>log.warning()</code>, <code>log.error()</code>. Never <code>print()</code>.</div>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th>Call (inside which module)</th><th>What <code>__name__</code> equals</th><th>Logger returned</th></tr></thead>
+        <tbody>
+          <tr><td><code>get_logger(__name__)</code> in <code>src/core/llm.py</code></td><td><code>"src.core.llm"</code></td><td><code>Logger("src.core.llm")</code> — child of <code>src.core</code></td></tr>
+          <tr><td><code>get_logger(__name__)</code> in <code>src/agents/portfolio.py</code></td><td><code>"src.agents.portfolio"</code></td><td><code>Logger("src.agents.portfolio")</code> — child of <code>src.agents</code></td></tr>
+          <tr><td><code>get_logger("my_logger")</code> (hardcoded — wrong!)</td><td>n/a</td><td><code>Logger("my_logger")</code> — not in hierarchy, can't be silenced with <code>src.*</code></td></tr>
+          <tr><td><code>get_logger(__name__)</code> before <code>setup_logging()</code> was called</td><td>any module</td><td>Triggers <code>setup_logging()</code> first, then returns logger — always safe</td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Interview grill</div>
+        <details class="q"><summary>Why not just call logging.getLogger(__name__) directly in each module?</summary><div class="a"><ul><li><code>setup_logging()</code> would never run</li><li>The root logger would have no handlers (Python's default), so every log line hits the "last resort" handler — just a warning that no handler was found</li><li>Routing through <code>get_logger</code> ensures the first module that asks for a logger triggers setup automatically</li></ul></div></details>
+      </div>
+    </div>
+  </details>
 
-  <div class="ann"><span class="num">__name__</span><span>When a module calls <code>get_logger(__name__)</code>, <code>__name__</code> is Python's built-in that equals the module's import path. In <code>src/agents/portfolio.py</code>, <code>__name__</code> is <code>"src.agents.portfolio"</code>. This is the convention — using a hardcoded string like <code>"portfolio"</code> would break the hierarchy.</span></div>
-  <div class="ann"><span class="num">hierarchy</span><span>Python loggers form a tree by dot-separated name. <code>src.agents.portfolio</code> is a child of <code>src.agents</code>, which is a child of <code>src</code>. A handler on any ancestor catches all descendant logs. That's how <code>logging.getLogger("src.rag").setLevel("WARNING")</code> silences the entire RAG subsystem in one line.</span></div>
+  <!-- ── Phase 0 Grill ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Interview Grill</span>
+      <span class="card-title prose">Phase 0 — 12 Questions</span>
+    </summary>
+    <div class="card-body">
+      <p>All four functions are written and tested. Try answering each out loud before clicking to reveal.</p>
+      <div class="qa"><div class="lbl">12 questions — answer them cold</div>
+        <details class="q"><summary>Walk me through what happens when load_config() is called for the first time.</summary><div class="a"><ul><li><code>load_dotenv</code> reads <code>.env</code> into <code>os.environ</code> without overwriting existing vars</li><li><code>yaml.safe_load</code> reads <code>config.yaml</code> into a plain Python dict</li><li><code>_apply_env_overrides</code> scans <code>os.environ</code> for <code>FINNIE_*</code> vars and writes them into the dict — values are still strings here</li><li>Reads <code>OPENAI_API_KEY</code> from env; if missing or blank, raises <code>RuntimeError</code> immediately</li><li><code>Config(**raw)</code> lets Pydantic coerce types, run field validators, and return a fully-typed <code>Config</code> object</li><li><code>ValidationError</code> is intentionally not caught — a bad config must crash at startup, not silently continue</li></ul></div></details>
+        <details class="q"><summary>FINNIE_LLM__TEMPERATURE=99 arrives as a string. What happens and where?</summary><div class="a"><ul><li><code>_apply_env_overrides</code> writes <code>"99"</code> into <code>raw["llm"]["temperature"]</code> — no validation at this stage</li><li>When <code>load_config</code> reaches step 5, Pydantic coerces <code>"99"</code> to <code>99.0</code></li><li>Pydantic then checks the <code>le=2.0</code> constraint — <code>ValidationError</code> is raised inside <code>Config(**raw)</code></li><li>The app crashes at startup, before any user sees it</li></ul></div></details>
+        <details class="q"><summary>Why does get_config use lru_cache instead of reading YAML at module level?</summary><div class="a"><ul><li>Module-level code runs at import time — <code>.env</code> must exist the moment anyone does <code>import config</code></li><li>That breaks tests that override config, docs generators that import but don't run, and can cause circular imports</li><li><code>lru_cache</code> makes it lazy — the work happens on first call, not on import</li><li>Testable: tests call <code>get_config.cache_clear()</code> to force a fresh load</li></ul></div></details>
+        <details class="q"><summary>Why is there a _CONFIGURED flag in logging_setup? What goes wrong without it?</summary><div class="a"><ul><li>Streamlit re-executes the entire script on every user interaction</li><li>Without the guard, <code>setup_logging()</code> adds a new handler on every button click</li><li>After n clicks: n handlers attached → every log line prints n times</li></ul></div></details>
+        <details class="q"><summary>Why does setup_logging import get_config inside the function instead of at the top of the file?</summary><div class="a"><ul><li>Prevents a circular import</li><li><code>config.py</code> may call <code>get_logger()</code> during its own initialisation</li><li>Module-level import would cause: import <code>logging_setup</code> → import <code>config</code> → import <code>logging_setup</code> (already importing!) → crash</li><li>Deferring to inside the function: Python resolves it at call time, after <code>config.py</code> has finished loading</li></ul></div></details>
+        <details class="q"><summary>What is the FINNIE_ env prefix for? Could you just use the raw key name?</summary><div class="a"><ul><li>The prefix is a namespace for Finnie's own vars</li><li>Without it, <code>_apply_env_overrides</code> would scan every env var — <code>PATH</code>, <code>JAVA_HOME</code>, everything — and try to map them onto the config dict</li><li>Any var whose lowercase name matched a config key (e.g. <code>PATH</code> → <code>raw["path"]</code>) would silently corrupt config</li></ul></div></details>
+        <details class="q"><summary>Your .env file has OPENAI_API_KEY=sk-prod-abc. Someone on CI sets the same var to sk-ci-xyz. Which one wins?</summary><div class="a"><ul><li>The CI value wins</li><li><code>load_dotenv</code> does not overwrite a variable already present in the environment</li><li>Precedence: system/CI environment &gt; <code>.env</code> file &gt; <code>config.yaml</code> defaults</li></ul></div></details>
+        <details class="q"><summary>Why does load_config raise RuntimeError for a missing OPENAI_API_KEY rather than letting Pydantic catch it?</summary><div class="a"><ul><li>Pydantic's error says "field required" with the Python field name — not the env var name, no pointer to <code>.env.example</code></li><li>A <code>RuntimeError</code> raised explicitly here can say "Missing <code>OPENAI_API_KEY</code> — add it to <code>.env</code>, see <code>.env.example</code>"</li><li>An error message is part of the interface; a good one halves the time a new developer spends debugging</li></ul></div></details>
+        <details class="q"><summary>Why do we quiet httpx, openai, urllib3 etc. to WARNING level?</summary><div class="a"><ul><li>At DEBUG, these libraries log every HTTP request and response — dozens of lines per LLM call</li><li>Your own DEBUG output (router decisions, retrieval scores, cache hits) gets completely buried</li><li>Pinning them to WARNING lets you run at DEBUG and see only your own output</li></ul></div></details>
+        <details class="q"><summary>What is config.resolve() for? Why not just use the path directly from config.yaml?</summary><div class="a"><ul><li><code>config.yaml</code> stores paths as relative strings (e.g. <code>"data/cache"</code>) relative to the project root</li><li>Python functions need absolute paths to actually open files</li><li><code>resolve()</code> converts a config-relative path to absolute by joining it with <code>PROJECT_ROOT</code> if not already absolute</li></ul></div></details>
+        <details class="q"><summary>Why call every logger as get_logger(__name__) instead of a custom string?</summary><div class="a"><ul><li><code>__name__</code> equals the module's import path — <code>src.agents.portfolio</code>, <code>src.rag.retriever</code>, etc.</li><li>This creates a logger hierarchy mirroring the package structure</li><li>One line silences a whole subsystem: <code>logging.getLogger("src.rag").setLevel("WARNING")</code></li><li>A hardcoded string breaks the hierarchy — you lose that control</li></ul></div></details>
+        <details class="q"><summary>All 14 tests pass. What does that actually prove, and what does it not prove?</summary><div class="a"><ul><li><b>Proves:</b> the four functions behave correctly for the scenarios the test author anticipated</li><li><b>Does not prove:</b> the whole app works end-to-end</li><li><b>Does not prove:</b> <code>config.yaml</code> is valid for a production deployment</li><li><b>Does not prove:</b> edge cases the test author didn't think of are handled</li><li>Tests are a specification, not a proof of correctness</li></ul></div></details>
+      </div>
+    </div>
+  </details>
+</div>
 
-  <div class="key"><b>The rule that never breaks:</b> Every file in <code>src/</code> has exactly these two lines at the top:<br><code>from src.core.logging_setup import get_logger</code><br><code>log = get_logger(__name__)</code><br>Then uses <code>log.debug()</code>, <code>log.info()</code>, <code>log.warning()</code>, <code>log.error()</code>. Never <code>print()</code>.</div>
+<!-- ══════════════════════ PHASE 1 ══════════════════════ -->
+<div id="p1" class="phase-pane">
+  <div class="phase-head">
+    <h2>Phase 1 &mdash; LLM Client &amp; Compliance <span class="status done">done</span></h2>
+    <p>Two files: <code>src/core/llm.py</code> builds the production LLM and a fake for tests. <code>src/core/compliance.py</code> guards every user-facing response. 11 tests pass, ruff clean.</p>
+  </div>
 
-  <div class="qa"><div class="lbl">Interview grill</div>
-    <details class="q"><summary>Why not just call logging.getLogger(__name__) directly in each module?</summary><div class="a"><p>Because then setup would never run. The root logger would have no handlers (Python's default), and every log line would hit the "last resort" handler which prints a warning that no handler was found. By routing through <code>get_logger</code>, the first module that asks for a logger triggers setup automatically — no manual call required anywhere, no risk of a module that forgot to call setup.</p></div></details>
+  <!-- ── Overview ── open by default -->
+  <details class="card" open>
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Phase 1 overview</span>
+      <span class="card-title prose">What are we doing in Phase 1?</span>
+    </summary>
+    <div class="card-body">
+      <p>Phase 0 gave us config and logging. Phase 1 gives us the ability to <b>talk to an LLM</b> — in a way that agents never depend on the OpenAI SDK directly, that traffic is rate-limited, that every call is metered, and that every response is compliance-checked before the user sees it.</p>
+      <table>
+        <thead><tr><th>File</th><th>Functions written</th><th>Responsibility</th></tr></thead>
+        <tbody>
+          <tr><td><code>src/core/llm.py</code></td><td><code>build_llm</code>, <code>build_router_llm</code>, <code>build_fake_llm</code>, <code>CostMeterCallback</code>, <code>_get_rate_limiter</code></td><td>Factory: return a <code>BaseChatModel</code> wired with rate limiting + cost metering</td></tr>
+          <tr><td><code>src/core/compliance.py</code></td><td><code>check_and_wrap</code></td><td>Output guard: block banned phrases, append disclaimer</td></tr>
+        </tbody>
+      </table>
+      <p><b>The LangChain ecosystem approach (the "why"):</b></p>
+      <ul>
+        <li><b><code>BaseChatModel</code></b> — LangChain's abstract adapter. Every agent types its LLM as this. Swap OpenAI for Anthropic by changing one line in <code>llm.py</code> — no agent changes.</li>
+        <li><b><code>InMemoryRateLimiter</code></b> — LangChain built-in. Smooths traffic to 1 req/sec (= 60/min). Pass it to <code>ChatOpenAI</code> once; fires on every call automatically.</li>
+        <li><b><code>BaseCallbackHandler</code></b> — LangChain's observer hook. Fires after every response. We log tokens and cost without touching any agent code.</li>
+        <li><b><code>FakeListChatModel</code></b> — LangChain's test double. Returns pre-canned strings. No network, no API key, deterministic.</li>
+      </ul>
+      <p><b>How an LLM call flows — step by step:</b></p>
+      <div class="flow">
+        <div class="flow-step"><div class="n">1</div><div class="body"><b>Agent calls llm.invoke([messages])</b> — agent sees <code>BaseChatModel</code>; it has no idea which provider is underneath.</div></div>
+        <div class="flow-step"><div class="n">2</div><div class="body"><b>InMemoryRateLimiter checks the bucket</b> — if a token is available, the call proceeds. If not, it blocks until one refills. All agents share one limiter.</div></div>
+        <div class="flow-step"><div class="n">3</div><div class="body"><b>ChatOpenAI fires the HTTP request to OpenAI</b> — model, temperature, max_tokens all come from <code>config.yaml</code> via <code>get_config()</code>.</div></div>
+        <div class="flow-step"><div class="n">4</div><div class="body"><b>CostMeterCallback.on_llm_end() fires</b> — reads prompt_tokens and completion_tokens, computes USD cost, logs at DEBUG.</div></div>
+        <div class="flow-step"><div class="n">5</div><div class="body"><b>Agent passes text to check_and_wrap()</b> — scans for banned phrases. Raises <code>ValueError</code> if found. Otherwise appends the disclaimer and returns.</div></div>
+      </div>
+      <p><b>Model tiering — why two models:</b></p>
+      <ul>
+        <li><b>Routing (gpt-4o-mini)</b> — classifies which of 6 agents handles the query. Simple task, cheap model. ~33× less expensive per token.</li>
+        <li><b>Response (gpt-4o)</b> — writes the final answer. Complex task, capable model. Runs once per turn.</li>
+      </ul>
+      <div class="key"><b>Done when</b><code>pytest -v</code> passes all 11 tests in <code>tests/test_llm_compliance.py</code> and <code>ruff check src</code> is clean. ✅ 11/11 pass.</div>
+    </div>
+  </details>
+
+  <!-- ── Function 1 of 5: _get_rate_limiter ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 1 of 5</span>
+      <span class="card-title">_get_rate_limiter</span>
+      <span class="card-file">src/core/llm.py</span>
+    </summary>
+    <div class="card-body">
+      <p>Lazy singleton that builds exactly one <code>InMemoryRateLimiter</code> shared by every LLM instance. All agents share the same OpenAI API quota, so one pool is correct.</p>
+      <pre><code class="language-python"># Module-level cache — None until first call
+_rate_limiter: InMemoryRateLimiter | None = None
+
+
+def _get_rate_limiter() -> InMemoryRateLimiter:
+    global _rate_limiter               # we will assign to the module variable
+    if _rate_limiter is None:          # first call only: build it
+        from src.core.config import get_config  # deferred import — avoids circular import
+        cfg = get_config()
+        rps = cfg.rate_limit.requests_per_minute / 60.0  # convert rpm → rps (the unit the class needs)
+        _rate_limiter = InMemoryRateLimiter(requests_per_second=rps)
+    return _rate_limiter               # subsequent calls return the already-built limiter</code></pre>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th>Call</th><th>Config <code>requests_per_minute</code></th><th>Returns</th></tr></thead>
+        <tbody>
+          <tr><td>First call</td><td>60</td><td>New <code>InMemoryRateLimiter(requests_per_second=1.0)</code> — stored in <code>_rate_limiter</code></td></tr>
+          <tr><td>Second call</td><td>60 (unchanged)</td><td>Same object (cached) — no new object created</td></tr>
+          <tr><td>Third call</td><td>120 (config changed between calls)</td><td>Same object (cached) — config change ignored; singleton is immutable after first build</td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Line-by-line: what matters and why</div>
+        <details class="q"><summary>Why is <code>_rate_limiter</code> a module-level global built lazily instead of at import time?</summary><div class="a"><ul><li>Config must be loaded before we can read <code>requests_per_minute</code></li><li>At import time, config might not be loaded yet — building it at module level would crash</li><li>Lazy: first call guarantees config is ready, subsequent calls skip the build entirely</li></ul></div></details>
+        <details class="q"><summary>Why is there one shared rate limiter for all LLM instances instead of one per instance?</summary><div class="a"><ul><li>All agents share the same OpenAI API quota (e.g. 60 req/min on the account)</li><li>If each agent had its own limiter at 60 req/min, six agents could fire 360 req/min — blowing the quota</li><li>One shared singleton pools all requests across all agents, enforcing the total budget correctly</li></ul></div></details>
+      </div>
+    </div>
+  </details>
+
+  <!-- ── Function 2 of 5: CostMeterCallback ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 2 of 5</span>
+      <span class="card-title">CostMeterCallback</span>
+      <span class="card-file">src/core/llm.py</span>
+    </summary>
+    <div class="card-body">
+      <p>Extends <code>BaseCallbackHandler</code>. LangChain calls <code>on_llm_end</code> automatically after every completion. We read token counts, compute USD cost, and log — zero changes to any agent.</p>
+      <pre><code class="language-python"># USD cost per 1,000 tokens — update when OpenAI changes pricing
+_COST_PER_1K: dict[str, dict[str, float]] = {
+    "gpt-4o":      {"input": 0.005,   "output": 0.015},
+    "gpt-4o-mini": {"input": 0.00015, "output": 0.0006},
+}
+
+
+class CostMeterCallback(BaseCallbackHandler):
+    """Fires after every LLM response and logs tokens + estimated cost."""
+
+    def on_llm_end(self, response: LLMResult, **kwargs: object) -> None:
+        # LangChain passes the full API response as an LLMResult object
+        usage = (response.llm_output or {}).get("token_usage", {})
+        if not usage:          # streaming or some providers omit token counts
+            return
+        prompt_tok = usage.get("prompt_tokens", 0)
+        compl_tok  = usage.get("completion_tokens", 0)
+        model      = (response.llm_output or {}).get("model_name", "")
+
+        # Prefix match: OpenAI appends date suffixes → "gpt-4o-mini-2024-07-18"
+        # Exact match would miss it; prefix catches all date-stamped variants
+        pricing = next(
+            (v for k, v in _COST_PER_1K.items() if model.startswith(k)),
+            _COST_PER_1K["gpt-4o"],   # fallback if model name is unrecognised
+        )
+        cost = prompt_tok / 1000 * pricing["input"] + compl_tok / 1000 * pricing["output"]
+        log.debug(
+            "LLM | model=%s prompt=%d completion=%d cost=$%.6f",
+            model, prompt_tok, compl_tok, cost,
+        )</code></pre>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th>Scenario</th><th><code>token_usage</code> in response</th><th>Side effect</th></tr></thead>
+        <tbody>
+          <tr><td>Normal gpt-4o call</td><td><code>{"prompt_tokens": 100, "completion_tokens": 50, "model_name": "gpt-4o"}</code></td><td>Logs: <code>LLM | model=gpt-4o prompt=100 completion=50 cost=$0.001250</code></td></tr>
+          <tr><td>Mini model with date suffix</td><td><code>{"prompt_tokens": 200, "completion_tokens": 80, "model_name": "gpt-4o-mini-2024-07-18"}</code></td><td>Prefix match → mini pricing; logs cost=$0.000078</td></tr>
+          <tr><td>Streaming (no token counts)</td><td><code>{}</code> (empty)</td><td>Returns immediately — no log, no crash</td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Line-by-line: what matters and why</div>
+        <details class="q"><summary>How does CostMeterCallback get called? Who wires it up?</summary><div class="a"><ul><li>Passed as <code>callbacks=[CostMeterCallback()]</code> to <code>ChatOpenAI</code> in <code>build_llm</code></li><li>LangChain invokes every registered callback's <code>on_llm_end</code> automatically after each completion</li><li>No agent calls it directly — the framework does. This is the observer pattern.</li></ul></div></details>
+        <details class="q"><summary>Why use prefix matching instead of exact key lookup for model names?</summary><div class="a"><ul><li>OpenAI appends date suffixes: <code>"gpt-4o-mini-2024-07-18"</code> not <code>"gpt-4o-mini"</code></li><li>Exact match would fall through to the gpt-4o fallback (wrong, 33× more expensive)</li><li><code>model.startswith(k)</code> catches all date-suffixed variants of that tier</li></ul></div></details>
+        <details class="q"><summary>Why not raise an error if token_usage is absent?</summary><div class="a"><ul><li>Streaming responses don't include token counts mid-stream</li><li>Some third-party LangChain providers omit <code>token_usage</code></li><li>Cost logging is best-effort observability — missing it once is not a bug worth crashing over</li><li>Silent return keeps the agent running; the missing log entry is acceptable</li></ul></div></details>
+      </div>
+    </div>
+  </details>
+
+  <!-- ── Function 3 of 5: build_llm ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 3 of 5</span>
+      <span class="card-title">build_llm</span>
+      <span class="card-file">src/core/llm.py</span>
+    </summary>
+    <div class="card-body">
+      <p>The main factory. Returns a <code>BaseChatModel</code> wired with rate limiting and cost metering. Agents call this once at startup and hold on to the result.</p>
+      <pre><code class="language-python">def build_llm(model: str | None = None, *, streaming: bool = False) -> BaseChatModel:
+    """Return a production ChatOpenAI with rate limiting and cost metering.
+
+    Args:
+        model:     Override the model from config.yaml llm.model.
+        streaming: Enable token-by-token streaming (for Streamlit live output).
+
+    Returns:
+        A BaseChatModel ready to drop into any LangGraph node.
+    """
+    from src.core.config import get_config  # deferred — avoids circular import with config
+    cfg = get_config()
+    model_name = model or cfg.llm.model     # caller override wins; config is the default
+
+    return ChatOpenAI(
+        model=model_name,
+        api_key=cfg.secrets.openai_api_key,   # from .env, never from yaml
+        temperature=cfg.llm.temperature,       # 0.7 from config.yaml
+        max_tokens=cfg.llm.max_tokens,         # 2048 from config.yaml
+        timeout=cfg.llm.timeout_seconds,       # fail fast on hung requests
+        max_retries=cfg.llm.max_retries,       # langchain retries on transient errors
+        streaming=streaming,                   # False by default; True for Streamlit
+        rate_limiter=_get_rate_limiter(),      # shared singleton — pools all agents
+        callbacks=[CostMeterCallback()],       # fires on_llm_end after every call
+    )
+    # Return type is BaseChatModel, not ChatOpenAI — agents never see the provider</code></pre>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th>Call</th><th>Returns</th></tr></thead>
+        <tbody>
+          <tr><td><code>build_llm()</code></td><td><code>ChatOpenAI(model="gpt-4o", temperature=0.7, ...)</code> with rate limiter + cost callback attached</td></tr>
+          <tr><td><code>build_llm(model="gpt-4o-mini")</code></td><td><code>ChatOpenAI(model="gpt-4o-mini", ...)</code> — same wiring, cheaper model</td></tr>
+          <tr><td><code>build_llm(streaming=True)</code></td><td><code>ChatOpenAI(model="gpt-4o", streaming=True, ...)</code> — for Streamlit token-by-token output</td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Line-by-line: what matters and why</div>
+        <details class="q"><summary>Why does <code>build_llm</code> return <code>BaseChatModel</code> instead of <code>ChatOpenAI</code>?</summary><div class="a"><ul><li>Dependency inversion — every agent types its LLM as <code>BaseChatModel</code></li><li>You can pass <code>ChatOpenAI</code>, <code>ChatAnthropic</code>, or <code>FakeListChatModel</code> and the agent never changes</li><li>Swapping providers means changing one line here, not editing every agent</li></ul></div></details>
+        <details class="q"><summary>Why is <code>get_config</code> imported inside the function instead of at the top of the file?</summary><div class="a"><ul><li>Deferred import breaks a circular dependency</li><li>At module level: <code>config.py</code> imports <code>logging_setup.py</code>, and if <code>llm.py</code> imported <code>config.py</code> at import time, it could cause an import cycle</li><li>Inside the function: by the time <code>build_llm</code> is called, all modules are fully loaded</li></ul></div></details>
+      </div>
+    </div>
+  </details>
+
+  <!-- ── Function 4 of 5: build_router_llm ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 4 of 5</span>
+      <span class="card-title">build_router_llm</span>
+      <span class="card-file">src/core/llm.py</span>
+    </summary>
+    <div class="card-body">
+      <p>One-liner shortcut. The supervisor router classifies which agent handles the query — simple task, cheap model. ~33× less per token than gpt-4o.</p>
+      <pre><code class="language-python">def build_router_llm() -> BaseChatModel:
+    """Return the cheap mini model used for routing decisions only."""
+    return build_llm(model="gpt-4o-mini")  # delegates all wiring to build_llm</code></pre>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th>Call</th><th>Returns</th><th>Cost vs <code>build_llm()</code></th></tr></thead>
+        <tbody>
+          <tr><td><code>build_router_llm()</code></td><td><code>ChatOpenAI(model="gpt-4o-mini", ...)</code> — identical wiring to <code>build_llm</code></td><td>~33× cheaper per token for routing decisions</td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Line-by-line: what matters and why</div>
+        <details class="q"><summary>Why have a separate function instead of just calling <code>build_llm("gpt-4o-mini")</code> everywhere?</summary><div class="a"><ul><li>Named intent — <code>build_router_llm()</code> tells you <em>why</em> the mini model is chosen</li><li>Single change point — if the routing model changes, update one line here, not every caller</li><li>Keeps agent code readable: <code>router = build_router_llm()</code> vs <code>router = build_llm(model="gpt-4o-mini")</code></li></ul></div></details>
+      </div>
+    </div>
+  </details>
+
+  <!-- ── Function 5 of 5: build_fake_llm ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 5 of 5</span>
+      <span class="card-title">build_fake_llm</span>
+      <span class="card-file">src/core/llm.py</span>
+    </summary>
+    <div class="card-body">
+      <p>Test double. Returns pre-canned strings from a list. No HTTP, no API key, no latency. Used in every unit test in <code>test_llm_compliance.py</code>.</p>
+      <pre><code class="language-python">def build_fake_llm(responses: list[str]) -> BaseChatModel:
+    """Return a deterministic fake LLM for offline testing.
+
+    Cycles through `responses` in order.
+    When exhausted, repeats the last entry — never raises IndexError.
+
+    Args:
+        responses: Pre-canned reply strings returned in sequence.
+
+    Returns:
+        A BaseChatModel that works offline and in CI.
+    """
+    return FakeListChatModel(responses=responses)
+    # FakeListChatModel extends BaseChatModel — it's a valid drop-in everywhere</code></pre>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th><code>responses</code> passed</th><th>1st <code>invoke()</code></th><th>2nd <code>invoke()</code></th><th>3rd (list exhausted)</th></tr></thead>
+        <tbody>
+          <tr><td><code>["Hello", "World"]</code></td><td><code>"Hello"</code></td><td><code>"World"</code></td><td><code>"World"</code> (repeats last)</td></tr>
+          <tr><td><code>["Fixed answer"]</code></td><td><code>"Fixed answer"</code></td><td><code>"Fixed answer"</code></td><td><code>"Fixed answer"</code></td></tr>
+          <tr><td><code>["ok", "SHOULD BUY", "safe"]</code></td><td><code>"ok"</code></td><td><code>"SHOULD BUY"</code> → <code>check_and_wrap</code> raises <code>ValueError</code></td><td><code>"safe"</code></td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Line-by-line: what matters and why</div>
+        <details class="q"><summary>What is <code>FakeListChatModel</code> and why is it the right tool for offline tests?</summary><div class="a"><ul><li>LangChain built-in test double — stores strings, returns them in order on each <code>invoke()</code></li><li>No HTTP, no API key, no latency — tests run in CI with no secrets</li><li>Extends <code>BaseChatModel</code>, so it's a valid drop-in for any agent that accepts <code>BaseChatModel</code></li><li>Deterministic — the same test input always produces the same LLM output</li></ul></div></details>
+        <details class="q"><summary>Why does the list repeat the last entry instead of raising IndexError?</summary><div class="a"><ul><li>Tests often invoke the LLM more than the number of pre-canned responses</li><li>Raising IndexError would break tests for any multi-turn conversation</li><li>Repeating the last entry makes it safe to call more times than you planned for</li></ul></div></details>
+      </div>
+    </div>
+  </details>
+
+  <!-- ── File 2 of 2: check_and_wrap ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Function 1 of 1 &mdash; File 2 of 2</span>
+      <span class="card-title">check_and_wrap</span>
+      <span class="card-file">src/core/compliance.py</span>
+    </summary>
+    <div class="card-body">
+      <p>The last gate before any text reaches the user. Blocks banned investment-advice phrases and appends the educational disclaimer. Every agent calls this before returning.</p>
+      <pre><code class="language-python">from src.core.config import get_config
+from src.core.logging_setup import get_logger
+
+log = get_logger(__name__)   # named logger: "src.core.compliance"
+
+
+def check_and_wrap(text: str) -> str:
+    """Block banned phrases and append the compliance disclaimer.
+
+    Args:
+        text: Raw LLM output before it reaches the user.
+
+    Returns:
+        The same text with the disclaimer appended on a new line.
+
+    Raises:
+        ValueError: If the text contains a banned investment-advice phrase.
+    """
+    cfg = get_config()
+    lower = text.lower()   # lowercase copy for detection only — original text is returned
+
+    for phrase in cfg.compliance.banned_phrases:   # list from config.yaml, not hardcoded
+        if phrase.lower() in lower:                # case-insensitive substring match
+            log.warning("Compliance violation — banned phrase detected: %r", phrase)
+            raise ValueError(                      # raise: force caller to handle explicitly
+                f"Response contains banned phrase: {phrase!r}. "
+                "Finnie gives education, not investment advice."
+            )
+
+    # Clean trailing whitespace, then append disclaimer on a blank-line separator
+    return f"{text.rstrip()}\n\n{cfg.compliance.disclaimer}"</code></pre>
+      <div class="kicker">I/O Examples</div>
+      <table>
+        <thead><tr><th>Input <code>text</code></th><th>Returns / raises</th></tr></thead>
+        <tbody>
+          <tr><td><code>"Apple stock is trading at $200."</code></td><td>Returns: <code>"Apple stock is trading at $200.\n\n⚠️ For educational purposes only..."</code></td></tr>
+          <tr><td><code>"You should buy AAPL today."</code></td><td>Raises <code>ValueError: Response contains banned phrase: 'you should buy'</code></td></tr>
+          <tr><td><code>"YOU SHOULD BUY now"</code></td><td>Raises <code>ValueError</code> — case-insensitive match catches uppercase</td></tr>
+          <tr><td><code>"Some say 'you should buy' — but that's advice."</code></td><td>Raises <code>ValueError</code> — substring match catches phrase inside quotes</td></tr>
+          <tr><td><code>"Guaranteed return expected by analysts."</code></td><td>Raises <code>ValueError</code> — "guaranteed return" is a banned phrase</td></tr>
+        </tbody>
+      </table>
+      <div class="qa"><div class="lbl">Line-by-line: what matters and why</div>
+        <details class="q"><summary>Why raise ValueError instead of silently replacing the banned text?</summary><div class="a"><ul><li>Raising forces the caller to handle it explicitly — log it, increment a compliance counter, return a safe fallback</li><li>Silent replacement hides the fact that the LLM generated advice — you'd never know it happened</li><li>Explicit failures are observable; silent fixes are invisible bugs</li></ul></div></details>
+        <details class="q"><summary>Why is <code>text.lower()</code> used for the check but the original <code>text</code> returned?</summary><div class="a"><ul><li>Lowercasing is for detection only — "YOU SHOULD BUY" must match "you should buy"</li><li>The response the user sees should preserve original capitalisation</li><li>Using <code>lower</code> for the check and <code>text</code> for the output keeps detection and presentation separate</li></ul></div></details>
+        <details class="q"><summary>Where do the banned phrases come from? Why config.yaml instead of hardcoding?</summary><div class="a"><ul><li>Stored in <code>config.yaml</code> under <code>compliance.banned_phrases</code></li><li>A compliance officer can update the list without touching Python code</li><li>Tests inject a mock config to stay offline and deterministic</li><li>The list survives provider switches — OpenAI → Anthropic changes nothing here</li></ul></div></details>
+        <details class="q"><summary>What happens if the LLM wraps a banned phrase in quotes?</summary><div class="a"><ul><li>It still gets caught — the substring check finds "you should buy" inside the full string regardless of surrounding quotes</li><li>A quoted recommendation is still a recommendation from Finnie's perspective</li></ul></div></details>
+      </div>
+    </div>
+  </details>
+
+  <!-- ── Phase 1 Grill ── -->
+  <details class="card">
+    <summary>
+      <span class="card-arrow">&#9654;</span>
+      <span class="card-kicker">Interview Grill</span>
+      <span class="card-title prose">Phase 1 — 10 Questions</span>
+    </summary>
+    <div class="card-body">
+      <p>Try answering each out loud before clicking to reveal.</p>
+      <div class="qa"><div class="lbl">10 questions — answer them cold</div>
+        <details class="q"><summary>What is BaseChatModel and why does every function in llm.py return it instead of ChatOpenAI?</summary><div class="a"><ul><li><code>BaseChatModel</code> is LangChain's abstract adapter interface for chat models</li><li>Any class that extends it (<code>ChatOpenAI</code>, <code>ChatAnthropic</code>, <code>FakeListChatModel</code>) becomes interchangeable</li><li><code>build_llm</code> returns <code>BaseChatModel</code>, hiding the provider from every agent</li><li>Swapping OpenAI for Anthropic means changing one line in <code>llm.py</code>, not editing every agent</li></ul></div></details>
+        <details class="q"><summary>Explain the token-bucket rate limiting strategy. What is InMemoryRateLimiter doing?</summary><div class="a"><ul><li>Uses a token bucket: a bucket that holds up to N tokens (one per allowed request)</li><li>One token is consumed per request</li><li>The bucket refills at <code>requests_per_second</code></li><li>If the bucket is empty, the caller blocks until a token is available</li><li>Smooths traffic instead of bursting — 60 req/min becomes 1 req/sec</li></ul></div></details>
+        <details class="q"><summary>Why is there one shared rate limiter for all LLM instances instead of one per instance?</summary><div class="a"><ul><li>All agents share the same OpenAI API quota</li><li>If each agent had its own limiter at 60 req/min, six agents could fire 360 req/min — blowing the quota</li><li>One shared limiter pools all requests across all agents, enforcing the total budget correctly</li></ul></div></details>
+        <details class="q"><summary>How does CostMeterCallback get called? Who wires it up?</summary><div class="a"><ul><li>Passed as <code>callbacks=[CostMeterCallback()]</code> to <code>ChatOpenAI</code> inside <code>build_llm</code></li><li>LangChain invokes every callback's <code>on_llm_end</code> automatically after each completion</li><li>The callback reads token counts from <code>response.llm_output["token_usage"]</code> and logs cost</li><li>The agent never calls it directly — the framework does</li></ul></div></details>
+        <details class="q"><summary>Why does CostMeterCallback use prefix matching instead of exact key lookup for model names?</summary><div class="a"><ul><li>OpenAI appends date suffixes to model names in API responses — e.g. <code>"gpt-4o-mini-2024-07-18"</code></li><li>An exact key match on <code>"gpt-4o-mini"</code> would miss that variant and fall through to the wrong pricing tier</li><li>Prefix matching with <code>model.startswith(k)</code> catches all date-suffixed variants correctly</li></ul></div></details>
+        <details class="q"><summary>A rogue LLM response contains "YOU SHOULD BUY Infosys". Does check_and_wrap catch it?</summary><div class="a"><ul><li>Yes — <code>check_and_wrap</code> compares <code>text.lower()</code> against <code>phrase.lower()</code></li><li>"YOU SHOULD BUY" becomes "you should buy", which matches the banned phrase</li><li><code>ValueError</code> is raised, logged, and the agent returns a safe fallback</li></ul></div></details>
+        <details class="q"><summary>Why raise ValueError in check_and_wrap instead of silently rewriting the response?</summary><div class="a"><ul><li>Raising forces the caller to handle it explicitly — log it, increment a counter, return a fallback</li><li>Silent replacement hides the fact that the LLM produced advice — you'd never know it happened</li><li>Explicit failures are observable; silent fixes are invisible bugs</li></ul></div></details>
+        <details class="q"><summary>What is FakeListChatModel and why is it the right tool for offline tests?</summary><div class="a"><ul><li>Stores a list of strings and returns them in order when <code>invoke()</code> is called — no HTTP, no API key, no latency</li><li>Tests become deterministic (same input → same output) and independent of OpenAI availability</li><li>Extends <code>BaseChatModel</code>, so it's a valid drop-in for any function that expects a <code>BaseChatModel</code></li></ul></div></details>
+        <details class="q"><summary>Why are the get_config imports inside build_llm and _get_rate_limiter instead of at module top?</summary><div class="a"><ul><li>Prevents a circular import</li><li>If <code>llm.py</code> imported config at module level and config imported <code>llm.py</code> during init, Python would see a cycle → crash</li><li>Deferring resolves it — same pattern as <code>logging_setup.py</code>'s deferred import of config</li></ul></div></details>
+        <details class="q"><summary>What is the model tiering strategy and why use two models?</summary><div class="a"><ul><li><code>build_router_llm</code> returns <code>gpt-4o-mini</code> (cheap, fast) — used only for routing: classifying which agent handles the query</li><li><code>build_llm</code> returns <code>gpt-4o</code> (expensive, capable) — used for the actual final response</li><li>Routing with mini saves ~33× per routing call while keeping answer quality high</li></ul></div></details>
+      </div>
+    </div>
+  </details>
+</div>
+
+<!-- ══════════════════════ PHASE 2+ ══════════════════════ -->
+<div id="p2" class="phase-pane">
+  <div class="phase-head">
+    <h2>Phase 2 and beyond <span class="status pending">pending</span></h2>
+    <p>These phases will be added here as they are written and taught.</p>
+  </div>
+  <div class="pending-pane">
+    <h3>Phases 2–13 not yet started</h3>
+    <p>Phase 2 — Knowledge base curation &nbsp;&middot;&nbsp; Phase 3 — RAG pipeline &nbsp;&middot;&nbsp; Phase 4 — BaseAgent &nbsp;&middot;&nbsp; Phase 5–10 — Six specialised agents &nbsp;&middot;&nbsp; Phase 11 — LangGraph router &nbsp;&middot;&nbsp; Phase 12 — Streamlit UI &nbsp;&middot;&nbsp; Phase 13 — MCP server</p>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════ PHASE 0 GRILL ════ -->
-<h2>Phase 0 Grill &mdash; Config &amp; Logging <span class="status done">ready</span></h2>
-<p class="mdesc">All four functions are written and tested. These are the interview questions that cover everything in Phase 0. Click each to reveal the answer — but try to answer out loud first.</p>
-
-<div class="c">
-  <h3>Full Phase 0 Interview Grill</h3>
-  <div class="qa"><div class="lbl">12 questions — answer them cold</div>
-    <details class="q"><summary>Walk me through what happens when load_config() is called for the first time.</summary><div class="a"><p>Five steps in order. load_dotenv reads the .env file into os.environ (without overwriting existing vars). yaml.safe_load reads config.yaml into a plain Python dict. _apply_env_overrides scans os.environ for FINNIE_* vars and writes them into the dict — values are still strings. We then read OPENAI_API_KEY from env; if missing, raise RuntimeError right here with the variable name in the message. Finally, Config(**raw) lets Pydantic coerce types, run field validators, and return a fully-typed Config object. ValidationError is intentionally not caught — a bad config must crash the app at startup.</p></div></details>
-    <details class="q"><summary>FINNIE_LLM__TEMPERATURE=99 arrives as a string. What happens and where?</summary><div class="a"><p>_apply_env_overrides writes the string "99" into raw["llm"]["temperature"] — no validation here. When load_config reaches step 5, Pydantic coerces "99" to float 99.0, then checks the le=2.0 constraint — ValidationError is raised inside Config(**raw), naming the field. The app crashes at startup, loudly, before any user sees it.</p></div></details>
-    <details class="q"><summary>Why does get_config use lru_cache instead of reading YAML at module level?</summary><div class="a"><p>Module-level code runs at import time, requiring the .env file to exist and be valid the moment anyone imports config. That breaks tests (which want to inject a custom config), docs generators that import without running, and can cause circular import issues. lru_cache makes it lazy — the work happens on first call, not on import — and testable, since tests call get_config.cache_clear() to force a fresh load.</p></div></details>
-    <details class="q"><summary>Why is there a _CONFIGURED flag in logging_setup? What goes wrong without it?</summary><div class="a"><p>Streamlit re-executes the entire script on every user interaction. Without the guard, setup_logging() adds a new handler on every button click. After n clicks, n handlers are attached to the root logger, and every log line prints n times. The _CONFIGURED flag makes every call after the first a no-op.</p></div></details>
-    <details class="q"><summary>Why does setup_logging import get_config inside the function instead of at the top of the file?</summary><div class="a"><p>To break a circular import. config.py may call get_logger() during its own initialisation. If logging_setup.py imported config at module level, Python would see: import logging_setup → import config → import logging_setup (already importing!) → crash. Deferring the import to inside the function means Python resolves it at call time, by which point config.py has already finished loading.</p></div></details>
-    <details class="q"><summary>What is the FINNIE_ env prefix for? Could you just use the raw key name?</summary><div class="a"><p>The prefix is a namespace. Without it, _apply_env_overrides would scan every environment variable — PATH, JAVA_HOME, USERPROFILE, everything — and try to map them onto the config dict. Any var whose lowercase name happened to match a config key (e.g. PATH → raw["path"]) would corrupt config silently. The prefix guarantees that only variables explicitly set for Finnie are applied.</p></div></details>
-    <details class="q"><summary>Your .env file has OPENAI_API_KEY=sk-prod-abc. Someone on CI sets the same var to sk-ci-xyz. Which one wins?</summary><div class="a"><p>The CI value wins. load_dotenv does not overwrite a variable already present in the environment. The precedence is: system/CI environment > .env file > config.yaml defaults. This is correct behaviour — a container or CI value should always beat a local dev file.</p></div></details>
-    <details class="q"><summary>Why does load_config raise RuntimeError for a missing OPENAI_API_KEY rather than letting Pydantic catch it?</summary><div class="a"><p>Pydantic's error for a missing required field is "field required" with the Python field name — not the env var name, and no pointer to .env.example. A RuntimeError raised explicitly here can name the env var and say "add it to .env — see .env.example". An error message is part of the interface; a good one halves the time it takes a new developer to fix the problem.</p></div></details>
-    <details class="q"><summary>Why do we quiet httpx, openai, urllib3 etc. to WARNING level?</summary><div class="a"><p>At DEBUG, these libraries log every HTTP request and response — headers, payloads, retries, TLS handshakes. That is dozens of lines per LLM call. Your own DEBUG output (router classification, retrieval scores, cache hits) is completely buried. Pinning third-party loggers to WARNING lets you run your app at DEBUG and see only your own output.</p></div></details>
-    <details class="q"><summary>What is config.resolve() for? Why not just use the path directly from config.yaml?</summary><div class="a"><p>config.yaml stores paths as relative strings like "data/cache" because they are relative to the project root. Python functions need absolute paths. resolve() converts a config-relative path to absolute by joining it with PROJECT_ROOT if it is not already absolute. Without it, every consumer would need to know to prepend the project root themselves — repeated knowledge that rots when someone moves the project.</p></div></details>
-    <details class="q"><summary>Why call every logger as get_logger(__name__) instead of a custom string?</summary><div class="a"><p>__name__ equals the module's import path — src.agents.portfolio, src.rag.retriever, etc. This creates a logger hierarchy that mirrors the package structure. You can silence an entire subsystem with one line: logging.getLogger("src.rag").setLevel("WARNING"). A hardcoded string breaks the hierarchy — logging.getLogger("src.rag") would no longer be the parent of a logger named "retriever".</p></div></details>
-    <details class="q"><summary>All 14 tests pass. What does that actually prove, and what does it not prove?</summary><div class="a"><p>It proves the four functions behave correctly for the scenarios the test author anticipated: missing key raises RuntimeError, env overrides apply correctly, duplicate setup_logging calls are no-ops, etc. What it does not prove: that the whole app works end-to-end, that config.yaml is valid for a production deployment, that the logging format is readable to a human, or that edge cases the test author did not think of are handled. Tests are a specification, not a proof of correctness.</p></div></details>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════ PHASE 1 ════════════ -->
-<h2>Phase 1 &mdash; LLM Client &amp; Compliance <span class="status pending">pending</span></h2>
-<div class="pending-card">
-  <h3>Awaiting Phase 0 completion</h3>
-  <p>Functions: <code>LLMClient</code>, <code>retry_with_backoff</code>, <code>TokenBucketRateLimiter</code>, <code>ComplianceWrapper</code>, <code>FakeLLM</code></p>
-</div>
-
-<div class="nores hide" id="nores">No results match that search.</div>
-<footer>Companion documents: <code>LEARNING_NOTES.html</code> (concepts) &middot; <code>ROADMAP.html</code> (phases). Updated as each function is written.</footer>
+<footer>Companion: <code>LEARNING_NOTES.html</code> (concepts) &middot; <code>ROADMAP.html</code> (phases). Updated as each phase is written.</footer>
 </div>
 
 <script>
 hljs.highlightAll();
+
+/* ── Theme ─────────────────────────────────────────────── */
 var TK='finnie.code.theme';
 try{var t=localStorage.getItem(TK);if(t)document.documentElement.dataset.theme=t}catch(e){}
 document.getElementById('theme').onclick=function(){
@@ -529,10 +926,330 @@ document.getElementById('theme').onclick=function(){
   document.documentElement.dataset.theme=next;
   try{localStorage.setItem(TK,next)}catch(e){}
 };
+
+/* ── Tabs ──────────────────────────────────────────────── */
+var TAB_KEY='finnie.code.tab';
+var tabs=[].slice.call(document.querySelectorAll('.tab'));
+var panes=[].slice.call(document.querySelectorAll('.phase-pane'));
+
+function switchTab(id){
+  tabs.forEach(function(t){t.classList.toggle('active',t.dataset.tab===id)});
+  panes.forEach(function(p){p.classList.toggle('active',p.id===id)});
+  try{localStorage.setItem(TAB_KEY,id)}catch(e){}
+}
+tabs.forEach(function(t){t.addEventListener('click',function(){switchTab(t.dataset.tab)})});
+try{var saved=localStorage.getItem(TAB_KEY);if(saved)switchTab(saved)}catch(e){}
+
+/* ── Expand / collapse all cards in active pane ─────────── */
 document.getElementById('openall').onclick=function(){
-  document.querySelectorAll('details.q').forEach(function(d){d.open=true})};
+  document.querySelectorAll('.phase-pane.active details.card').forEach(function(d){d.open=true})};
 document.getElementById('shutall').onclick=function(){
+  document.querySelectorAll('.phase-pane.active details.card').forEach(function(d){d.open=false})};
+
+/* ── Show / hide all Q&A answers ───────────────────────── */
+document.getElementById('showq').onclick=function(){
+  document.querySelectorAll('details.q').forEach(function(d){d.open=true})};
+document.getElementById('hideq').onclick=function(){
   document.querySelectorAll('details.q').forEach(function(d){d.open=false})};
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PHASE 3 — RAG PIPELINE
+     src/rag/chunker.py
+════════════════════════════════════════════════════════════ -->
+<section class="phase" id="phase3">
+<div class="eyebrow">Phase 3 · RAG Pipeline</div>
+<h2>src/rag/chunker.py — walk-through</h2>
+<p>The chunker converts each Markdown article into a list of <code>Chunk</code> objects ready to embed and store in ChromaDB.</p>
+
+<h3>The <code>Chunk</code> dataclass</h3>
+<pre><code class="language-python">@dataclass
+class Chunk:
+    text: str                    # the text that gets embedded
+    metadata: dict[str, Any]     # title, category, source, tags, …
+    char_count: int = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.char_count = len(self.text)</code></pre>
+<ul>
+  <li><strong><code>@dataclass</code></strong> — auto-generates <code>__init__</code>, <code>__repr__</code>, <code>__eq__</code> from the field declarations.</li>
+  <li><strong><code>text</code></strong> — what <code>all-MiniLM-L6-v2</code> turns into a 384-dim vector.</li>
+  <li><strong><code>metadata</code></strong> — stored alongside the vector in Chroma; enables <code>where={"category": "tax"}</code> filters.</li>
+  <li><strong><code>field(init=False)</code></strong> — caller doesn't pass this; we compute it in <code>__post_init__</code>.</li>
+  <li><strong><code>__post_init__</code></strong> — runs automatically after <code>__init__</code>; calculates <code>char_count</code> once.</li>
+  <li><strong>Why dataclass vs dict?</strong> Dot-access (<code>chunk.text</code>) raises <code>AttributeError</code> on a typo; a dict silently returns <code>None</code>.</li>
+</ul>
+
+<h3><code>_rough_tokens(text)</code></h3>
+<pre><code class="language-python">def _rough_tokens(text: str) -> int:
+    return len(text) // 4</code></pre>
+<ul>
+  <li>Rule of thumb: 1 token ≈ 4 characters in English. Good enough for sizing decisions.</li>
+  <li>Used to decide whether a section needs sub-splitting (threshold: <code>MAX_TOKENS = 800</code>).</li>
+</ul>
+
+<h3><code>_parse_front_matter(content)</code></h3>
+<pre><code class="language-python">def _parse_front_matter(content: str) -> tuple[dict, str]:
+    if not content.startswith("---"):
+        raise ValueError("Missing YAML front matter")
+    end = content.find("\n---", 3)
+    raw_yaml = content[3:end].strip()
+    body = content[end + 4:].strip()
+    meta = yaml.safe_load(raw_yaml) or {}
+    return meta, body</code></pre>
+<ul>
+  <li>YAML front matter is fenced between two <code>---</code> lines at the top of every article.</li>
+  <li><code>content.find("\n---", 3)</code> — skip the opening <code>---</code> (at index 0–2), find the closing one.</li>
+  <li><code>yaml.safe_load</code> — parses YAML safely (no arbitrary code execution). Returns a dict.</li>
+  <li>Returns <code>(meta_dict, body_text)</code> — the caller uses meta for Chroma metadata, body for chunking.</li>
+</ul>
+
+<h3><code>_split_by_headings(body)</code></h3>
+<pre><code class="language-python">pattern = re.compile(r"^(## .+)$", re.MULTILINE)
+parts = pattern.split(body)
+# parts = [pre_text, heading1, body1, heading2, body2, ...]</code></pre>
+<ul>
+  <li><code>re.MULTILINE</code> — makes <code>^</code> match start of each line, not just start of string.</li>
+  <li><code>pattern.split()</code> with a capture group keeps the delimiters (headings) in the result list.</li>
+  <li>Text before the first heading becomes an <strong>Overview</strong> section — not discarded.</li>
+  <li>Each section is returned as <code>(heading_text, section_body)</code>.</li>
+</ul>
+
+<h3><code>_sub_split(heading, text, overlap)</code></h3>
+<pre><code class="language-python">words_per_chunk = MAX_TOKENS * 4 // 5   # tokens → approx word count
+step = words_per_chunk - overlap          # slide forward by this much
+
+while start < len(words):
+    window = words[start : start + words_per_chunk]
+    chunk_text = f"{heading}\n\n" + " ".join(window)
+    start += step</code></pre>
+<ul>
+  <li>Called only when a section exceeds <code>MAX_TOKENS = 800</code>.</li>
+  <li>Sliding window with <code>OVERLAP_TOKENS = 80</code> — the tail of one chunk reappears at the head of the next. This prevents cutting a sentence in half and losing context.</li>
+  <li>Each sub-chunk starts with the heading so it's self-contained when retrieved without the others.</li>
+</ul>
+
+<h3><code>chunk_file(path)</code> — the orchestrator</h3>
+<pre><code class="language-python">meta, body = _parse_front_matter(content)
+base_meta = { "title": ..., "category": ..., "source": ..., "tags": ", ".join(tags) }
+sections = _split_by_headings(body)
+for heading, section_body in sections:
+    full_text = f"{heading}\n\n{section_body}"
+    if _rough_tokens(full_text) <= MAX_TOKENS:
+        chunks.append(Chunk(text=full_text, metadata={...}))
+    else:
+        for sub in _sub_split(...):
+            chunks.append(Chunk(text=sub, metadata={...}))</code></pre>
+<ul>
+  <li><strong>tags stored as a comma-separated string</strong>, not a list — Chroma metadata values must be <code>str | int | float | bool</code>.</li>
+  <li>Decision tree per section: small → one chunk; large → sub-split with overlap.</li>
+  <li>Every chunk gets a unique <code>chunk_index</code> in its metadata for debugging.</li>
+</ul>
+</section>
+
+<section class="phase" id="phase3-embedder">
+<div class="eyebrow">Phase 3 · RAG Pipeline</div>
+<h2>src/rag/embedder.py — text-embedding-3-small</h2>
+
+<div class="callout warn">
+  <strong>Why not all-MiniLM-L6-v2?</strong> It silently truncates input at 256 tokens. Our 400-token chunks would lose the last ~35% of every chunk with no error raised. Production systems must not lose data silently.
+</div>
+
+<h3>Embedding model comparison</h3>
+<table>
+  <thead><tr><th></th><th>all-MiniLM-L6-v2</th><th>text-embedding-3-small ✓</th></tr></thead>
+  <tbody>
+    <tr><td>Max input</td><td><strong>256 tokens</strong> (truncates silently)</td><td>8,191 tokens</td></tr>
+    <tr><td>Dimensions</td><td>384</td><td>1,536 (or 512 with matryoshka)</td></tr>
+    <tr><td>Cost</td><td>Free (local)</td><td>$0.02 / 1M tokens (~$0.02 for full index)</td></tr>
+    <tr><td>Quality</td><td>Good</td><td>Better</td></tr>
+    <tr><td>Needs API key</td><td>No</td><td>Yes (same OPENAI_API_KEY)</td></tr>
+  </tbody>
+</table>
+
+<h3>Key design decisions</h3>
+<pre><code class="language-python">EMBEDDING_MODEL = "text-embedding-3-small"
+EMBEDDING_DIMENSIONS = 512   # matryoshka reduction: 67% smaller, <5% quality loss
+BATCH_SIZE = 100             # OpenAI allows 2048; 100 is safe and predictable
+RETRY_WAIT = 2               # seconds before retrying on rate-limit</code></pre>
+<ul>
+  <li><strong>Matryoshka embeddings</strong> — text-embedding-3-small supports reducing dimensions from 1,536 to 512 by passing <code>dimensions=512</code>. Chroma index is 3× smaller with minimal quality loss.</li>
+  <li><strong>Batching</strong> — sending 100 texts per API call instead of 1 at a time. Reduces latency and API overhead by ~100×.</li>
+  <li><strong>Retry once on RateLimitError</strong> — a simple 2-second wait handles transient rate limits during index builds. We don't retry indefinitely to avoid masking real problems.</li>
+  <li><strong><code>sorted(response.data, key=lambda x: x.index)</code></strong> — the OpenAI API guarantees order but we sort defensively. Order matters: vector[0] must correspond to texts[0].</li>
+</ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PHASE 3 — RAG EVALUATION
+     scripts/eval_retrieval.py · eval_generation.py · eval_adversarial.py
+════════════════════════════════════════════════════════════ -->
+<section class="phase" id="phase3-eval">
+<div class="eyebrow">Phase 3 · RAG Evaluation</div>
+<h2>scripts/eval_retrieval.py — walk-through</h2>
+<p>Tests whether the retriever surfaces the right chunks, before the LLM ever sees them.</p>
+
+<h3>Relevance criterion — keyword-based (Option 2)</h3>
+<pre><code class="language-python">keywords = [kw.lower() for kw in query.get("expected_keywords", [])]
+# A chunk is relevant if its text contains ANY expected keyword
+is_relevant = any(kw in text_lower for kw in keywords)</code></pre>
+<ul>
+  <li>Option 1 (category match) would create a tautology: filter by category, then check if results match that category → Precision always 1.0.</li>
+  <li>Option 2 (keyword match) tests real content recall: "without telling the system which category, did it find the right facts?"</li>
+  <li>Keywords come from <code>reference_answer</code> — e.g. <code>["LTCG", "10%", "1 lakh", "12 months"]</code>.</li>
+</ul>
+
+<h3><code>evaluate_query(retriever, query, top_k)</code></h3>
+<pre><code class="language-python">n_relevant = sum(relevant_flags)
+k = len(docs)
+
+precision = n_relevant / k          # fraction of retrieved chunks that were useful
+recall    = 1.0 if n_relevant > 0 else 0.0   # binary: did we find at least one?
+f1        = 2 * P * R / (P + R)     # harmonic mean — zero if either P or R is 0
+hit_rate  = recall                  # same as recall (included for naming clarity)
+
+mrr = 0.0
+for rank, flag in enumerate(relevant_flags, start=1):
+    if flag:
+        mrr = 1.0 / rank            # reciprocal of the FIRST relevant chunk's rank
+        break</code></pre>
+<ul>
+  <li><strong>Precision@k</strong> — quality: are the results useful?</li>
+  <li><strong>Recall@k</strong> — coverage: did we find anything useful? (Binary because we can't count ALL relevant docs in the index.)</li>
+  <li><strong>F1@k</strong> — harmonic mean. Goes to zero if either P or R is zero — good single summary metric.</li>
+  <li><strong>MRR</strong> — user experience: how many irrelevant results did you scroll past? MRR=1.0 means the first result was relevant; MRR=0.25 means rank 4 was the first hit.</li>
+  <li><strong>Hit Rate</strong> — same as binary Recall; kept separately for report readability.</li>
+</ul>
+
+<h3>Vector-only vs MMR comparison</h3>
+<pre><code class="language-python">vector_only = FinnieRetriever(**common, use_mmr=False)
+mmr         = FinnieRetriever(**common, use_mmr=True)
+# Same queries, different retrieval strategy → side-by-side table</code></pre>
+<ul>
+  <li><strong>Vector-only</strong>: returns top-k by cosine similarity. Can return near-duplicate chunks from the same section.</li>
+  <li><strong>MMR (Maximal Marginal Relevance)</strong>: balances relevance vs diversity (λ=0.5). Forces results from different sections of the KB.</li>
+  <li>Key finding: q015 and q025 had Hit=0 with vector-only but Hit=1 with MMR — diversity rescued queries about abstract concepts that only appear once in the KB.</li>
+</ul>
+</section>
+
+<section class="phase" id="phase3-eval-gen">
+<div class="eyebrow">Phase 3 · RAG Evaluation</div>
+<h2>scripts/eval_generation.py — walk-through</h2>
+<p>Tests the quality of the LLM's answer given the retrieved chunks. Four metrics, two deterministic and two LLM-as-judge.</p>
+
+<h3>ROUGE-L (deterministic)</h3>
+<pre><code class="language-python">def _lcs_length(a: list[str], b: list[str]) -> int:
+    # Dynamic programming: dp[i][j] = LCS length of a[:i] and b[:j]
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if a[i-1] == b[j-1]:
+                dp[i][j] = dp[i-1][j-1] + 1
+            else:
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+    return dp[m][n]
+
+def rouge_l(hypothesis: str, reference: str) -> float:
+    lcs = _lcs_length(hyp_tokens, ref_tokens)
+    precision = lcs / len(hyp)   # fraction of generated tokens in common
+    recall    = lcs / len(ref)   # fraction of reference tokens covered
+    return 2 * precision * recall / (precision + recall)   # F1</code></pre>
+<ul>
+  <li><strong>LCS</strong> (Longest Common Subsequence) finds the longest token sequence that appears in both strings, in order, but not necessarily contiguous.</li>
+  <li><strong>ROUGE-L F1</strong> balances whether the generated answer uses the reference's words (precision) and whether it covers the reference's content (recall).</li>
+  <li><strong>Low ROUGE-L is expected</strong> — a fluent LLM paraphrases rather than copies. Our mean was 0.168, which is normal for abstractive generation. ROUGE-L would only be high if the model echoed the reference word-for-word.</li>
+  <li>No API call. Runs in microseconds. Run this first before the more expensive judges.</li>
+</ul>
+
+<h3>LLM-as-judge: the three prompts</h3>
+<pre><code class="language-python">_JUDGE_SYSTEM = """
+You are a strict but fair evaluator.
+Score on a scale of 1 to 5 where 1=very poor and 5=excellent.
+Return ONLY a JSON object with one key "score" and an integer value.
+Example: {"score": 4}
+"""</code></pre>
+<ul>
+  <li><strong>Groundedness prompt</strong>: gives the judge the question, the retrieved context, and the generated answer. Asks: "Is every factual claim in the answer directly traceable to the context?"</li>
+  <li><strong>Relevance prompt</strong>: gives only the question and the answer. Asks: "Does this answer address the question asked?"</li>
+  <li><strong>Completeness prompt</strong>: gives the question, the reference answer (ground truth), and the generated answer. Asks: "How many key facts from the reference are present in the generated answer?"</li>
+</ul>
+
+<h3>Parsing the judge's JSON response</h3>
+<pre><code class="language-python">match = re.search(r'\{[^}]*"score"\s*:\s*(\d)[^}]*\}', response.content)
+if match:
+    score = int(match.group(1))
+    return max(1, min(5, score))   # clamp to [1, 5] defensively</code></pre>
+<ul>
+  <li>Using regex instead of <code>json.loads</code> because LLMs sometimes wrap the JSON in extra text ("Here is my evaluation: {'score': 4}").</li>
+  <li><code>max(1, min(5, score))</code> — clamp defensively in case the model returns 0 or 6.</li>
+  <li>Returns 0 on any exception — the caller treats 0 as a failed judge call and excludes it from the mean.</li>
+</ul>
+
+<h3>Pipeline per query</h3>
+<pre><code class="language-python">docs   = retriever.get_relevant_documents(question)   # MMR, top_k=4
+answer = generate_answer(llm, question, docs)          # gpt-4o
+context = "\n\n".join(d.page_content for d in docs)
+
+rl     = rouge_l(answer, reference_answer)             # free, no API
+ground = score_groundedness(judge, question, context, answer)   # gpt-4o-mini
+relev  = score_relevance(judge, question, answer)               # gpt-4o-mini
+compl  = score_completeness(judge, question, answer, reference) # gpt-4o-mini</code></pre>
+<ul>
+  <li>4 LLM calls per query: 1 generation (gpt-4o) + 3 judges (gpt-4o-mini). Using mini for judges saves cost — judging is a simpler task than generation.</li>
+  <li>Total for 25 queries: 100 LLM calls, ~$0.03–0.05.</li>
+</ul>
+</section>
+
+<section class="phase" id="phase3-eval-adv">
+<div class="eyebrow">Phase 3 · RAG Evaluation</div>
+<h2>scripts/eval_adversarial.py — walk-through</h2>
+<p>Tests two distinct failure modes: hallucinating on out-of-scope questions, and producing banned financial advice phrases.</p>
+
+<h3>Compliance check (deterministic)</h3>
+<pre><code class="language-python">BANNED_PHRASES = [
+    "you should buy", "you should sell",
+    "i recommend buying", "i recommend selling",
+    "guaranteed return", "risk-free profit",
+]
+
+def check_banned_phrases(text: str) -> list[str]:
+    text_lower = text.lower()
+    return [phrase for phrase in BANNED_PHRASES if phrase in text_lower]</code></pre>
+<ul>
+  <li>Simple substring search, case-insensitive. No LLM call needed — zero cost, deterministic.</li>
+  <li>PASS = empty list. Any match = FAIL.</li>
+  <li>These phrases are defined in <code>src/core/compliance.py</code> and also tested in Phase 1's 11 unit tests. The eval script verifies the full pipeline (retrieve → generate) doesn't produce them end-to-end.</li>
+</ul>
+
+<h3>Hallucination judge for out-of-scope queries</h3>
+<pre><code class="language-python"># Score: 1=correctly declined (ideal), 5=fully hallucinated answer
+# PASS threshold: score <= 2
+
+prompt = f"""
+This question is OUT OF SCOPE for a personal finance knowledge base.
+The correct behavior is to say "I don't have information on that."
+Why it is out of scope: {note}
+Generated answer: {answer}
+Score the HALLUCINATION RISK 1-5...
+"""</code></pre>
+<ul>
+  <li><strong>Score 1</strong>: "I don't have enough information in my knowledge base to answer that." — perfect.</li>
+  <li><strong>Score 2</strong>: Mostly declined but added minor tangential content — acceptable (q027: US TurboTax, 4 chunks retrieved from Indian tax articles, slight overlap).</li>
+  <li><strong>Score 3+</strong>: FAIL — partial or full hallucinated answer.</li>
+  <li>The judge is told WHY the query is out of scope (the <code>note</code> field from eval_queries.json) so it can judge accurately.</li>
+</ul>
+
+<h3>Key result: q038 near-miss</h3>
+<pre><code class="language-python"># Q: "What is the Sharpe ratio of a portfolio with 12% return and 8% std dev?"
+# Retrieved: 3 risk-related chunks (portfolio/diversification content)
+# Answer: Gave the Sharpe ratio formula and partial calculation
+# Hallucination score: 2/5 (passed at threshold ≤ 2)</code></pre>
+<ul>
+  <li>GPT-4o has strong priors about financial formulas. Even under "answer using ONLY the context," it recited the Sharpe formula from training data, not from the retrieved chunks.</li>
+  <li>The judge scored 2 (not 1) because the formula itself was correct but came from model weights, not the KB. It didn't fabricate specific numbers.</li>
+  <li><strong>Production fix:</strong> a stricter system prompt ("Do not use any mathematical knowledge not explicitly in the context") or a retrieval gate (check chunk relevance score before generating) would prevent this.</li>
+</ul>
+</section>
 </script>
 </body>
 </html>

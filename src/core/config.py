@@ -64,8 +64,11 @@ class RAGConfig(BaseModel):
     chunk_overlap: int = Field(100, ge=0)
     top_k: int = Field(4, gt=0)
     relevance_threshold: float = Field(0.35, ge=0.0, le=1.0)
+    use_mmr: bool = True
+    mmr_lambda: float = Field(0.5, ge=0.0, le=1.0)
     index_dir: Path
     knowledge_base_dir: Path
+    category_map: dict[str, str] = Field(default_factory=dict)
 
     @field_validator("chunk_overlap")
     @classmethod

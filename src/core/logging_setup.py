@@ -48,7 +48,7 @@ def setup_logging(level: str | None = None) -> None:
     # Deferred import — avoids a circular dependency.
     # config.py may call get_logger() during its own initialisation;
     # a top-level import here would create a cycle that crashes at startup.
-    from src.core.config import get_config
+    from core.config import get_config
     cfg = get_config()
 
     # level argument wins over config; config wins over Python's default WARNING.

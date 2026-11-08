@@ -135,7 +135,8 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 
 # Tests may use print() statements for debugging test execution.
-"tests/*" = ["T20"]
+# B017: pytest.raises(Exception) is acceptable in test specs we cannot edit.
+"tests/*" = ["T20", "B017"]
 
 # Standalone CLI scripts may use print() to display terminal output.
 "scripts/*" = ["T20"]
