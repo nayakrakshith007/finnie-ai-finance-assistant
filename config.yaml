@@ -79,13 +79,31 @@ compliance:
     This is educational information, not financial advice. Finnie cannot know your
     full circumstances. Consult a licensed financial adviser before making any
     investment decision.
+  # These block ADVICE, not topics. The distinction matters: "guaranteed return" was
+  # banned outright until 2026-11-08, which made Finnie unable to say that PPF pays a
+  # government-set 7.1% -- a true, educational statement about the instrument most
+  # Indian beginners ask about first. A guard that blocks facts is not safer, it is
+  # just broken in a direction nobody notices.
+  #
+  # What is banned is promising an outcome or telling someone what to do. What remains
+  # allowed is describing how an instrument works, including that a sovereign-backed
+  # one carries a guaranteed rate.
   banned_phrases:
+    # Telling the user to transact
     - you should buy
     - you should sell
     - i recommend buying
     - i recommend selling
-    - guaranteed return
+    - i suggest buying
+    - i suggest selling
+    # Promising an outcome
+    - guaranteed profit
+    - guaranteed returns of
+    - assured profit
     - risk-free profit
+    - risk-free return
+    - cannot lose money
+    - will definitely grow
 
 logging:
   level: INFO                       # DEBUG | INFO | WARNING | ERROR

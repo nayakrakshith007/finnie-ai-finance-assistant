@@ -38,13 +38,22 @@ class TestBuildFakeLlm:
 @pytest.fixture()
 def mock_cfg(monkeypatch):
     cfg = MagicMock()
+    # Mirrors config.yaml. Kept in sync deliberately: a mock that drifts from the
+    # real list tests a policy nobody ships.
     cfg.compliance.banned_phrases = [
         "you should buy",
         "you should sell",
         "i recommend buying",
         "i recommend selling",
-        "guaranteed return",
+        "i suggest buying",
+        "i suggest selling",
+        "guaranteed profit",
+        "guaranteed returns of",
+        "assured profit",
         "risk-free profit",
+        "risk-free return",
+        "cannot lose money",
+        "will definitely grow",
     ]
     cfg.compliance.disclaimer = (
         "For educational purposes only. Not financial advice. "
@@ -75,10 +84,41 @@ class TestCheckAndWrap:
         with pytest.raises(ValueError):
             check_and_wrap("YOU SHOULD SELL before the crash.")
 
-    def test_guaranteed_return_blocked(self, mock_cfg):
+    # ── the advice/topic boundary ──────────────────────────────────────────────
+    # Policy changed 2026-11-08. "guaranteed return" was banned outright, which meant
+    # Finnie could not state that PPF pays a government-set 7.1% — true, educational,
+    # and the single most common beginner question in India. The guard now blocks
+    # PROMISES and INSTRUCTIONS, not the topic of guaranteed instruments.
+
+    def test_promissory_language_blocked(self, mock_cfg):
+        from core.compliance import check_and_wrap
+        with pytest.raises(ValueError, match="banned phrase"):
+            check_and_wrap("This scheme offers guaranteed returns of 15% per year.")
+
+    def test_guaranteed_profit_blocked(self, mock_cfg):
         from core.compliance import check_and_wrap
         with pytest.raises(ValueError):
-            check_and_wrap("This scheme offers a guaranteed return of 15% per year.")
+            check_and_wrap("Options arbitrage delivers guaranteed profit every month.")
+
+    def test_cannot_lose_money_blocked(self, mock_cfg):
+        from core.compliance import check_and_wrap
+        with pytest.raises(ValueError):
+            check_and_wrap("With this strategy you cannot lose money.")
+
+    def test_factual_guaranteed_rate_is_allowed(self, mock_cfg):
+        """The regression this policy change exists to prevent."""
+        from core.compliance import check_and_wrap
+        text = (
+            "PPF is backed by the Government of India and pays a guaranteed return "
+            "of 7.1% per annum, revised quarterly by the Ministry of Finance."
+        )
+        result = check_and_wrap(text)
+        assert "7.1%" in result
+
+    def test_describing_fd_safety_is_allowed(self, mock_cfg):
+        from core.compliance import check_and_wrap
+        text = "A fixed deposit gives a guaranteed rate for its term, insured by DICGC to ₹5 lakh."
+        assert "DICGC" in check_and_wrap(text)
 
     def test_risk_free_profit_blocked(self, mock_cfg):
         from core.compliance import check_and_wrap

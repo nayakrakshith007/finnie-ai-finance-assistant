@@ -168,12 +168,6 @@ category = st.sidebar.selectbox(
 category_arg = None if category.startswith("(none") else category
 
 st.sidebar.divider()
-st.sidebar.subheader("Generation")
-do_generate = st.sidebar.toggle(
-    "Generate an answer",
-    value=False,
-    help="Off = retrieval only, costs a fraction of a cent. On = a gpt-4o call, roughly $0.01 per question.",
-)
 st.sidebar.metric("Session spend (est.)", f"${st.session_state.spend:.4f}")
 if st.sidebar.button("Reset session", width="stretch"):
     st.session_state.history = []
@@ -212,7 +206,34 @@ question = st.text_area(
     height=80,
     placeholder="e.g. Is PPF better than ELSS?",
 )
-run = st.button("Run retrieval", type="primary")
+
+# The generation toggle lives here, beside the run button, NOT in the sidebar:
+# Streamlit auto-collapses the sidebar on a narrow window, which hid the single
+# most important control and made the lab look retrieval-only.
+ctl = st.columns([1, 2])
+with ctl[1]:
+    do_generate = st.toggle(
+        "Generate the final answer",
+        value=False,
+        key="do_generate",
+        help=(
+            "Off = retrieval only (one embedding, a fraction of a cent). "
+            "On = runs the system + user prompt through gpt-4o, roughly $0.01 per question."
+        ),
+    )
+with ctl[0]:
+    run = st.button(
+        "Run retrieval + answer" if do_generate else "Run retrieval only",
+        type="primary",
+        width="stretch",
+    )
+
+if not do_generate:
+    st.caption(
+        "⚠️ Generation is **off** — you will see retrieved chunks and the assembled prompt, "
+        "but no final answer. Switch on *Generate the final answer* above to run the full "
+        "pipeline."
+    )
 
 
 # ── the run ───────────────────────────────────────────────────────────────────
