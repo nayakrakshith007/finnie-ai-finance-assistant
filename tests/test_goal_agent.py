@@ -301,3 +301,28 @@ def test_a_failure_degrades_instead_of_raising(monkeypatch):
 
     assert update["agent_trace"][0]["status"] == "error"
     assert "projection blew up" not in update["messages"][0].content
+
+
+# ── the prompt must not hand the model numbers to copy (found live 2026-11-08) ─
+
+
+def test_the_prompt_contains_no_example_amounts():
+    """gpt-4o told a user with a ₹1 crore goal that "₹10 lakh today won't have
+    the same purchasing power" — it had copied the figures out of the prompt's
+    own illustrative example. A rule that demonstrates with numbers invites the
+    model to reuse them, so the rule now points at the data instead.
+    """
+    import re
+
+    from agents.goal import GOAL_SYSTEM_PROMPT
+
+    # The placeholder is the only brace-delimited token that should remain.
+    body = GOAL_SYSTEM_PROMPT.replace("{data}", "")
+    amounts = re.findall(r"₹\s?[\d,.]+|\b\d+\s*(?:lakh|crore)\b", body, re.IGNORECASE)
+    assert amounts == [], f"the prompt offers numbers to copy: {amounts}"
+
+
+def test_the_prompt_tells_the_model_to_use_only_the_data():
+    from agents.goal import GOAL_SYSTEM_PROMPT
+
+    assert "Do not reuse any number that appears in these instructions" in GOAL_SYSTEM_PROMPT

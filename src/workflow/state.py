@@ -74,6 +74,12 @@ class AgentState(TypedDict, total=False):
     # Router output: which agents should handle this turn, in order.
     route: list[str]
 
+    # The latest question rewritten to stand on its own, set by the supervisor.
+    # "What about the second one?" becomes "What is the TCS price?" once, here,
+    # rather than six agents each being handed the whole transcript. Agents read
+    # it in preference to the raw message (see `BaseAgent._latest_question`).
+    resolved_question: str
+
     # Per-turn working data, written by whichever agent produced it.
     retrieved_docs: list[dict[str, Any]]
     market_data: dict[str, Any]

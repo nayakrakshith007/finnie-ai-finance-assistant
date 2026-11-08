@@ -42,9 +42,10 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 | 7 | Portfolio Analysis Agent | ✅ Complete — `src/portfolio/` (metrics, holdings, analysis) + `src/agents/portfolio.py`, 120 tests |
 | 8 | Goal Planning Agent | ✅ Complete — `src/goals/projections.py` + `src/agents/goal.py`, 91 tests |
 | 9 | News Synthesizer + Tax Education | ✅ Complete — `src/data/news.py`, `src/agents/news.py`, `src/agents/tax.py`, 66 tests. **All six agents exist.** |
-| 10–13 | (see ROADMAP) | Pending |
+| 10 | LangGraph workflow | ✅ Complete — `src/workflow/{registry,router,graph}.py`, 75 tests. Router gate **95% strict / 100% lenient** on the 40-query set |
+| 11–13 | (see ROADMAP) | Pending |
 
-**Test/lint status:** 414/414 pass, ruff clean. (14 config · 21 llm/compliance · 16 base agent · 15 qa · 41 market data · 29 market agent · 49 portfolio metrics · 47 holdings/analysis · 24 portfolio agent · 45 goal maths · 46 goal agent · 24 tax · 42 news + 1 regression file)
+**Test/lint status:** 491/491 pass, ruff clean.
 **Pushed:** `f48e533` on `origin/master`.
 
 **Index:** 2,000 chunks in `data/indexes` (Chroma collection `finnie_kb`), built 2026-11-08.
@@ -82,7 +83,21 @@ A holding with no price is **excluded and named**, never valued at zero — a po
 
 **Known gap:** Yahoo's news endpoint was down on 2026-11-08 — `Ticker.news` raised "YAHOO! FINANCE IS CURRENTLY DOWN" while quotes worked fine. So the news parsing is verified against fixtures, not a live response, and **the live path must be re-checked before the Day 6 video**. FR-014 is P1 and already on the cut list if it stays down; the outage path degrades to an honest message with no LLM call.
 
-**Phase 10 is next: the LangGraph workflow (Day 4)** — and with it, moving `check_and_wrap` out of the UI and into the terminal compliance node (PRD §7.5 / D1).
+**Phase 10 notes — the graph.** `START → supervisor → [1–2 agents] → compliance → END`, with a `fallback` node for a route that cannot run. Three things worth being able to defend:
+
+- **The next node is derived from `agent_trace`, not a counter.** `_next_node` subtracts the agents that have already recorded an entry from the route and takes the first one left. No index to keep in sync, and an agent cannot run twice — so a route cannot loop. Composition (FR-003) falls out of the same wiring as a single-agent turn, with no special case.
+- **The supervisor does two jobs in one call:** it picks the agents *and* rewrites the question to stand alone. "What about the second one?" becomes "What is the TCS price?" once, in `resolved_question`, instead of handing all six agents the whole transcript. Contextual query rewriting, at zero extra cost, on a call that was already happening every turn. `BaseAgent._latest_question` prefers it.
+- **Structured output constrains the shape, not the values.** The router validates every name against the registry, collapses duplicates, caps the route at 2, and falls back to `finance_qa` — a model can still return `crypto_advisor`, six agents, or the same agent twice. A route decides what code runs next; it is the last place to take a model's word for anything.
+
+**Router gate (FR-002): 95% strict, 100% lenient on 40 labelled queries** (`data/router_queries.json`, `scripts/eval_router.py --strict`). Both disagreements were on queries labelled ambiguous, where the router chose the alternative the label itself lists as defensible. **The set still needs the author's review and acceptance before it counts as the gate.**
+
+**Two defects found live on 2026-11-08, invisible to 491 passing tests:**
+1. A composed turn left two AI messages in state, so every consumer reading `messages[-1]` as "the answer" silently dropped the first agent's work. The compliance node now merges the turn's answers and removes the superseded ones with `RemoveMessage`. One turn, one answer, one disclaimer.
+2. gpt-4o copied the figures out of the goal prompt's own illustrative example, telling a user with a ₹1 crore goal that "₹10 lakh today won't have the same purchasing power". A rule that demonstrates with numbers invites the model to reuse them.
+
+**The general lesson, now three times over:** data belongs in the data block as flags and figures, instructions belong in the rules, and prose written into a data block gets quoted back at the user. The equity-cap flag was rewritten from a sentence into `Horizon equity cap: applied / not applied` for exactly this reason.
+
+**Phase 11 is next:** the Streamlit 4-tab app per PRD §6.5a (Day 5).
 
 ---
 
@@ -114,7 +129,7 @@ A holding with no price is **excluded and named**, never valued at zero — a po
 1. **Secrets in `.env` only** — `.env` is gitignored; `.env.example` is committed and must never contain a real key
 2. **Fail fast on missing key** — `load_config` raises `RuntimeError` naming `OPENAI_API_KEY` if absent
 3. **Never log a secret or a user's full portfolio**
-4. **Compliance belongs to the graph, not the call site.** Today `check_and_wrap` is called from `app.py` / `rag_lab.py` because there is no graph yet. **On Day 4 it moves into the terminal compliance node and the UI stops importing it** (PRD §7.5 / D1) — otherwise the MCP server in Phase 13 would bypass it. No agent ever calls it: `BaseAgent` deliberately does not apply it, and doing so in an agent double-injects the disclaimer.
+4. **Compliance is a terminal graph node — DONE on Day 4 (PRD §7.5 / D1).** `check_and_wrap` is called only from `src/workflow/graph.py`. `app.py` no longer imports it, and two tests in `tests/test_graph.py` assert that it never does again. Never call it from an agent or from the UI: `BaseAgent` deliberately does not apply it, and a second call double-injects the disclaimer. `rag_lab.py` keeps its own call on purpose — it is a debug harness for the raw RAG chain, deliberately showing the un-orchestrated pipeline, and is not a user-facing path.
 5. **Compliance is not optional** — every user-facing response passes `check_and_wrap`, which appends the disclaimer exactly once (it strips any the model wrote itself). The prompt must NOT instruct the model to add one.
 6. **Education, not advice** — no agent ever suggests a specific trade
 7. **The banned list blocks advice, not topics** (narrowed 2026-11-08). Blocked: promises (`guaranteed returns of`, `guaranteed profit`, `risk-free profit`, `cannot lose money`) and instructions (`you should buy/sell`, `i recommend/suggest buying/selling`). Allowed: factual statements about sovereign-backed rates, e.g. "PPF pays a government-set 7.1%". The old blanket ban on `guaranteed return` made Finnie unable to describe PPF or FDs. Read the list from `config.yaml` — never hardcode a copy, which is exactly how `eval_adversarial.py` ended up grading a policy that was no longer shipped.

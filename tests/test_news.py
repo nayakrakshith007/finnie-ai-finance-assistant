@@ -385,7 +385,7 @@ def test_a_long_horizon_states_that_equity_was_not_capped():
 
     GoalPlanningAgent(llm=CapturingLLM()).run(fresh("I need 50 lakh in 12 years"))
     prompt = " ".join(str(m.content) for m in captured[0])
-    assert "No horizon constraint applies" in prompt
+    assert "Horizon equity cap: not applied" in prompt
 
 
 def test_a_short_horizon_states_that_equity_was_capped():
@@ -403,4 +403,4 @@ def test_a_short_horizon_states_that_equity_was_capped():
         fresh("I need 5 lakh in 2 years", profile={"risk_appetite": "aggressive"})
     )
     prompt = " ".join(str(m.content) for m in captured[0])
-    assert "Equity WAS capped" in prompt
+    assert "Horizon equity cap: applied" in prompt

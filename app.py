@@ -24,15 +24,35 @@ st.set_page_config(
 )
 
 # ── lazy imports (after sys.path is set) ───────────────────────────────────────
-@st.cache_resource(show_spinner="Loading Finnie RAG chain…")
-def load_chain():
-    from rag.chain import build_rag_chain
-    return build_rag_chain()
+@st.cache_resource(show_spinner="Loading Finnie…")
+def load_graph():
+    """The compiled LangGraph workflow: router -> agent(s) -> compliance.
+
+    Note what this module no longer imports: `core.compliance`. Until Day 4 the
+    UI appended the disclaimer itself, which meant FR-006's guarantee held only
+    because the UI happened to be the single caller — the MCP server in Phase 13
+    would have bypassed it entirely. Compliance is now a terminal node inside the
+    graph, so the UI cannot forget it and cannot apply it twice (PRD §7.5 / D1).
+    """
+    from workflow.graph import build_production_graph
+    return build_production_graph()
 
 
-def get_compliance():
-    from core.compliance import check_and_wrap
-    return check_and_wrap
+def _render_trace(trace: list[dict]) -> None:
+    """The "how I answered this" expander (FR-007).
+
+    Shows which nodes ran, in what order, and how long each took — so the
+    supervisor's routing decision, a composed two-agent turn, and a degraded
+    price are all visible rather than inferred from the prose.
+    """
+    with st.expander(f"🔍 How I answered this ({len(trace)} steps)", expanded=False):
+        for step in trace:
+            icon = "✅" if step["status"] == "ok" else "⚠️"
+            st.markdown(
+                f"{icon} **{step['agent']}** · {step['latency_ms']:.0f} ms"
+                f"<br><span style='color:grey;font-size:0.85em'>{step['detail']}</span>",
+                unsafe_allow_html=True,
+            )
 
 
 # ── session state init ─────────────────────────────────────────────────────────
@@ -45,26 +65,30 @@ def _init_state() -> None:
         st.session_state.total_latency = 0.0
     if "category" not in st.session_state:
         st.session_state.category = None
+    if "graph_state" not in st.session_state:
+        # The conversation as the graph sees it: LangChain messages, the user
+        # profile and the per-turn working data. Kept separate from `messages`,
+        # which is only what Streamlit renders. The graph owns memory (FR-004);
+        # the UI owns presentation.
+        from workflow.state import new_state
+        st.session_state.graph_state = new_state("")
+        st.session_state.graph_state["messages"] = []
 
 
 _init_state()
 
 # ── sidebar ────────────────────────────────────────────────────────────────────
 # ── warm up chain at startup so the first message is fast ─────────────────────
-with st.spinner("Loading Finnie knowledge base… (first load only)"):
+with st.spinner("Loading Finnie… (first load only)"):
     try:
-        _chain = load_chain()
+        _graph = load_graph()
     except Exception as _startup_err:
-        if "does not exist" in str(_startup_err):
-            load_chain.clear()
-            try:
-                _chain = load_chain()
-            except Exception as _e2:
-                st.error(f"⚠️ Could not load RAG chain: {_e2}")
-                st.stop()
-        else:
-            st.error(f"⚠️ Could not load RAG chain: {_startup_err}")
-            st.stop()
+        st.error(
+            f"⚠️ Could not start Finnie: {_startup_err}"
+            "\n\nCheck that `OPENAI_API_KEY` is set in `.env`, and that the index "
+            "has been built with `python scripts/build_index.py`."
+        )
+        st.stop()
 
 CATEGORIES = [
     "All topics",
@@ -139,6 +163,8 @@ for msg in st.session_state.messages:
                         f"<span style='color:grey;font-size:0.85em'>dist={dist_str}</span>",
                         unsafe_allow_html=True,
                     )
+        if msg["role"] == "assistant" and msg.get("trace"):
+            _render_trace(msg["trace"])
         if msg.get("latency"):
             st.caption(f"⏱ {msg['latency']*1000:.0f} ms")
 
@@ -152,72 +178,50 @@ if prompt := st.chat_input("Ask a finance question…"):
     # generate answer
     with st.chat_message("assistant"):
         with st.spinner("Thinking…"):
+            from langchain_core.messages import HumanMessage
+
+            answer, sources, trace, latency = "", [], [], 0.0
             try:
-                chain = load_chain()
-                check_and_wrap = get_compliance()
+                graph = load_graph()
+                state = st.session_state.graph_state
+                state["messages"] = [*state.get("messages", []), HumanMessage(content=prompt)]
+
+                # Per-turn working data is cleared first, so last turn's quote or
+                # portfolio analysis cannot be rendered beside this turn's answer.
+                # `messages` and `user_profile` deliberately survive: they are the
+                # conversation memory (FR-004).
+                for key in ("retrieved_docs", "market_data", "portfolio", "route", "error"):
+                    if key == "portfolio":
+                        # Keep the user's holdings; drop only the computed analysis.
+                        held = state.get("portfolio") or {}
+                        held.pop("analysis", None)
+                        state["portfolio"] = held
+                    else:
+                        state.pop(key, None)
+                state["agent_trace"] = []
 
                 t0 = time.perf_counter()
-                result = chain.ask_with_sources(
-                    prompt,
-                    category=st.session_state.category,
-                )
+                state = graph.invoke(state)
                 latency = time.perf_counter() - t0
 
-                raw_answer = result["answer"]
-                sources    = result["sources"]
-
-                # compliance guard — appends disclaimer, raises on banned phrases
-                try:
-                    answer = check_and_wrap(raw_answer)
-                except ValueError as exc:
-                    answer = (
-                        "⚠️ I cannot answer that in the way you've phrased it — "
-                        "Finnie gives education, not investment advice. "
-                        "Please rephrase your question.\n\n"
-                        f"*({exc})*"
-                    )
-                    sources = []
-
-            except RuntimeError as exc:
-                # most likely: OPENAI_API_KEY missing or index not built
-                answer = (
-                    f"❌ **Setup error:** {exc}\n\n"
-                    "Make sure you have:\n"
-                    "1. Added `OPENAI_API_KEY` to `.env`\n"
-                    "2. Built the vector index: `python scripts/build_index.py`"
-                )
-                sources = []
-                latency = 0.0
+                st.session_state.graph_state = state
+                answer = str(state["messages"][-1].content)
+                sources = state.get("retrieved_docs") or []
+                trace = state.get("agent_trace") or []
 
             except Exception as exc:
-                # Stale Chroma collection after a --rebuild: auto-recover once
-                if "does not exist" in str(exc):
-                    load_chain.clear()
-                    try:
-                        chain = load_chain()
-                        t0 = time.perf_counter()
-                        result = chain.ask_with_sources(
-                            prompt,
-                            category=st.session_state.category,
-                        )
-                        latency = time.perf_counter() - t0
-                        raw_answer = result["answer"]
-                        sources    = result["sources"]
-                        try:
-                            answer = get_compliance()(raw_answer)
-                        except ValueError:
-                            answer  = "⚠️ I cannot answer that as phrased. Please rephrase."
-                            sources = []
-                    except Exception as exc2:
-                        answer  = f"❌ Unexpected error after cache reset: {exc2}"
-                        sources = []
-                        latency = 0.0
-                else:
-                    answer  = f"❌ Unexpected error: {exc}"
-                    sources = []
-                    latency = 0.0
+                # Only the graph itself failing reaches here: every agent has its
+                # own error boundary and the compliance node never raises.
+                answer = (
+                    f"❌ Something went wrong before I could answer: {exc}"
+                    "\n\nIf this is the first run, check `OPENAI_API_KEY` in `.env` "
+                    "and that the index is built (`python scripts/build_index.py`)."
+                )
 
         st.markdown(answer)
+
+        if trace:
+            _render_trace(trace)
 
         if sources:
             with st.expander(f"📚 Sources ({len(sources)} chunks retrieved)", expanded=False):
@@ -240,6 +244,7 @@ if prompt := st.chat_input("Ask a finance question…"):
         "role": "assistant",
         "content": answer,
         "sources": sources,
+        "trace": trace,
         "latency": latency,
     })
     st.session_state.query_count += 1

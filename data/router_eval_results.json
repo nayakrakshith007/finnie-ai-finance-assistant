@@ -1,0 +1,579 @@
+{
+  "rows": [
+    {
+      "id": "r01",
+      "query": "What is a SIP and how is it different from a lump sum investment?",
+      "expected": [
+        "finance_qa"
+      ],
+      "actual": [
+        "finance_qa"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What is a SIP and how is it different from a lump sum investment?",
+      "why": "Definitional, no ticker, no holdings, no goal."
+    },
+    {
+      "id": "r02",
+      "query": "How does PPF work?",
+      "expected": [
+        "finance_qa"
+      ],
+      "actual": [
+        "finance_qa"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How does PPF work?",
+      "why": "How an instrument works. Tax is incidental, not the question."
+    },
+    {
+      "id": "r03",
+      "query": "Is PPF better than ELSS?",
+      "expected": [
+        "finance_qa"
+      ],
+      "actual": [
+        "finance_qa"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Is Public Provident Fund (PPF) better than Equity Linked Savings Scheme (ELSS)?",
+      "why": "Comparison of two instruments; prompt rule 6 covers answering it without declaring a winner."
+    },
+    {
+      "id": "r04",
+      "query": "What does expense ratio mean?",
+      "expected": [
+        "finance_qa"
+      ],
+      "actual": [
+        "finance_qa"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What does expense ratio mean?",
+      "why": "Definition. Portfolio analysis computes a user's actual fees; this asks what the term means."
+    },
+    {
+      "id": "r05",
+      "query": "How much should I keep in an emergency fund?",
+      "expected": [
+        "finance_qa"
+      ],
+      "actual": [
+        "finance_qa"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How much should I keep in an emergency fund?",
+      "why": "A rule of thumb from the knowledge base, not a goal calculation: no amount and no horizon given."
+    },
+    {
+      "id": "r06",
+      "query": "What is the price of RELIANCE today?",
+      "expected": [
+        "market_analysis"
+      ],
+      "actual": [
+        "market_analysis"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What is the price of RELIANCE today?",
+      "why": "Names a ticker, wants a live quote."
+    },
+    {
+      "id": "r07",
+      "query": "How has TCS performed over the last month?",
+      "expected": [
+        "market_analysis"
+      ],
+      "actual": [
+        "market_analysis"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How has TCS performed over the last month?",
+      "why": "30-day trend on a named ticker (FR-011)."
+    },
+    {
+      "id": "r08",
+      "query": "Where is the NIFTY 50 trading?",
+      "expected": [
+        "market_analysis"
+      ],
+      "actual": [
+        "market_analysis"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Where is the NIFTY 50 trading?",
+      "why": "Index quote."
+    },
+    {
+      "id": "r09",
+      "query": "Compare HDFCBANK and ICICIBANK share prices",
+      "expected": [
+        "market_analysis"
+      ],
+      "actual": [
+        "market_analysis"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What are the share prices of HDFCBANK and ICICIBANK?",
+      "why": "Two tickers, one agent: the market agent handles up to three symbols in a turn."
+    },
+    {
+      "id": "r10",
+      "query": "Is the sensex up or down today?",
+      "expected": [
+        "market_analysis"
+      ],
+      "actual": [
+        "market_analysis"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Is the SENSEX up or down today?",
+      "why": "Daily change on an index."
+    },
+    {
+      "id": "r11",
+      "query": "How is my portfolio doing?",
+      "expected": [
+        "portfolio_analysis"
+      ],
+      "actual": [
+        "portfolio_analysis"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How is my portfolio doing?",
+      "why": "\"My portfolio\" is the signal."
+    },
+    {
+      "id": "r12",
+      "query": "Am I too concentrated in one stock?",
+      "expected": [
+        "portfolio_analysis"
+      ],
+      "actual": [
+        "portfolio_analysis"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Am I too concentrated in one stock?",
+      "why": "Concentration is a portfolio metric (HHI, flags)."
+    },
+    {
+      "id": "r13",
+      "query": "What is my asset allocation?",
+      "expected": [
+        "portfolio_analysis"
+      ],
+      "actual": [
+        "portfolio_analysis"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What is my asset allocation?",
+      "why": "Class breakdown of holdings the user owns."
+    },
+    {
+      "id": "r14",
+      "query": "How much am I paying in mutual fund fees?",
+      "expected": [
+        "portfolio_analysis"
+      ],
+      "actual": [
+        "portfolio_analysis"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How much am I paying in mutual fund fees?",
+      "why": "Needs their actual holdings to compute the rupee cost, unlike r04."
+    },
+    {
+      "id": "r15",
+      "query": "What is my total unrealised gain?",
+      "expected": [
+        "portfolio_analysis"
+      ],
+      "actual": [
+        "portfolio_analysis"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What is my total unrealised gain?",
+      "why": "P&L against cost basis."
+    },
+    {
+      "id": "r16",
+      "query": "How much should I invest monthly to reach 50 lakh in 10 years?",
+      "expected": [
+        "goal_planning"
+      ],
+      "actual": [
+        "goal_planning"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How much should I invest monthly to reach 50 lakh in 10 years?",
+      "why": "Amount plus horizon: the required-SIP calculation."
+    },
+    {
+      "id": "r17",
+      "query": "I want 1 crore for retirement in 25 years",
+      "expected": [
+        "goal_planning"
+      ],
+      "actual": [
+        "goal_planning"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How much should I invest monthly to reach 1 crore for retirement in 25 years?",
+      "why": "A goal stated as amount and horizon, even without a question mark."
+    },
+    {
+      "id": "r18",
+      "query": "Can I afford a house down payment of 20 lakh in 5 years?",
+      "expected": [
+        "goal_planning"
+      ],
+      "actual": [
+        "goal_planning"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Can I afford a house down payment of 20 lakh in 5 years?",
+      "why": "Affordability of a goal is the same arithmetic in reverse."
+    },
+    {
+      "id": "r19",
+      "query": "What SIP do I need for my child's education in 15 years?",
+      "expected": [
+        "goal_planning"
+      ],
+      "actual": [
+        "goal_planning"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What SIP do I need for my child's education in 15 years?",
+      "why": "Horizon given; the agent asks for the amount if the sentence omits it."
+    },
+    {
+      "id": "r20",
+      "query": "Is 10000 a month enough to reach 25 lakh in 12 years?",
+      "expected": [
+        "goal_planning"
+      ],
+      "actual": [
+        "goal_planning"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Is 10000 a month enough to reach 25 lakh in 12 years?",
+      "why": "Years-to-target, the inverse of the SIP formula."
+    },
+    {
+      "id": "r21",
+      "query": "What tax do I pay on selling shares after 2 years?",
+      "expected": [
+        "tax_education"
+      ],
+      "actual": [
+        "tax_education"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What tax do I pay on selling shares after 2 years?",
+      "why": "LTCG rules. Post-July-2024 rates, which is why the tax prompt pins them."
+    },
+    {
+      "id": "r22",
+      "query": "How much can I claim under section 80C?",
+      "expected": [
+        "tax_education"
+      ],
+      "actual": [
+        "tax_education"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How much can I claim under section 80C?",
+      "why": "A named section of the Income Tax Act."
+    },
+    {
+      "id": "r23",
+      "query": "What is the lock-in period for ELSS?",
+      "expected": [
+        "tax_education"
+      ],
+      "actual": [
+        "finance_qa"
+      ],
+      "strict": false,
+      "lenient": true,
+      "resolved": "What is the lock-in period for ELSS?",
+      "why": "The lock-in exists because of 80C, so it sits with tax."
+    },
+    {
+      "id": "r24",
+      "query": "Is the old tax regime better than the new one for me?",
+      "expected": [
+        "tax_education"
+      ],
+      "actual": [
+        "tax_education"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Is the old tax regime better than the new one?",
+      "why": "Regime comparison. 'For me' does not make it a liability calculation, which the agent refuses to do either way."
+    },
+    {
+      "id": "r25",
+      "query": "How are debt mutual funds taxed now?",
+      "expected": [
+        "tax_education"
+      ],
+      "actual": [
+        "tax_education"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How are debt mutual funds taxed now?",
+      "why": "The post-April-2023 slab-rate change; 'now' is the tell."
+    },
+    {
+      "id": "r26",
+      "query": "Any news on Reliance?",
+      "expected": [
+        "news_synthesizer"
+      ],
+      "actual": [
+        "news_synthesizer"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Any news on Reliance?",
+      "why": "Explicit request for news on a named company."
+    },
+    {
+      "id": "r27",
+      "query": "What is the latest on the RBI rate decision?",
+      "expected": [
+        "news_synthesizer"
+      ],
+      "actual": [
+        "news_synthesizer"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What is the latest news on the RBI rate decision?",
+      "why": "A theme rather than a ticker, which the free-text search path covers."
+    },
+    {
+      "id": "r28",
+      "query": "Why did INFY fall today?",
+      "expected": [
+        "news_synthesizer"
+      ],
+      "actual": [
+        "news_synthesizer"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Why did INFY fall today?",
+      "why": "'Why' needs headlines; the price alone cannot answer it. A market+news chain is also defensible."
+    },
+    {
+      "id": "r29",
+      "query": "What is happening in the Indian IT sector?",
+      "expected": [
+        "news_synthesizer"
+      ],
+      "actual": [
+        "news_synthesizer"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What is happening in the Indian IT sector?",
+      "why": "Sector theme. The acronym must survive topic extraction."
+    },
+    {
+      "id": "r30",
+      "query": "Headlines for HDFC Bank please",
+      "expected": [
+        "news_synthesizer"
+      ],
+      "actual": [
+        "news_synthesizer"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What are the recent headlines for HDFC Bank?",
+      "why": "'Headlines' is unambiguous."
+    },
+    {
+      "id": "r31",
+      "query": "Analyse my portfolio and tell me if it fits my 10-year goal",
+      "expected": [
+        "portfolio_analysis",
+        "goal_planning"
+      ],
+      "actual": [
+        "portfolio_analysis",
+        "goal_planning"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Analyse my portfolio and tell me if it fits my 10-year goal.",
+      "why": "The FR-003 reference case. Order matters: the goal check needs the portfolio's value."
+    },
+    {
+      "id": "r32",
+      "query": "How is my portfolio doing and what is the news on my biggest holding?",
+      "expected": [
+        "portfolio_analysis",
+        "news_synthesizer"
+      ],
+      "actual": [
+        "portfolio_analysis",
+        "news_synthesizer"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How is my portfolio doing and what is the news on my biggest holding?",
+      "why": "The news agent needs the portfolio agent to establish which holding is biggest."
+    },
+    {
+      "id": "r33",
+      "query": "What is the TCS price and any recent news about it?",
+      "expected": [
+        "market_analysis",
+        "news_synthesizer"
+      ],
+      "actual": [
+        "market_analysis",
+        "news_synthesizer"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What is the TCS price and any recent news about it?",
+      "why": "Two distinct asks about one ticker; neither subsumes the other."
+    },
+    {
+      "id": "r34",
+      "query": "Is my portfolio tax-efficient?",
+      "expected": [
+        "portfolio_analysis",
+        "tax_education"
+      ],
+      "actual": [
+        "portfolio_analysis",
+        "tax_education"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Is my portfolio tax-efficient?",
+      "why": "Needs the holdings and then the rules that apply to them."
+    },
+    {
+      "id": "r35",
+      "query": "How much is my portfolio worth and how much more should I add monthly to reach 1 crore?",
+      "expected": [
+        "portfolio_analysis",
+        "goal_planning"
+      ],
+      "actual": [
+        "portfolio_analysis",
+        "goal_planning"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "How much is my portfolio worth and how much more should I add monthly to reach 1 crore?",
+      "why": "The shortfall depends on the current value, so the order is forced."
+    },
+    {
+      "id": "r36",
+      "query": "Where is the nifty and what should I know about index funds?",
+      "expected": [
+        "market_analysis",
+        "finance_qa"
+      ],
+      "actual": [
+        "market_analysis",
+        "finance_qa"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What is the current price of the NIFTY 50 index and what should I know about index funds?",
+      "why": "A quote plus a concept. Independent, so either order works, but quote-then-concept reads better."
+    },
+    {
+      "id": "r37",
+      "query": "What is the capital of France?",
+      "expected": [
+        "finance_qa"
+      ],
+      "actual": [
+        "finance_qa"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What is the capital of France?",
+      "why": "Out of scope. Routes to the only agent that refuses honestly, by retrieving nothing and saying so (FR-002's unknown-intent rule)."
+    },
+    {
+      "id": "r38",
+      "query": "Should I buy Reliance?",
+      "expected": [
+        "finance_qa"
+      ],
+      "actual": [
+        "market_analysis"
+      ],
+      "strict": false,
+      "lenient": true,
+      "resolved": "Should I buy Reliance?",
+      "why": "Advice-seeking. Q&A explains how to think about a decision; answering with a live price implies the price is the answer. Compliance blocks the advice framing on either route."
+    },
+    {
+      "id": "r39",
+      "query": "Hi",
+      "expected": [
+        "finance_qa"
+      ],
+      "actual": [
+        "finance_qa"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Hi",
+      "why": "No intent to classify. The default agent handles it without a wasted data call."
+    },
+    {
+      "id": "r40",
+      "query": "What about the second one?",
+      "expected": [
+        "finance_qa"
+      ],
+      "actual": [
+        "finance_qa"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What about the second one?",
+      "why": "Scored with no history, so there is no referent to resolve. With history the supervisor rewrites it first and routes on the rewrite \u2014 which is the behaviour tested in test_router.py, not here."
+    }
+  ],
+  "total": 40,
+  "strict_accuracy": 0.95,
+  "lenient_accuracy": 1.0
+}

@@ -147,13 +147,21 @@ class BaseAgent(ABC):
 
     @staticmethod
     def _latest_question(state: AgentState) -> str:
-        """The most recent human turn.
+        """The question this agent should answer.
+
+        Prefers `resolved_question` -- the supervisor's rewrite, which has had
+        references like "the second one" resolved into explicit names. Falls back
+        to scanning backwards for the last human message, which is what happens
+        when an agent is invoked directly (tests, the Portfolio tab's button) with
+        no router ahead of it.
 
         Scanning backwards rather than taking messages[-1]: by the time a second
         agent runs in a composed turn (FR-003), the last message is the first
-        agent's output, not the user's question. Lives on the base class because
-        every agent that reads the user's words needs exactly this.
+        agent's output, not the user's question.
         """
+        resolved = (state.get("resolved_question") or "").strip()
+        if resolved:
+            return resolved
         for message in reversed(state.get("messages", [])):
             if isinstance(message, HumanMessage):
                 return str(message.content)

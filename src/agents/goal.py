@@ -154,12 +154,16 @@ Never say the user will have a particular amount, and never guarantee a return.
 2. Never invent a number. Every figure in your answer must appear in the data.
 3. Lead with the required monthly amount, and make clear it is sized against the \
 inflation-adjusted target rather than today's figure. Explain in one sentence why \
-₹10 lakh ten years out needs more than ₹10 lakh of saving.
+the target has to grow — use the actual target and adjusted figures from the data, \
+and no other amounts. Do not reuse any number that appears in these instructions.
 4. The allocation is a commonly used starting template for this horizon and risk \
 appetite, not a recommendation of what to hold. Present it that way.
-5. The data states whether equity was capped by the horizon. If it was, explain \
-that a short horizon leaves no time to recover from a bad run. If the data says \
-equity was NOT capped, do not mention capping and do not call the horizon short.
+5. The data line "Horizon equity cap" says applied or not applied. If applied, \
+explain that a short horizon leaves no time to recover from a bad run, which is \
+why the equity share is lower than the risk appetite alone would give. If NOT \
+applied, say nothing about caps, constraints or the length of the horizon — the \
+reader has no idea what would have been capped, and mentioning it only confuses \
+them. Never quote these instructions or the data labels back to the reader.
 6. Do NOT write a disclaimer or closing caveat. One is appended automatically.
 7. Six sentences at most. Plain English. Indian rupee figures in lakh/crore where \
 that is clearer.
@@ -324,21 +328,14 @@ class GoalPlanningAgent(BaseAgent):
             f"Real return after inflation: {plan['real_return']:.2%}",
             "Starting allocation template: "
             + ", ".join(f"{k} {v:.0f}%" for k, v in plan["allocation"].items()),
-            # Stated either way, because a conditional prompt rule gets applied
-            # unconditionally. Told only "the template caps equity on short
-            # horizons", gpt-4o explained a 12-year plan as "equity is capped at
-            # 50% because the horizon is relatively short" -- neither half true.
-            (
-                f"Equity WAS capped below the {plan['risk_appetite']} template "
-                "because the horizon is short: explain that there is no time to "
-                "recover from a bad run"
-                if plan.get("equity_capped")
-                else "No horizon constraint applies: this horizon is long enough "
-                f"for the full {plan['risk_appetite']} template. Do NOT say the "
-                "horizon is short, do NOT say equity was reduced or capped, and "
-                "do NOT mention capping at all — the reader does not know what "
-                "would have been capped"
-            ),
+            # A flag, not a sentence. Stated either way because a conditional
+            # prompt rule gets applied unconditionally: told only "the template
+            # caps equity on short horizons", gpt-4o explained a 12-year plan as
+            # "equity is capped at 50% because the horizon is relatively short".
+            # Phrased as data rather than as an instruction because the model
+            # quotes instructions back at the user when they are written as
+            # prose — both findings are from live runs on 2026-11-08.
+            f"Horizon equity cap: {'applied' if plan.get('equity_capped') else 'not applied'}",
         ]
         if final:
             lines.append(
