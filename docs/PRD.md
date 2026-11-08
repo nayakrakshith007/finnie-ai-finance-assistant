@@ -315,6 +315,26 @@ The metrics look excellent — retrieval hit_rate 0.92 (vector) / 1.00 (MMR), MR
 
 **Conclusion:** the retrieval *mechanics* are sound — keep the chunker, embedder, store and MMR as built. The *corpus* is the problem. Rebuild the content, not the pipeline, then re-measure honestly against queries the corpus has never seen.
 
+### 7.5 Known architectural deviations (audited 2026-11-08)
+
+The import graph was checked directly rather than taken on trust: it is acyclic and
+correctly layered (`agents -> rag/data -> core`, and nothing imports `agents`).
+Three deviations from §7.1 stand open, each with a decided resolution.
+
+| # | Deviation | Why it matters | Resolution |
+|---|---|---|---|
+| D1 | **Compliance is applied in the UI, not in the graph.** `check_and_wrap` is called from `app.py` and `rag_lab.py` | FR-006 requires that no response reach the user without passing it. That holds today only because the UI is the sole caller. A second entry point -- the MCP server (Phase 13), a CLI, a test harness -- bypasses it entirely. Policy enforced at each call site is a convention; policy enforced at a graph node is a guarantee | **Day 4, with the graph.** `check_and_wrap` moves into the terminal compliance node; `app.py` stops importing it, so the UI cannot forget and cannot double-apply. Accepted by the author 2026-11-08 |
+| D2 | **`rag/chain.py` and `agents/qa.py` are two paths to a grounded answer** | Both retrieve and generate. Defensible (the chain serves the eval scripts and `rag_lab.py`; the agent serves the graph) but an unstated second path rots | Day 6: DESIGN.md names the agent as canonical for user-facing answers and the chain as the eval/debug path. No code change; the split is deliberate |
+| D3 | **`src/web_app/` is empty while `app.py` sits at the repo root** | The Dockerfile and the Streamlit Cloud entrypoint both depend on which one is real | Day 5, before deployment: pick one entrypoint and delete the other |
+
+**The general principle, worth stating because it recurs:** a cross-cutting
+guarantee belongs at a single structural boundary, not in every call site that
+remembers to honour it. The double-disclaimer defect of 2026-11-08 was the same
+mistake in the other direction -- policy had leaked into the *prompt*, where the
+model could paraphrase it.
+
+---
+
 ---
 
 ## 8. Implementation Phases (7 days, dependency-ordered)

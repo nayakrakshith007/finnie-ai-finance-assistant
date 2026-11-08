@@ -31,7 +31,7 @@ from time import perf_counter
 from typing import Any, ClassVar
 
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, HumanMessage
 
 from core.llm import build_llm
 from core.logging_setup import get_logger
@@ -142,6 +142,22 @@ class BaseAgent(ABC):
         """
         keys = [k for k in update if k != "agent_trace"]
         return f"wrote: {', '.join(keys)}" if keys else "no state change"
+
+    # ── shared helpers ────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _latest_question(state: AgentState) -> str:
+        """The most recent human turn.
+
+        Scanning backwards rather than taking messages[-1]: by the time a second
+        agent runs in a composed turn (FR-003), the last message is the first
+        agent's output, not the user's question. Lives on the base class because
+        every agent that reads the user's words needs exactly this.
+        """
+        for message in reversed(state.get("messages", [])):
+            if isinstance(message, HumanMessage):
+                return str(message.content)
+        raise ValueError("No HumanMessage in state; the agent has nothing to answer")
 
     # ── the part each agent implements ────────────────────────────────────────
 

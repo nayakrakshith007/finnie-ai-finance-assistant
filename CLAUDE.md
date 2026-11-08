@@ -37,10 +37,12 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 | 2 | Knowledge base curation | ✅ Complete — 281 docs, 14 categories, none below 6, real titles |
 | 3 | RAG pipeline | ✅ Complete — chunker, embedder, Chroma store, retriever (MMR), prompt, chain + 3 eval harnesses |
 | 4 | BaseAgent abstraction | ✅ Complete — `src/agents/base.py` + `src/workflow/state.py`, 16 tests |
-| 5 | Finance Q&A Agent | ⬜ Next (Day 1) |
-| 6–13 | (see ROADMAP) | Pending |
+| 5 | Finance Q&A Agent | ✅ Complete — `src/agents/qa.py`, 15 tests |
+| 6 | Market data layer + Market Analysis Agent | ✅ Complete — `src/data/market.py` (4-tier degradation, trends), `src/agents/market.py`, 70 tests |
+| 7–13 | (see ROADMAP) | Pending |
 
-**Test/lint status:** 41/41 pass (14 config + 11 llm/compliance + 16 base agent), ruff clean.
+**Test/lint status:** 136/136 pass (14 config + 21 llm/compliance + 16 base agent + 15 qa agent + 41 market data + 29 market agent), ruff clean.
+**Pushed:** `f48e533` on `origin/master`.
 
 **Index:** 2,000 chunks in `data/indexes` (Chroma collection `finnie_kb`), built 2026-11-08.
 
@@ -61,7 +63,9 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 
 **Phase 4 BaseAgent — DONE.** `src/workflow/state.py` defines `AgentState` with reducers (`add_messages` for conversation, `operator.add` for `agent_trace`). `src/agents/base.py` is a template method: `run()` owns timing, logging, tracing and the error boundary; subclasses implement only `handle()`. `run()` never raises — a failing agent returns a friendly message plus `error`, because a raising node aborts the whole LangGraph invocation.
 
-**Phase 5 is next:** Finance Q&A Agent — first real subclass, wired to the RAG chain.
+**Phase 6 notes.** `src/data/market.py` owns *what the number is*; `src/agents/market.py` owns *what to say about it*. Four-tier degradation (live → fresh cache → stale cache → mock) with the provenance label travelling on the `Quote`. Two rules learned the hard way on 2026-11-08: a feed **raising** means an outage (retry, then degrade), a feed **answering cleanly with nothing** means no such symbol (reject, never mock) — conflating them made AAPL return an invented ₹593. And `get_trends` has **no mock tier at all**: a labelled fake price is honest, a fake trend line is an invented narrative. Symbol extraction is a tested pure function, not an LLM call.
+
+**Phase 7 is next:** Portfolio Analysis Agent (Day 2).
 
 ---
 
@@ -93,8 +97,11 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 1. **Secrets in `.env` only** — `.env` is gitignored; `.env.example` is committed and must never contain a real key
 2. **Fail fast on missing key** — `load_config` raises `RuntimeError` naming `OPENAI_API_KEY` if absent
 3. **Never log a secret or a user's full portfolio**
-4. **Compliance is not optional** — every user-facing response carries the educational-use disclaimer; banned phrases: `"you should buy"`, `"you should sell"`, `"i recommend buying"`, `"i recommend selling"`, `"guaranteed return"`, `"risk-free profit"`
-5. **Education, not advice** — no agent ever suggests a specific trade
+4. **Compliance belongs to the graph, not the call site.** Today `check_and_wrap` is called from `app.py` / `rag_lab.py` because there is no graph yet. **On Day 4 it moves into the terminal compliance node and the UI stops importing it** (PRD §7.5 / D1) — otherwise the MCP server in Phase 13 would bypass it. No agent ever calls it: `BaseAgent` deliberately does not apply it, and doing so in an agent double-injects the disclaimer.
+5. **Compliance is not optional** — every user-facing response passes `check_and_wrap`, which appends the disclaimer exactly once (it strips any the model wrote itself). The prompt must NOT instruct the model to add one.
+6. **Education, not advice** — no agent ever suggests a specific trade
+7. **The banned list blocks advice, not topics** (narrowed 2026-11-08). Blocked: promises (`guaranteed returns of`, `guaranteed profit`, `risk-free profit`, `cannot lose money`) and instructions (`you should buy/sell`, `i recommend/suggest buying/selling`). Allowed: factual statements about sovereign-backed rates, e.g. "PPF pays a government-set 7.1%". The old blanket ban on `guaranteed return` made Finnie unable to describe PPF or FDs. Read the list from `config.yaml` — never hardcode a copy, which is exactly how `eval_adversarial.py` ended up grading a policy that was no longer shipped.
+8. **Comparison questions get answered, not refused** (prompt rule 6). "Is PPF better than ELSS?" returns the trade-offs plus "it depends on your goals, horizon and risk tolerance" — never a winner, never a refusal.
 
 ---
 
