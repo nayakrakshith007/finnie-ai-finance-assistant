@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 3"
+title: "Risk (Part 2) - Variance & Covariance"
 category: "risk"
 source: "Zerodha Varsity"
 module: "Risk Management and Trading Psychology"

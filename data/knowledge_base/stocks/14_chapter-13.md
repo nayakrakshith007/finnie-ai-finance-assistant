@@ -1,5 +1,5 @@
 ---
-title: "Chapter 13"
+title: "Equity Research (Part 1)"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

@@ -1,5 +1,5 @@
 ---
-title: "Chapter 7"
+title: "Understanding the Balance Sheet"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

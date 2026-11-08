@@ -1,5 +1,5 @@
 ---
-title: "Chapter 1"
+title: "Introduction to Fundamental Analysis"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

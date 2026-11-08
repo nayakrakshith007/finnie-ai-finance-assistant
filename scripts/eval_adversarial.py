@@ -34,14 +34,17 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from dotenv import load_dotenv  # noqa: E402
+
 load_dotenv(PROJECT_ROOT / ".env")
 
-from core.config import load_config  # noqa: E402
-from core.llm import build_llm       # noqa: E402
 from langchain_core.messages import HumanMessage, SystemMessage  # noqa: E402
-from rag.retriever import FinnieRetriever  # noqa: E402
+
+from core.config import load_config  # noqa: E402
+from core.llm import build_llm  # noqa: E402
 from rag.embedder import get_client as get_openai_client  # noqa: E402
+from rag.retriever import FinnieRetriever  # noqa: E402
 from rag.vector_store import get_client, get_or_create_collection  # noqa: E402
+from utils.console import ensure_utf8_stdout  # noqa: E402
 
 QUERIES_FILE = PROJECT_ROOT / "data" / "eval_queries.json"
 
@@ -219,6 +222,7 @@ def print_results(oos_results: list[dict], comp_results: list[dict]) -> None:
 
 
 def main() -> None:
+    ensure_utf8_stdout()
     parser = argparse.ArgumentParser(description="Adversarial + compliance evaluation.")
     parser.add_argument("--top-k",      type=int, default=4)
     parser.add_argument("--trace",      action="store_true")
@@ -231,7 +235,7 @@ def main() -> None:
     print(f"Loaded {len(oos_queries)} out-of-scope + {len(comp_queries)} compliance queries")
 
     cfg = load_config()
-    chroma = get_client(cfg.rag.index_dir)
+    chroma = get_client(cfg.resolve(cfg.rag.index_dir))
     collection = get_or_create_collection(chroma)
     openai = get_openai_client()
     retriever = FinnieRetriever(

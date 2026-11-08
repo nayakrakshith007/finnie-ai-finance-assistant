@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 3"
+title: "Personal Finance Math (Part 2)"
 category: "etfs"
 source: "Zerodha Varsity"
 module: "Personal Finance"

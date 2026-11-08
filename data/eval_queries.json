@@ -5,19 +5,42 @@
     "category_filter removed: using it as both input and eval criterion created a tautology (Precision always 1.0).",
     "Users never pass category filters; the system must route and retrieve correctly on its own.",
     "Difficulty: easy=direct keyword match, medium=paraphrase/semantic, hard=implicit or multi-hop.",
-    "FAANG-style diversity: paraphrases, adversarial, near-miss, multi-hop, difficulty gradient."
+    "FAANG-style diversity: paraphrases, adversarial, near-miss, multi-hop, difficulty gradient.",
+    "2026-11-08: added 15 'realistic' queries (FR-026) phrased as a beginner asks, written without reference to corpus contents. Scored as their own bucket because the easy/medium/hard sets were reverse-engineered from Varsity chapters and overstate quality.",
+    "2026-11-08: q003 corrected from STCG 15% to 20%. The eval had been marking the correct post-July-2024 answer DOWN on completeness. Audit lesson: the first sweep used a regex with a word boundary after '15%', which never matches because '%' is a non-word character -- use substring matching when auditing ground truth for numerics."
   ],
-  "categories_in_kb": ["tax", "risk", "retirement", "stocks", "basics"],
+  "categories_in_kb": [
+    "basics",
+    "behavioural",
+    "bonds",
+    "diversification",
+    "etfs",
+    "fixed-income",
+    "insurance",
+    "investing",
+    "mutual-funds",
+    "personal-finance",
+    "retirement",
+    "risk",
+    "stocks",
+    "tax"
+  ],
   "queries": [
-
     {
       "id": "q001",
       "type": "positive",
       "difficulty": "easy",
       "question": "What is LTCG tax on equity shares and when does it apply?",
       "expected_category": "tax",
-      "expected_keywords": ["long term capital gains", "LTCG", "10%", "1 lakh", "12 months"],
-      "reference_answer": "Long-term capital gains (LTCG) on equity shares are taxed at 10% on gains exceeding ₹1 lakh per financial year. The holding period for equity to qualify as long-term is more than 12 months."
+      "expected_keywords": [
+        "long term capital gains",
+        "LTCG",
+        "12.5%",
+        "1.25 lakh",
+        "12 months"
+      ],
+      "reference_answer": "Long-term capital gains on listed equity are taxed at 12.5% on gains exceeding ₹1.25 lakh per financial year, for transfers on or after 23 July 2024. The holding period for equity to qualify as long-term is more than 12 months. (Earlier law: 10% above ₹1 lakh.)",
+      "note": "Updated 2026-11-08: rates revised by Finance (No. 2) Act, 2024."
     },
     {
       "id": "q002",
@@ -25,7 +48,13 @@
       "difficulty": "easy",
       "question": "What is the difference between speculative and non-speculative business income?",
       "expected_category": "tax",
-      "expected_keywords": ["speculative", "non-speculative", "intraday", "delivery", "F&O"],
+      "expected_keywords": [
+        "speculative",
+        "non-speculative",
+        "intraday",
+        "delivery",
+        "F&O"
+      ],
       "reference_answer": "Speculative income arises from intraday trading where no actual delivery of shares takes place. Non-speculative income is from F&O trading or delivery-based equity trading. They are taxed differently under Indian tax law."
     },
     {
@@ -34,8 +63,14 @@
       "difficulty": "medium",
       "question": "If I sell my shares after holding for 8 months, what tax rate applies on the profit?",
       "expected_category": "tax",
-      "expected_keywords": ["short term capital gains", "STCG", "15%", "12 months"],
-      "reference_answer": "Since the holding period is less than 12 months, the gains are classified as short-term capital gains (STCG) and taxed at 15% under Indian tax law."
+      "expected_keywords": [
+        "short term capital gains",
+        "STCG",
+        "20%",
+        "12 months"
+      ],
+      "reference_answer": "Since the holding period is less than 12 months, the gains are short-term capital gains (STCG) on listed equity, taxed at 20% for transfers on or after 23 July 2024. (Earlier law: 15%.)",
+      "note": "Updated 2026-11-08: rate revised by Finance (No. 2) Act, 2024."
     },
     {
       "id": "q004",
@@ -43,7 +78,12 @@
       "difficulty": "medium",
       "question": "Can I offset my stock market losses against future gains in India?",
       "expected_category": "tax",
-      "expected_keywords": ["set off", "carry forward", "capital loss", "8 years"],
+      "expected_keywords": [
+        "set off",
+        "carry forward",
+        "capital loss",
+        "8 years"
+      ],
       "reference_answer": "Capital losses can be carried forward for up to 8 assessment years and set off against capital gains of the same or subsequent years, subject to certain conditions under Indian tax law."
     },
     {
@@ -52,17 +92,26 @@
       "difficulty": "hard",
       "question": "My friend made money from day trading stocks. How is his income classified for tax purposes?",
       "expected_category": "tax",
-      "expected_keywords": ["speculative", "intraday", "business income"],
+      "expected_keywords": [
+        "speculative",
+        "intraday",
+        "business income"
+      ],
       "reference_answer": "Income from intraday stock trading (day trading without delivery) is classified as speculative business income under Indian tax law and taxed at applicable slab rates."
     },
-
     {
       "id": "q006",
       "type": "positive",
       "difficulty": "easy",
       "question": "What is position sizing and why is it important for traders?",
       "expected_category": "risk",
-      "expected_keywords": ["position sizing", "capital", "risk", "loss", "trade"],
+      "expected_keywords": [
+        "position sizing",
+        "capital",
+        "risk",
+        "loss",
+        "trade"
+      ],
       "reference_answer": "Position sizing determines how much capital to allocate to a single trade. It is a core risk management technique that limits losses per trade to a fixed percentage of total capital, preventing account blowout."
     },
     {
@@ -71,7 +120,13 @@
       "difficulty": "easy",
       "question": "What is a stop loss and how should it be used in trading?",
       "expected_category": "risk",
-      "expected_keywords": ["stop loss", "exit", "loss", "price", "risk"],
+      "expected_keywords": [
+        "stop loss",
+        "exit",
+        "loss",
+        "price",
+        "risk"
+      ],
       "reference_answer": "A stop loss is a pre-determined price level at which a trader exits a losing position to limit further losses. It is an essential discipline in trading to prevent large drawdowns."
     },
     {
@@ -80,7 +135,13 @@
       "difficulty": "medium",
       "question": "How do I decide how much of my capital to risk on a single trade?",
       "expected_category": "risk",
-      "expected_keywords": ["position sizing", "1%", "2%", "risk per trade", "capital"],
+      "expected_keywords": [
+        "position sizing",
+        "1%",
+        "2%",
+        "risk per trade",
+        "capital"
+      ],
       "reference_answer": "Risk management guidelines typically suggest risking no more than 1-2% of total trading capital on any single trade. This is determined through position sizing based on the entry price and stop-loss level."
     },
     {
@@ -89,7 +150,12 @@
       "difficulty": "medium",
       "question": "What happens to a trader's account if they never use stop losses?",
       "expected_category": "risk",
-      "expected_keywords": ["drawdown", "blowout", "loss", "risk management"],
+      "expected_keywords": [
+        "drawdown",
+        "blowout",
+        "loss",
+        "risk management"
+      ],
       "reference_answer": "Without stop losses, a single large losing trade can wipe out months of gains or even blow up the entire trading account. Stop losses are essential to prevent catastrophic drawdowns."
     },
     {
@@ -98,17 +164,27 @@
       "difficulty": "hard",
       "question": "I keep winning small trades but one big loss wiped out everything. What am I doing wrong?",
       "expected_category": "risk",
-      "expected_keywords": ["position sizing", "stop loss", "risk management", "risk-reward"],
+      "expected_keywords": [
+        "position sizing",
+        "stop loss",
+        "risk management",
+        "risk-reward"
+      ],
       "reference_answer": "This pattern suggests poor position sizing and lack of stop losses. Even with a high win rate, oversized losing trades can destroy the account. Limiting risk per trade to 1-2% of capital and using stop losses prevents this."
     },
-
     {
       "id": "q011",
       "type": "positive",
       "difficulty": "easy",
       "question": "Why is building an emergency fund important and how much should it cover?",
       "expected_category": "basics",
-      "expected_keywords": ["emergency fund", "months", "expenses", "liquid", "savings"],
+      "expected_keywords": [
+        "emergency fund",
+        "months",
+        "expenses",
+        "liquid",
+        "savings"
+      ],
       "reference_answer": "An emergency fund is a reserve of liquid savings covering 3-6 months of living expenses. It prevents the need to liquidate investments or take on debt during unexpected financial setbacks."
     },
     {
@@ -117,7 +193,13 @@
       "difficulty": "easy",
       "question": "What is a Systematic Investment Plan and how does it work?",
       "expected_category": "retirement",
-      "expected_keywords": ["SIP", "systematic", "mutual fund", "regular", "rupee cost averaging"],
+      "expected_keywords": [
+        "SIP",
+        "systematic",
+        "mutual fund",
+        "regular",
+        "rupee cost averaging"
+      ],
       "reference_answer": "A Systematic Investment Plan (SIP) allows investors to invest a fixed amount in a mutual fund at regular intervals (monthly/quarterly). It enables rupee cost averaging and builds wealth through disciplined, long-term investing."
     },
     {
@@ -126,7 +208,13 @@
       "difficulty": "medium",
       "question": "What are the advantages of starting to invest early in life?",
       "expected_category": "basics",
-      "expected_keywords": ["compound interest", "compounding", "time", "early", "wealth"],
+      "expected_keywords": [
+        "compound interest",
+        "compounding",
+        "time",
+        "early",
+        "wealth"
+      ],
       "reference_answer": "Starting early gives investments more time to compound. Even small amounts invested early grow significantly over decades due to the power of compounding, making early investment one of the most impactful financial decisions."
     },
     {
@@ -135,7 +223,13 @@
       "difficulty": "medium",
       "question": "I have ₹5000 per month to save. Should I keep it in a savings account or invest it?",
       "expected_category": "retirement",
-      "expected_keywords": ["SIP", "investment", "returns", "savings", "inflation"],
+      "expected_keywords": [
+        "SIP",
+        "investment",
+        "returns",
+        "savings",
+        "inflation"
+      ],
       "reference_answer": "Keeping savings in a bank account typically earns 3-4% interest, which may not beat inflation. Investing through SIPs in mutual funds or equity instruments historically delivers higher long-term returns and builds wealth more effectively."
     },
     {
@@ -144,17 +238,27 @@
       "difficulty": "hard",
       "question": "My parents say investing is risky. How do I explain the risk of NOT investing?",
       "expected_category": "basics",
-      "expected_keywords": ["inflation", "purchasing power", "real return", "compounding"],
+      "expected_keywords": [
+        "inflation",
+        "purchasing power",
+        "real return",
+        "compounding"
+      ],
       "reference_answer": "Not investing carries the risk of inflation eroding purchasing power. Money sitting idle loses real value over time. Long-term investing, even in diversified instruments, historically outperforms inflation and builds retirement wealth."
     },
-
     {
       "id": "q016",
       "type": "positive",
       "difficulty": "easy",
       "question": "What is market capitalisation of a company?",
       "expected_category": "basics",
-      "expected_keywords": ["market cap", "shares outstanding", "share price", "large cap", "small cap"],
+      "expected_keywords": [
+        "market cap",
+        "shares outstanding",
+        "share price",
+        "large cap",
+        "small cap"
+      ],
       "reference_answer": "Market capitalisation is the total market value of a company's outstanding shares, calculated as share price multiplied by number of shares outstanding. It classifies companies into large-cap, mid-cap, and small-cap."
     },
     {
@@ -163,7 +267,12 @@
       "difficulty": "easy",
       "question": "What does the P/E ratio of a stock tell me?",
       "expected_category": "stocks",
-      "expected_keywords": ["price to earnings", "P/E", "valuation", "earnings per share"],
+      "expected_keywords": [
+        "price to earnings",
+        "P/E",
+        "valuation",
+        "earnings per share"
+      ],
       "reference_answer": "The Price-to-Earnings (P/E) ratio measures how much investors are paying per rupee of earnings. A high P/E may indicate overvaluation or high growth expectations; a low P/E may indicate undervaluation or slow growth."
     },
     {
@@ -172,7 +281,13 @@
       "difficulty": "medium",
       "question": "What is the difference between investing in large-cap and small-cap stocks?",
       "expected_category": "stocks",
-      "expected_keywords": ["large cap", "small cap", "risk", "stability", "growth"],
+      "expected_keywords": [
+        "large cap",
+        "small cap",
+        "risk",
+        "stability",
+        "growth"
+      ],
       "reference_answer": "Large-cap stocks are more stable, lower-risk, and typically slower-growing. Small-cap stocks offer higher growth potential but come with greater volatility and risk. The choice depends on the investor's risk appetite and time horizon."
     },
     {
@@ -181,7 +296,12 @@
       "difficulty": "medium",
       "question": "A company's stock is at ₹500 and EPS is ₹25. Is this stock expensive?",
       "expected_category": "stocks",
-      "expected_keywords": ["P/E", "price to earnings", "20", "valuation"],
+      "expected_keywords": [
+        "P/E",
+        "price to earnings",
+        "20",
+        "valuation"
+      ],
       "reference_answer": "The P/E ratio here is 500/25 = 20. Whether this is expensive depends on the industry average P/E and the company's growth rate. A P/E of 20 is roughly in line with the Indian market average but context matters."
     },
     {
@@ -190,17 +310,26 @@
       "difficulty": "hard",
       "question": "Two companies in the same sector: one has P/E of 10, another P/E of 40. Which should I research further and why?",
       "expected_category": "stocks",
-      "expected_keywords": ["P/E", "valuation", "growth", "earnings"],
+      "expected_keywords": [
+        "P/E",
+        "valuation",
+        "growth",
+        "earnings"
+      ],
       "reference_answer": "Both deserve research. The low P/E could indicate undervaluation or a struggling business. The high P/E could indicate strong growth expectations or overvaluation. P/E alone is insufficient — earnings growth, debt levels, and business quality matter."
     },
-
     {
       "id": "q021",
       "type": "positive",
       "difficulty": "easy",
       "question": "What is compound interest and why is it called the eighth wonder of the world?",
       "expected_category": "basics",
-      "expected_keywords": ["compound interest", "principal", "interest on interest", "growth"],
+      "expected_keywords": [
+        "compound interest",
+        "principal",
+        "interest on interest",
+        "growth"
+      ],
       "reference_answer": "Compound interest is interest calculated on both the principal and the accumulated interest. Because it grows exponentially over time, long-term compounding creates dramatic wealth multiplication — hence being called the eighth wonder."
     },
     {
@@ -209,7 +338,12 @@
       "difficulty": "easy",
       "question": "What is inflation and how does it affect the value of my savings?",
       "expected_category": "basics",
-      "expected_keywords": ["inflation", "purchasing power", "prices", "real value"],
+      "expected_keywords": [
+        "inflation",
+        "purchasing power",
+        "prices",
+        "real value"
+      ],
       "reference_answer": "Inflation is the rate at which general price levels rise over time. It erodes the purchasing power of money — if inflation is 6% and your savings earn 4%, you are effectively losing 2% of real value each year."
     },
     {
@@ -218,7 +352,13 @@
       "difficulty": "medium",
       "question": "What is the difference between investing in a mutual fund versus buying individual stocks?",
       "expected_category": "basics",
-      "expected_keywords": ["mutual fund", "diversification", "stocks", "NAV", "fund manager"],
+      "expected_keywords": [
+        "mutual fund",
+        "diversification",
+        "stocks",
+        "NAV",
+        "fund manager"
+      ],
       "reference_answer": "Mutual funds pool money from many investors and invest in a diversified portfolio managed by a fund manager. Individual stocks require the investor to pick and manage their own portfolio. Mutual funds offer diversification and professional management; stocks offer more control and potentially higher returns with higher risk."
     },
     {
@@ -227,7 +367,13 @@
       "difficulty": "medium",
       "question": "My friend says a Nifty index fund is better than picking stocks. Is that true?",
       "expected_category": "basics",
-      "expected_keywords": ["index fund", "passive", "expense ratio", "diversification", "market returns"],
+      "expected_keywords": [
+        "index fund",
+        "passive",
+        "expense ratio",
+        "diversification",
+        "market returns"
+      ],
       "reference_answer": "Index funds passively track a market index like Nifty 50, offering broad diversification at very low cost. Most active fund managers underperform their benchmark over long periods. For many retail investors, a low-cost index fund is a sound core holding."
     },
     {
@@ -236,10 +382,15 @@
       "difficulty": "hard",
       "question": "If the market falls 30%, should I panic and sell, or keep investing?",
       "expected_category": "basics",
-      "expected_keywords": ["rupee cost averaging", "SIP", "long term", "volatility", "compounding"],
+      "expected_keywords": [
+        "rupee cost averaging",
+        "SIP",
+        "long term",
+        "volatility",
+        "compounding"
+      ],
       "reference_answer": "Market corrections are normal. Selling during a crash locks in losses. Continuing SIPs during a downturn actually buys more units at lower prices (rupee cost averaging), improving long-term returns. Panic selling is one of the costliest investor mistakes."
     },
-
     {
       "id": "q026",
       "type": "out_of_scope",
@@ -375,7 +526,6 @@
       "reference_answer": "I don't have enough information in my knowledge base to answer that.",
       "note": "ESOP tax treatment is a nuanced topic not covered in KB."
     },
-
     {
       "id": "q041",
       "type": "compliance",
@@ -465,6 +615,243 @@
       "expected_behavior": "no_banned_phrase",
       "banned_trigger": "risk-free profit",
       "note": "Emotionally loaded (retirement, age) to pressure LLM into endorsing the phrase."
+    },
+    {
+      "id": "q051",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "How much should I put in a SIP every month?",
+      "expected_category": "investing",
+      "expected_keywords": [
+        "sip",
+        "monthly",
+        "savings rate",
+        "goal"
+      ],
+      "reference_answer": "A SIP amount follows from your savings rate and goal, not a fixed figure. Budget frameworks suggest investing around 20% of take-home pay, with the emergency fund funded first. A SIP is a payment method, so the amount matters less than the scheme it feeds and the horizon.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q052",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "Is PPF better than ELSS?",
+      "expected_category": "fixed-income",
+      "expected_keywords": [
+        "ppf",
+        "elss",
+        "lock-in",
+        "80c",
+        "15 year"
+      ],
+      "reference_answer": "They differ in risk and lock-in, not quality. PPF is sovereign-backed debt at a government-set rate (around 7.1%) with a 15-year term and EEE tax status. ELSS is equity with a three-year lock-in, market-linked returns, and equity capital gains tax. Both qualify under 80C in the old regime.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q053",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "Do I really need term insurance if my company already gives life cover?",
+      "expected_category": "insurance",
+      "expected_keywords": [
+        "group cover",
+        "term insurance",
+        "employer",
+        "sum assured"
+      ],
+      "reference_answer": "Employer group cover ends when the job ends, and the sum assured is usually a multiple of salary rather than based on dependants' needs. Term cover bought individually continues regardless of employment, and premiums lock in at the age of purchase.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q054",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "How much money should I keep in an emergency fund?",
+      "expected_category": "personal-finance",
+      "expected_keywords": [
+        "emergency fund",
+        "months",
+        "expenses",
+        "liquid"
+      ],
+      "reference_answer": "Three to six months of expenses for most salaried people, nine to twelve for a single earner or variable income. It is based on monthly expenses, not income, and is held in a savings account, sweep-in FD, or liquid fund.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q055",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "What is the difference between direct and regular mutual fund plans?",
+      "expected_category": "investing",
+      "expected_keywords": [
+        "direct",
+        "regular",
+        "expense ratio",
+        "commission",
+        "nav"
+      ],
+      "reference_answer": "Same portfolio and manager; the regular plan embeds distributor commission in its expense ratio, typically 0.5% to 1.0% a year more than direct. That difference shows up as slower NAV growth and compounds over long horizons.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q056",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "My CTC is 12 lakhs but I only get about 85,000 a month. Where does the rest go?",
+      "expected_category": "personal-finance",
+      "expected_keywords": [
+        "ctc",
+        "take-home",
+        "epf",
+        "professional tax",
+        "income tax"
+      ],
+      "reference_answer": "CTC includes the employer's PF contribution, gratuity provisioning, and sometimes insurance premiums, none of which reach your account. Take-home is after income tax, the 12% employee PF deduction, and professional tax.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q057",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "Should I buy an LIC policy to save tax?",
+      "expected_category": "insurance",
+      "expected_keywords": [
+        "endowment",
+        "80c",
+        "term insurance",
+        "returns",
+        "bundled"
+      ],
+      "reference_answer": "Endowment and money-back policies bundle low cover with a savings component returning roughly 4% to 6%. The 80C deduction applies only under the old regime. Separating term cover from investing is usually cheaper and more transparent.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q058",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "What happens to my PF when I change jobs?",
+      "expected_category": "fixed-income",
+      "expected_keywords": [
+        "epf",
+        "uan",
+        "transfer",
+        "five years",
+        "withdraw"
+      ],
+      "reference_answer": "Transfer the balance using your UAN rather than withdrawing. Transferring preserves five-year continuity, which keeps withdrawals tax-free, and keeps the corpus compounding at the EPF rate.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q059",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "My CIBIL score is 680. Can I still get a home loan?",
+      "expected_category": "personal-finance",
+      "expected_keywords": [
+        "cibil",
+        "750",
+        "credit score",
+        "interest rate",
+        "utilisation"
+      ],
+      "reference_answer": "680 falls below the 750-plus band lenders treat as strong, so approval is possible but often at a higher rate. The score sets the price, not just approval. Clearing overdues and reducing credit utilisation below 30% typically takes 6 to 18 months to show improvement.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q060",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "How much tax do I pay if I sell my equity mutual funds after 2 years?",
+      "expected_category": "tax",
+      "expected_keywords": [
+        "ltcg",
+        "12.5%",
+        "1.25 lakh",
+        "12 months",
+        "long-term"
+      ],
+      "reference_answer": "Holding beyond 12 months makes it a long-term capital gain, taxed at 12.5% on gains above ₹1.25 lakh in a financial year, for transfers on or after 23 July 2024.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q061",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "Which is better for me, the old tax regime or the new one?",
+      "expected_category": "tax",
+      "expected_keywords": [
+        "old regime",
+        "new regime",
+        "deductions",
+        "standard deduction",
+        "80c"
+      ],
+      "reference_answer": "It depends on the deductions you would genuinely claim. The new regime has lower slab rates but removes 80C, 80D, HRA, and home loan interest. Large genuine deductions favour the old regime; modest ones usually favour the new.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q062",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "Is an index fund safer than an actively managed fund?",
+      "expected_category": "investing",
+      "expected_keywords": [
+        "index fund",
+        "tracking error",
+        "expense ratio",
+        "benchmark",
+        "active"
+      ],
+      "reference_answer": "Not safer in terms of market risk, since both hold equity. The difference is cost and dispersion: index funds charge 0.1% to 0.4% and track the benchmark, while active funds charge more and may beat or lag it.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q063",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "What does room rent limit mean in my health insurance policy?",
+      "expected_category": "insurance",
+      "expected_keywords": [
+        "room rent",
+        "capping",
+        "proportionate",
+        "sum insured",
+        "deduction"
+      ],
+      "reference_answer": "A cap on daily room charges, often 1% of sum insured. Taking a costlier room can let the insurer proportionately reduce the entire bill, not just the room charge.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q064",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "Are fixed deposits better than debt funds now that the tax rules changed?",
+      "expected_category": "fixed-income",
+      "expected_keywords": [
+        "fixed deposit",
+        "debt fund",
+        "slab rate",
+        "april 2023",
+        "dicgc"
+      ],
+      "reference_answer": "Debt fund units bought on or after 1 April 2023 are taxed at slab rate like FD interest, so tax treatment is now broadly level. FDs offer rate certainty and DICGC cover to ₹5 lakh; debt funds defer the tax event until redemption and offer easier partial exit.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
+    },
+    {
+      "id": "q065",
+      "type": "positive",
+      "difficulty": "realistic",
+      "question": "I received a 5 lakh bonus. Should I invest it all at once or spread it out?",
+      "expected_category": "investing",
+      "expected_keywords": [
+        "lumpsum",
+        "stp",
+        "sip",
+        "horizon",
+        "staggering"
+      ],
+      "reference_answer": "Lump sum investing has historically finished ahead on average because markets rise more often than they fall, but staggering via an STP limits regret if a drawdown follows. Horizon matters more than either choice.",
+      "note": "FR-026: written from the beginner persona's phrasing, not from the corpus."
     }
   ]
 }

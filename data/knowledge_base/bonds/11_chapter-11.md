@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 11"
+title: "The Debt Funds (Part 1)"
 category: "bonds"
 source: "Zerodha Varsity"
 module: "Personal Finance"

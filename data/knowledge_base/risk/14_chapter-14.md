@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 14"
+title: "Kelly's Criterion"
 category: "risk"
 source: "Zerodha Varsity"
 module: "Risk Management and Trading Psychology"

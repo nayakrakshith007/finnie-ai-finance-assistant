@@ -1,5 +1,5 @@
 ---
-title: "Chapter 12"
+title: "Volume plays a very integral role in technical analysis as it helps us to confirm"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

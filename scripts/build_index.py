@@ -20,16 +20,19 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from core.config import load_config                          # noqa: E402
-from rag.chunker import chunk_directory                      # noqa: E402
-from rag.embedder import embed_texts, get_client             # noqa: E402
-from rag.vector_store import (                               # noqa: E402
+from core.config import load_config  # noqa: E402
+from rag.chunker import chunk_directory  # noqa: E402
+from rag.embedder import embed_texts, get_client  # noqa: E402
+from rag.vector_store import (  # noqa: E402
     add_chunks,
     collection_count,
     delete_collection,
-    get_client as get_chroma_client,
     get_or_create_collection,
 )
+from rag.vector_store import (  # noqa: E402
+    get_client as get_chroma_client,
+)
+from utils.console import ensure_utf8_stdout  # noqa: E402
 
 
 def _make_chunk_id(chunk_meta: dict) -> str:
@@ -52,7 +55,7 @@ def _make_chunk_id(chunk_meta: dict) -> str:
 def build(rebuild: bool = False) -> None:
     cfg = load_config()
 
-    chroma_client = get_chroma_client(cfg.rag.index_dir)
+    chroma_client = get_chroma_client(cfg.resolve(cfg.rag.index_dir))
     collection = get_or_create_collection(chroma_client)
 
     # ── Guard: skip if already indexed ───────────────────────────────────────
@@ -67,7 +70,7 @@ def build(rebuild: bool = False) -> None:
         collection = get_or_create_collection(chroma_client)
 
     # ── Step 1: Chunk all articles ────────────────────────────────────────────
-    kb_dir = cfg.rag.knowledge_base_dir
+    kb_dir = cfg.resolve(cfg.rag.knowledge_base_dir)
     print(f"\nChunking articles from {kb_dir} …")
     if cfg.rag.category_map:
         print(f"  Applying category_map: {dict(cfg.rag.category_map)}")
@@ -104,10 +107,11 @@ def build(rebuild: bool = False) -> None:
     # ── Summary ───────────────────────────────────────────────────────────────
     final_count = collection_count(collection)
     print(f"\nIndex built. Collection '{collection.name}' now has {final_count} chunks.")
-    print(f"Persisted to: {cfg.rag.index_dir}")
+    print(f"Persisted to: {cfg.resolve(cfg.rag.index_dir)}")
 
 
 def main() -> None:
+    ensure_utf8_stdout()
     parser = argparse.ArgumentParser(description="Build the Finnie ChromaDB index")
     parser.add_argument(
         "--rebuild",

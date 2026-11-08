@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 16"
+title: "Trading Biases (Part 2)"
 category: "risk"
 source: "Zerodha Varsity"
 module: "Risk Management and Trading Psychology"

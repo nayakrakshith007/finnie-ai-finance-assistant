@@ -1,5 +1,5 @@
 ---
-title: "Chapter 14"
+title: "Indicators (Part 1)"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

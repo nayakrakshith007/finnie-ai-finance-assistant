@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 3"
+title: "Classifying Your Market Activity"
 category: "tax"
 source: "Zerodha Varsity"
 module: "Markets and Taxation"

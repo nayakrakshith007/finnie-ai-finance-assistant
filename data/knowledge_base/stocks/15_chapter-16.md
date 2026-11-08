@@ -1,5 +1,5 @@
 ---
-title: "Chapter 16"
+title: "The Fibonacci Retracements"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

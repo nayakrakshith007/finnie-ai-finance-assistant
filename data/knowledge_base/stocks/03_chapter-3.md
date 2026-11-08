@@ -1,5 +1,5 @@
 ---
-title: "Chapter 3"
+title: "How to Read the Annual Report of a"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

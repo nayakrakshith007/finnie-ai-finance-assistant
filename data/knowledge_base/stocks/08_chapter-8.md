@@ -1,5 +1,5 @@
 ---
-title: "Chapter 8"
+title: "The Cash Flow statement"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

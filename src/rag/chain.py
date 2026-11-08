@@ -28,7 +28,7 @@ from rag.prompt import RAG_SYSTEM_PROMPT, RAG_USER_TEMPLATE, format_context
 from rag.retriever import FinnieRetriever, build_retriever
 
 
-def build_rag_chain(retriever: FinnieRetriever | None = None) -> "RAGChain":
+def build_rag_chain(retriever: FinnieRetriever | None = None) -> RAGChain:
     """Construct a RAGChain from config.
 
     Args:

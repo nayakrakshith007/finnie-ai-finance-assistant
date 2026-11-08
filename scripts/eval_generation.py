@@ -44,12 +44,14 @@ from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(PROJECT_ROOT / ".env")
 
-from core.config import load_config  # noqa: E402
-from core.llm import build_llm       # noqa: E402
 from langchain_core.messages import HumanMessage, SystemMessage  # noqa: E402
-from rag.retriever import FinnieRetriever  # noqa: E402
+
+from core.config import load_config  # noqa: E402
+from core.llm import build_llm  # noqa: E402
 from rag.embedder import get_client as get_openai_client  # noqa: E402
+from rag.retriever import FinnieRetriever  # noqa: E402
 from rag.vector_store import get_client, get_or_create_collection  # noqa: E402
+from utils.console import ensure_utf8_stdout  # noqa: E402
 
 QUERIES_FILE = PROJECT_ROOT / "data" / "eval_queries.json"
 
@@ -246,8 +248,11 @@ def aggregate(results: list[dict]) -> dict:
 
 
 def aggregate_by_difficulty(results: list[dict]) -> dict:
+    # "realistic" is its own bucket, not folded into the other three: those were
+    # written against corpus content and flatter the score. See the same note in
+    # eval_retrieval.aggregate_by_difficulty.
     breakdown = {}
-    for diff in ["easy", "medium", "hard"]:
+    for diff in ["easy", "medium", "hard", "realistic"]:
         subset = [r for r in results if r.get("difficulty") == diff]
         if subset:
             breakdown[diff] = aggregate(subset)
@@ -298,6 +303,7 @@ def print_difficulty_breakdown(breakdown: dict) -> None:
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
+    ensure_utf8_stdout()
     parser = argparse.ArgumentParser(description="Evaluate generation quality.")
     parser.add_argument("--top-k",      type=int, default=4)
     parser.add_argument("--trace",      action="store_true", help="Print answer per query")
@@ -311,7 +317,7 @@ def main() -> None:
 
     # Build retriever (MMR)
     cfg = load_config()
-    chroma = get_client(cfg.rag.index_dir)
+    chroma = get_client(cfg.resolve(cfg.rag.index_dir))
     collection = get_or_create_collection(chroma)
     openai = get_openai_client()
     retriever = FinnieRetriever(

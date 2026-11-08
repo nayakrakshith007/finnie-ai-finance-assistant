@@ -1,5 +1,5 @@
 ---
-title: "Chapter 3"
+title: "The Chart Types"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

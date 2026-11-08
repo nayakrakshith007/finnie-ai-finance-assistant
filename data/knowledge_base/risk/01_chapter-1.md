@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 1"
+title: "Orientation Note"
 category: "risk"
 source: "Zerodha Varsity"
 module: "Risk Management and Trading Psychology"

@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 6"
+title: "Equity Curve"
 category: "risk"
 source: "Zerodha Varsity"
 module: "Risk Management and Trading Psychology"

@@ -1,5 +1,5 @@
 ---
-title: "Chapter 17"
+title: "The Dow Theory (Part 1)"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

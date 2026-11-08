@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 12"
+title: "Key Events and Their Impact"
 category: "basics"
 source: "Zerodha Varsity"
 module: "Introduction to Stock Markets"

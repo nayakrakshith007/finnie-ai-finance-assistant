@@ -1,5 +1,5 @@
 ---
-title: "Chapter 4"
+title: "Understanding the P&L Statement (Part"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

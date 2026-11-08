@@ -1,5 +1,5 @@
 ---
-title: "Chapter 9"
+title: "The Financial Ratio Analysis (Part 1)"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

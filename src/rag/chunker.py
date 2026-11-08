@@ -14,6 +14,10 @@ from typing import Any
 
 import yaml
 
+from core.logging_setup import get_logger
+
+logger = get_logger(__name__)
+
 # Defaults — overridden at runtime by values from config.yaml via chunk_directory()
 MAX_TOKENS = 500
 OVERLAP_TOKENS = 50
@@ -118,6 +122,11 @@ def chunk_file(path: Path, category_map: dict[str, str] | None = None) -> list[C
         "source": meta.get("source", "unknown"),
         "module": meta.get("module", ""),
         "tags": ", ".join(meta.get("tags", [])),  # Chroma needs strings, not lists
+        # url lets a citation link out to the authority it came from; date_retrieved
+        # matters because tax rules change with every Finance Act. Both default to ""
+        # so older articles without them still index cleanly.
+        "url": meta.get("url", ""),
+        "date_retrieved": str(meta.get("date_retrieved", "")),
         "file": str(path),
     }
 
@@ -150,5 +159,5 @@ def chunk_directory(kb_dir: Path, category_map: dict[str, str] | None = None) ->
         try:
             all_chunks.extend(chunk_file(path, category_map=category_map))
         except (ValueError, yaml.YAMLError) as exc:
-            print(f"  SKIP {path.name}: {exc}")
+            logger.warning("Skipped %s during chunking: %s", path.name, exc)
     return all_chunks

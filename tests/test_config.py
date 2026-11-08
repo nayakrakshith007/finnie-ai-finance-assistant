@@ -14,9 +14,9 @@ from pathlib import Path
 
 import pytest
 
-from src.core import config as config_mod
-from src.core.config import PROJECT_ROOT, Config, get_config, load_config
-from src.core.logging_setup import get_logger, setup_logging
+from core import config as config_mod
+from core.config import PROJECT_ROOT, Config, get_config, load_config
+from core.logging_setup import get_logger, setup_logging
 
 
 @pytest.fixture(autouse=True)
@@ -37,7 +37,10 @@ def test_loads_and_validates_real_config():
     assert isinstance(cfg, Config)
     assert cfg.llm.model == "gpt-4o"
     assert cfg.llm.router_model == "gpt-4o-mini"
-    assert cfg.rag.embedding_dim == 384
+    # 512, not 384: the stack moved from local all-MiniLM-L6-v2 (384-dim) to OpenAI
+    # text-embedding-3-small truncated to 512 dims via matryoshka reduction. Deliberate
+    # spec change, accepted 2026-11-08 -- better retrieval quality for ~$0.01 per re-index.
+    assert cfg.rag.embedding_dim == 512
     assert "educational" in cfg.compliance.disclaimer.lower()
 
 
@@ -145,6 +148,6 @@ def test_noisy_libraries_are_quietened():
 
 def config_mod_flag_reset() -> None:
     """Reset the one-shot guard so the idempotency test starts clean."""
-    import src.core.logging_setup as ls
+    import core.logging_setup as ls
 
     ls._CONFIGURED = False

@@ -1,5 +1,5 @@
 ---
-title: "Chapter 6"
+title: "Single Candlestick patterns (Part 2)"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

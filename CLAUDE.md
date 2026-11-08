@@ -32,20 +32,42 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 0 | Environment & project skeleton | ✅ Complete — 14/14 tests pass, ruff clean |
-| 1 | LLM client + compliance guard | ✅ Complete — 11/11 tests pass, ruff clean |
-| 2–13 | (see ROADMAP) | Pending |
+| 0 | Environment & project skeleton | ✅ Complete — ruff clean |
+| 1 | Config, LLM client & compliance layer | ✅ Complete — ruff clean |
+| 2 | Knowledge base curation | ✅ Complete — 281 docs, 14 categories, none below 6, real titles |
+| 3 | RAG pipeline | ✅ Complete — chunker, embedder, Chroma store, retriever (MMR), prompt, chain + 3 eval harnesses |
+| 4 | BaseAgent abstraction | ✅ Complete — `src/agents/base.py` + `src/workflow/state.py`, 16 tests |
+| 5 | Finance Q&A Agent | ⬜ Next (Day 1) |
+| 6–13 | (see ROADMAP) | Pending |
 
-**Phase 0 — DONE.** All four functions implemented (`_apply_env_overrides`, `load_config`, `setup_logging`, `get_logger`). 14/14 tests pass, ruff clean, GitHub repo live.
+**Test/lint status:** 41/41 pass (14 config + 11 llm/compliance + 16 base agent), ruff clean.
 
-**Phase 1 — DONE.** `src/core/llm.py` (ChatOpenAI + InMemoryRateLimiter + CostMeterCallback + FakeListChatModel) and `src/core/compliance.py` (output guard). 11/11 tests pass, ruff clean.
+**Index:** 2,000 chunks in `data/indexes` (Chroma collection `finnie_kb`), built 2026-11-08.
 
-**Phase 2 is next:** LangGraph `StateGraph` — supervisor router + agent stubs.
+**Retrieval quality (MMR, top_k=4):** easy 1.00 hit / medium 1.00 / hard 1.00 / **realistic 1.00 hit, MRR 1.00, P@k 0.85**. The `realistic` bucket is the one that matters — 15 queries written from the beginner persona's phrasing rather than reverse-engineered from the corpus (FR-026). Caveat for honesty: the same author wrote both those articles and those queries, so it is better evidence than the easy/medium/hard sets but not independent.
+
+**Day 0 (Nov 8) housekeeping — DONE:**
+- Baseline commit `3d02c5e` (299 files); `docs/Varsity PDFs/` gitignored (61 MB, copyrighted, not redistributable)
+- `config.yaml` market block is now India-only: `default_tickers` RELIANCE/TCS/HDFCBANK/INFY/ICICIBANK (`.NS`), `default_indices` `^NSEI`/`^BSESN`, plus `currency: INR` and `exchange_suffix`
+- **One import convention everywhere:** `src/` is the import root, so all code uses `from core.x import ...` / `from rag.x import ...`. `pyproject.toml` sets `pythonpath = ["src", "."]`; tests were migrated off the `src.`-prefixed style
+- 15 ruff errors cleared — the 4 `print` calls in `src/rag/` are now `logger` calls, `zip()` in `_cosine_similarity` is `strict=True`
+
+**Phase 2 KB rebuild — DONE** (PRD FR-020 → FR-026):
+- `scripts/fix_kb_titles.py` derived real titles from the line after each `## Chapter N` heading: 253 of 263 files renamed, 2 fallbacks, idempotent. Also strips private-use Unicode glyphs left by PDF extraction
+- 18 beginner articles authored, every thin category now ≥ 6: insurance 2→6, fixed-income 2→6, investing 2→6, personal-finance 3→6, tax 8→11. Each carries a real title, source organisation, authority URL, `date_retrieved`, and an educational-use note
+- `chunker.py` now carries `url` and `date_retrieved` into chunk metadata — previously parsed then dropped, so citations could never link out
+- `eval_queries.json`: 15 `realistic` queries added; `q001` corrected from the pre-July-2024 LTCG rule (10% above ₹1 lakh) to the current 12.5% above ₹1.25 lakh — the eval set had been penalising the right answer
+- `src/utils/console.py` — `ensure_utf8_stdout()`, wired into all four scripts. Windows cp1252 consoles crashed the eval scripts *after* the run completed, which would hit any grader on Windows
+
+**Phase 4 BaseAgent — DONE.** `src/workflow/state.py` defines `AgentState` with reducers (`add_messages` for conversation, `operator.add` for `agent_trace`). `src/agents/base.py` is a template method: `run()` owns timing, logging, tracing and the error boundary; subclasses implement only `handle()`. `run()` never raises — a failing agent returns a friendly message plus `error`, because a raising node aborts the whole LangGraph invocation.
+
+**Phase 5 is next:** Finance Q&A Agent — first real subclass, wired to the RAG chain.
 
 ---
 
 ## Project documents (always open these first if confused)
 
+- **[`docs/PRD.md`](docs/PRD.md)** — v1.2 product requirements: 46 FRs with acceptance criteria, rubric→artifact matrix, 7-day plan, risks, Streamlit layout spec (§6.5a), and the root-cause analysis of the RAG quality gap (§7.4). **Read this before the ROADMAP.**
 - **[`docs/ROADMAP.html`](docs/ROADMAP.html)** — 14-phase build plan, checklists, rubric mapping
 - **[`docs/LEARNING_NOTES.html`](docs/LEARNING_NOTES.html)** — every concept taught so far, with interview questions
 - **Artifact URL for ROADMAP**: https://claude.ai/artifact/4f4dvqr4vYMK7rEavpKHWF
@@ -58,7 +80,7 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 |-------|--------|-----|
 | Orchestration | LangGraph `StateGraph` | Highest-weighted rubric item; explicit, inspectable, testable |
 | LLM | GPT-4o, `gpt-4o-mini` for routing | Reliable structured outputs; model tiering controls cost |
-| Embeddings | `all-MiniLM-L6-v2` local | 384-dim, CPU-friendly, zero API cost |
+| Embeddings | OpenAI `text-embedding-3-small` @ **512-dim** | Matryoshka truncation: 67% smaller index for <5% quality loss. Costs ~$0.01 per full re-index. *(Was planned as local 384-dim MiniLM; changed deliberately on 2026-11-08 for retrieval quality — `tests/test_config.py` asserts 512)* |
 | Vector store | ChromaDB | Stores vectors + metadata together natively; simpler than FAISS + separate metadata dict |
 | Market data | yfinance primary, Alpha Vantage fallback | yfinance free; Alpha Vantage teaches real rate-limit engineering |
 | UI | Streamlit | Named in rubric; `session_state` handles conversation memory |
@@ -146,4 +168,11 @@ Every phase ends with an interview grilling. The student needs to be able to exp
 - The **exact terminology** an interviewer would use
 
 ---
-*Last updated: Phase 1 complete. 25 tests pass (14 config + 11 llm/compliance), ruff clean, GitHub repo live.*
+## Scope (locked 2026-11-08)
+
+**India only.** INR, NSE/BSE, Indian instruments and Indian tax. No US/global exchanges, no USD, no 401k/IRA/Roth. A foreign ticker gets a clear out-of-scope reply. Submission target: **2026-11-15**.
+
+**Commits carry no `Co-Authored-By` / AI attribution line** — author's preference, the repo is an interview showcase.
+
+---
+*Last updated: 2026-11-08, Day 0. Baseline committed (`3d02c5e`), India-only config, one import convention, ruff clean, 25/25 tests pass. KB rebuild in progress.*

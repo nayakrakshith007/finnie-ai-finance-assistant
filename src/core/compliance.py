@@ -40,4 +40,32 @@ def check_and_wrap(text: str) -> str:
                 "Finnie gives education, not investment advice."
             )
 
-    return f"{text.rstrip()}\n\n{cfg.compliance.disclaimer}"
+    body = _strip_model_disclaimer(text.rstrip())
+    return f"{body}\n\n{cfg.compliance.disclaimer}"
+
+
+# A model-written disclaimer is recognised by this phrase rather than by matching the
+# official text. Exact matching proved useless in practice: the model paraphrases and
+# reflows, so "...Consult a licensed financial adviser..." never equals the configured
+# "...Finnie cannot know your full circumstances. Consult...". Observed 2026-11-08,
+# where every answer carried two near-identical disclaimers.
+_DISCLAIMER_MARKER = "not financial advice"
+
+
+def _strip_model_disclaimer(body: str) -> str:
+    """Remove a trailing disclaimer the model wrote itself, if any.
+
+    Compliance owns the disclaimer, so the guard normalises rather than tolerates:
+    any trailing disclaimer-shaped paragraph is dropped and the official one is
+    appended in its place. That guarantees exactly one, with the exact wording
+    legal signed off on, however the model phrased its own.
+
+    Only *trailing* paragraphs are considered. A mid-answer mention such as
+    "this is educational information, not financial advice, so..." is part of the
+    explanation and is left alone.
+    """
+    paragraphs = body.split("\n\n")
+    while paragraphs and _DISCLAIMER_MARKER in paragraphs[-1].lower():
+        dropped = paragraphs.pop()
+        log.debug("Stripped model-written disclaimer before appending official one: %r", dropped[:80])
+    return "\n\n".join(paragraphs).rstrip()

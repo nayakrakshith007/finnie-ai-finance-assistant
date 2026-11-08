@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 6"
+title: "Turnover, Balance Sheet, and P&L"
 category: "tax"
 source: "Zerodha Varsity"
 module: "Markets and Taxation"

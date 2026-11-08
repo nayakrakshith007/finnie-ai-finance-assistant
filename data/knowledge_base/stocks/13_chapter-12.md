@@ -1,5 +1,5 @@
 ---
-title: "Chapter 12"
+title: "The Investment Due Diligence"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

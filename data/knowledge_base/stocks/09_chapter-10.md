@@ -1,5 +1,5 @@
 ---
-title: "Chapter 10"
+title: "Multiple Candlestick Patterns (Part 3)"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

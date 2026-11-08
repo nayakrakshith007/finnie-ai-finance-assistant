@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 4"
+title: "Taxation for Investors"
 category: "tax"
 source: "Zerodha Varsity"
 module: "Markets and Taxation"

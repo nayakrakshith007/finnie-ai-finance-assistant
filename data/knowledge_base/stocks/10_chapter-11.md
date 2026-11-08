@@ -1,5 +1,5 @@
 ---
-title: "Chapter 11"
+title: "The Support and Resistance"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

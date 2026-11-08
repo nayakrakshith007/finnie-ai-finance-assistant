@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 12"
+title: "The Debt Funds (Part 2)"
 category: "diversification"
 source: "Zerodha Varsity"
 module: "Personal Finance"

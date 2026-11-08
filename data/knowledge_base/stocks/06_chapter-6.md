@@ -1,5 +1,5 @@
 ---
-title: "Chapter 6"
+title: "Understanding Balance Sheet Statement"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 14"
+title: "Supplementary Note"
 category: "basics"
 source: "Zerodha Varsity"
 module: "Introduction to Stock Markets"

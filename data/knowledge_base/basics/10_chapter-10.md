@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 10"
+title: "Clearing and Settlement"
 category: "basics"
 source: "Zerodha Varsity"
 module: "Introduction to Stock Markets"

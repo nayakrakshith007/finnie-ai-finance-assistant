@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 7"
+title: "Concept of fund & NAV"
 category: "behavioural"
 source: "Zerodha Varsity"
 module: "Personal Finance"

@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 11"
+title: "Five Corporate Actions and its"
 category: "basics"
 source: "Zerodha Varsity"
 module: "Introduction to Stock Markets"

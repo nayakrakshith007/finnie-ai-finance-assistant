@@ -1,5 +1,5 @@
 ---
-title: "Chapter 4"
+title: "Getting Started with Candlesticks"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

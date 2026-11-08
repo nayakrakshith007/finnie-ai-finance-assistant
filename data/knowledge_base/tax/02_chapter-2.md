@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 2"
+title: "Markets and Taxation - Chapter 2"
 category: "tax"
 source: "Zerodha Varsity"
 module: "Markets and Taxation"

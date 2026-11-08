@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 5"
+title: "Taxation for Traders"
 category: "tax"
 source: "Zerodha Varsity"
 module: "Markets and Taxation"

@@ -15,9 +15,13 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Sequence
+from collections.abc import Sequence
 
 import openai
+
+from core.logging_setup import get_logger
+
+logger = get_logger(__name__)
 
 # Model dimensions: 1536 by default; can reduce to 512 with `dimensions` param
 # for smaller index size with minimal quality loss (matryoshka embeddings).
@@ -75,7 +79,7 @@ def embed_texts(texts: Sequence[str], client: openai.OpenAI | None = None) -> li
 
             except openai.RateLimitError:
                 if attempt == 0:
-                    print(f"  Rate limit hit — waiting {RETRY_WAIT}s before retry …")
+                    logger.warning("Rate limit hit; waiting %ss before retry", RETRY_WAIT)
                     time.sleep(RETRY_WAIT)
                 else:
                     raise  # second attempt failed, propagate up

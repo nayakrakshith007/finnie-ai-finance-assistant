@@ -1,5 +1,5 @@
 ---
-title: "Chapter 16"
+title: "The Finale"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

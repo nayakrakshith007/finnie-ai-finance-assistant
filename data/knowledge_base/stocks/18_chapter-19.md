@@ -1,5 +1,5 @@
 ---
-title: "Chapter 19"
+title: "The Finale - Helping you get started"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

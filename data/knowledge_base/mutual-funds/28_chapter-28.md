@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 28"
+title: "A sset Allocation, An Introduction"
 category: "mutual-funds"
 source: "Zerodha Varsity"
 module: "Personal Finance"

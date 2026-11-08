@@ -1,5 +1,5 @@
 ---
-title: "Chapter 2"
+title: "Mindset of an Investor"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

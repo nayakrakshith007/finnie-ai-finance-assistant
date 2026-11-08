@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 3"
+title: "Personal Finance Math (Part 2)"
 category: "mutual-funds"
 source: "Zerodha Varsity"
 module: "Personal Finance"

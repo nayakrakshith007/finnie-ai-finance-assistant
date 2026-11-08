@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 2"
+title: "Risk (Part 1)"
 category: "risk"
 source: "Zerodha Varsity"
 module: "Risk Management and Trading Psychology"

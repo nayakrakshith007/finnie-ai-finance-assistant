@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 12"
+title: "The Debt Funds (Part 2)"
 category: "mutual-funds"
 source: "Zerodha Varsity"
 module: "Personal Finance"

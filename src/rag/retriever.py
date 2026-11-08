@@ -19,11 +19,12 @@ import chromadb
 from langchain_core.documents import Document
 
 from core.config import load_config
-from rag.embedder import embed_single, get_client as get_openai_client
+from rag.embedder import embed_single
+from rag.embedder import get_client as get_openai_client
 from rag.vector_store import get_client, get_or_create_collection, mmr_search, similarity_search
 
 
-def build_retriever(persist_dir: str | Path | None = None) -> "FinnieRetriever":
+def build_retriever(persist_dir: str | Path | None = None) -> FinnieRetriever:
     """Construct a FinnieRetriever from config.
 
     Args:
@@ -31,7 +32,9 @@ def build_retriever(persist_dir: str | Path | None = None) -> "FinnieRetriever":
                      Defaults to config.yaml → rag.index_dir.
     """
     cfg = load_config()
-    resolved_dir = persist_dir or cfg.rag.index_dir
+    # resolve(): config paths are relative to the project root, not the caller's cwd.
+    # Without this, launching from a parent directory silently creates an empty index.
+    resolved_dir = Path(persist_dir) if persist_dir else cfg.resolve(cfg.rag.index_dir)
 
     chroma_client = get_client(resolved_dir)
     collection = get_or_create_collection(chroma_client)

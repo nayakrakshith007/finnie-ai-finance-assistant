@@ -18,6 +18,10 @@ from typing import Any
 import chromadb
 from chromadb import Collection
 
+from core.logging_setup import get_logger
+
+logger = get_logger(__name__)
+
 COLLECTION_NAME = "finnie_kb"
 
 
@@ -77,7 +81,7 @@ def add_chunks(
             documents=documents[start:end],
             metadatas=metadatas[start:end],
         )
-        print(f"  upserted {end}/{total} chunks")
+        logger.debug("Upserted %d/%d chunks", end, total)
 
 
 # ── Read ──────────────────────────────────────────────────────────────────────
@@ -126,7 +130,10 @@ def similarity_search(
 
 def _cosine_similarity(vec_a: list[float], vec_b: list[float]) -> float:
     """Cosine similarity between two vectors (range –1 to 1)."""
-    dot = sum(a * b for a, b in zip(vec_a, vec_b))
+    # strict=True: mismatched vector lengths mean an index built with a different
+    # embedding model or dimension. Fail loudly rather than silently truncating to
+    # the shorter vector and returning a plausible-looking wrong similarity.
+    dot = sum(a * b for a, b in zip(vec_a, vec_b, strict=True))
     norm_a = sum(a * a for a in vec_a) ** 0.5
     norm_b = sum(b * b for b in vec_b) ** 0.5
     if norm_a == 0 or norm_b == 0:
@@ -237,9 +244,9 @@ def delete_collection(client: chromadb.PersistentClient) -> None:
     """
     try:
         client.delete_collection(COLLECTION_NAME)
-        print(f"Deleted collection '{COLLECTION_NAME}'")
-    except Exception:
-        pass  # collection didn't exist — nothing to do
+        logger.info("Deleted collection '%s'", COLLECTION_NAME)
+    except Exception:  # noqa: BLE001 - Chroma raises bare exceptions for "not found"
+        logger.debug("Collection '%s' did not exist; nothing to delete", COLLECTION_NAME)
 
 
 def collection_count(collection: Collection) -> int:

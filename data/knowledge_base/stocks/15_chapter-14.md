@@ -1,5 +1,5 @@
 ---
-title: "Chapter 14"
+title: "DCF Primer"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Fundamental Analysis"

@@ -11,6 +11,12 @@ Design rule: the LLM must only use the supplied context. If the context does
 not contain the answer, Finnie says so explicitly rather than hallucinating.
 This matters for a finance assistant — a confident wrong answer about tax or
 returns could mislead the user.
+
+Who owns the disclaimer: `src/core/compliance.py`, not this prompt. The prompt
+used to instruct the model to append one itself, which produced two overlapping
+disclaimers on every answer. A prompt instruction is also a request, not a
+guarantee — the compliance layer is a deterministic post-process that cannot be
+talked out of it, so it is the single source of truth.
 """
 
 from __future__ import annotations
@@ -34,9 +40,9 @@ RULES:
    beats "Budget 2018"), or the one marked as an amendment/update. Do NOT
    average contradictory rates — state the most recent figure and note that an
    earlier source said otherwise.
-5. Always end your response with this disclaimer:
-   "⚠️ This is educational information, not financial advice. \
-Consult a licensed financial adviser before making any investment decision."
+5. Do NOT write your own disclaimer. The compliance layer appends the official one
+   to every response after you finish (src/core/compliance.py). Adding your own
+   produces two near-identical disclaimers in the user's answer.
 
 CONTEXT:
 {context}

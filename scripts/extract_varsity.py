@@ -181,7 +181,7 @@ def extract(pdf_path: Path, category: str, module: str) -> None:
             if i % 20 == 0:
                 print(f"  read {i}/{total} pages")
 
-    print(f"Splitting into chapters ...")
+    print("Splitting into chapters ...")
     chapters = _split_into_chapters(pages)
     print(f"Found {len(chapters)} chapters")
 

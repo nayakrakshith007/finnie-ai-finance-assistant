@@ -7,12 +7,17 @@
 
 [tool.pytest.ini_options]
 
-# Add the project root directory to Python's import path.
-# This allows tests to import modules from the project root.
-# Example: from src.agents.finance_agent import FinanceAgent
+# Import paths for tests.
+#
+# "src" first: the whole codebase imports by package name -- `from core.llm import ...`,
+# `from rag.retriever import ...` -- treating src/ as the import root. Scripts achieve the
+# same with sys.path.insert(0, "src"); this is the pytest equivalent, so tests import
+# modules exactly the way production code does. One convention, no dual-path confusion.
+#
+# "." second: keeps the project root importable for anything that needs it (e.g. app.py).
 #
 # Run pytest from the project root for consistent imports.
-pythonpath = ["."]
+pythonpath = ["src", "."]
 
 # Directory where pytest should look for test files.
 # Example: tests/test_config.py, tests/test_agents.py

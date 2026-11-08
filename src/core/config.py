@@ -87,6 +87,9 @@ class MarketConfig(BaseModel):
     fallback_source: str = "alpha_vantage"
     cache_ttl_minutes: int = Field(30, gt=0)
     cache_dir: Path
+    currency: str = "INR"
+    exchange_suffix: str = ".NS"
+    default_indices: list[str] = []
     default_tickers: list[str] = []
 
 

@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 9"
+title: "Portfolio Optimization (Part 2)"
 category: "risk"
 source: "Zerodha Varsity"
 module: "Risk Management and Trading Psychology"

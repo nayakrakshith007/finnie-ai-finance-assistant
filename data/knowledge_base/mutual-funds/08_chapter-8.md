@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 8"
+title: "The mutual fund fact-sheet"
 category: "mutual-funds"
 source: "Zerodha Varsity"
 module: "Personal Finance"

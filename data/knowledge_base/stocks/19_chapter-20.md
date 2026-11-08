@@ -1,5 +1,5 @@
 ---
-title: "Chapter 20"
+title: "Supplementary Notes 1"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

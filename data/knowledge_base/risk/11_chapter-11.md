@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 11"
+title: "Position Sizing for active trader"
 category: "risk"
 source: "Zerodha Varsity"
 module: "Risk Management and Trading Psychology"

@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 13"
+title: "Getting started!"
 category: "basics"
 source: "Zerodha Varsity"
 module: "Introduction to Stock Markets"

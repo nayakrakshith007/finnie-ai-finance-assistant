@@ -50,9 +50,10 @@ from dotenv import load_dotenv  # noqa: E402
 load_dotenv(PROJECT_ROOT / ".env")
 
 from core.config import load_config  # noqa: E402
+from rag.embedder import get_client as get_openai_client  # noqa: E402
 from rag.retriever import FinnieRetriever  # noqa: E402
 from rag.vector_store import get_client, get_or_create_collection  # noqa: E402
-from rag.embedder import get_client as get_openai_client  # noqa: E402
+from utils.console import ensure_utf8_stdout  # noqa: E402
 
 QUERIES_FILE = PROJECT_ROOT / "data" / "eval_queries.json"
 
@@ -68,7 +69,7 @@ def load_positive_queries() -> list[dict]:
 def build_retriever_pair(top_k: int) -> tuple[FinnieRetriever, FinnieRetriever]:
     """Build two retrievers sharing the same Chroma client: vector-only and MMR."""
     cfg = load_config()
-    chroma = get_client(cfg.rag.index_dir)
+    chroma = get_client(cfg.resolve(cfg.rag.index_dir))
     collection = get_or_create_collection(chroma)
     openai = get_openai_client()
 
@@ -170,9 +171,17 @@ def aggregate(results: list[dict]) -> dict:
 
 
 def aggregate_by_difficulty(results: list[dict]) -> dict:
-    """Break down mean metrics by difficulty level."""
+    """Break down mean metrics by difficulty level.
+
+    "realistic" is deliberately its own bucket rather than being folded into
+    easy/medium/hard. Those three were written against Varsity chapters already in
+    the index, which flatters the score -- they measure "can it find the chunk I was
+    thinking of". The realistic set was written from the beginner persona's actual
+    phrasing, with no reference to what the corpus contains, so it is the honest
+    number and must stay visible instead of being averaged away.
+    """
     breakdown = {}
-    for diff in ["easy", "medium", "hard"]:
+    for diff in ["easy", "medium", "hard", "realistic"]:
         subset = [r for r in results if r.get("difficulty") == diff]
         if subset:
             breakdown[diff] = aggregate(subset)
@@ -263,6 +272,7 @@ def print_trace(results: list[dict], label: str) -> None:
 # ── main ─────────────────────────────────────────────────────────────────────
 
 def main() -> None:
+    ensure_utf8_stdout()
     parser = argparse.ArgumentParser(description="Evaluate retrieval quality.")
     parser.add_argument("--top-k", type=int, default=4, help="Number of chunks to retrieve")
     parser.add_argument("--trace", action="store_true", help="Print full chunk trace per query")

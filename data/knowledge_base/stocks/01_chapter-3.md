@@ -1,5 +1,5 @@
 ---
-title: "Chapter 3"
+title: "Introducing Technical Analysis"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

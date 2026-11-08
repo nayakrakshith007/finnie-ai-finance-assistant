@@ -1,5 +1,5 @@
 ---
-title: "CHAPTER 22"
+title: "Mutual Fund Beta, SD, and Sharpe Ratio"
 category: "bonds"
 source: "Zerodha Varsity"
 module: "Personal Finance"

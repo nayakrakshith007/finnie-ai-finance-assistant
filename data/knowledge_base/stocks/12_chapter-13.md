@@ -1,5 +1,5 @@
 ---
-title: "Chapter 13"
+title: "Moving Averages"
 category: "stocks"
 source: "Zerodha Varsity"
 module: "Technical Analysis"

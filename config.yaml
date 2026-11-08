@@ -42,10 +42,16 @@ rag:
 
 market:
   primary_source: yfinance
+  # Alpha Vantage NSE/BSE coverage is patchy -- treat it as best-effort only.
+  # The real safety net is stale cache, then labelled mock data (see src/data/market.py).
   fallback_source: alpha_vantage
   cache_ttl_minutes: 30
   cache_dir: data/cache
-  default_tickers: [AAPL, MSFT, GOOGL, AMZN, NVDA]
+  currency: INR
+  exchange_suffix: .NS            # NSE; .BO for BSE. yfinance needs the suffix on Indian equities.
+  # yfinance-native symbols. ^-prefixed are indices, .NS are NSE equities.
+  default_indices: ["^NSEI", "^BSESN"]          # NIFTY 50, SENSEX
+  default_tickers: [RELIANCE.NS, TCS.NS, HDFCBANK.NS, INFY.NS, ICICIBANK.NS]
 
 portfolio:
   concentration_warning_pct: 25.0   # flag any single holding above this
