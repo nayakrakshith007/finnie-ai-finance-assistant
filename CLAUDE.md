@@ -39,9 +39,10 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 | 4 | BaseAgent abstraction | ✅ Complete — `src/agents/base.py` + `src/workflow/state.py`, 16 tests |
 | 5 | Finance Q&A Agent | ✅ Complete — `src/agents/qa.py`, 15 tests |
 | 6 | Market data layer + Market Analysis Agent | ✅ Complete — `src/data/market.py` (4-tier degradation, trends), `src/agents/market.py`, 70 tests |
-| 7–13 | (see ROADMAP) | Pending |
+| 7 | Portfolio Analysis Agent | ✅ Complete — `src/portfolio/` (metrics, holdings, analysis) + `src/agents/portfolio.py`, 120 tests |
+| 8–13 | (see ROADMAP) | Pending |
 
-**Test/lint status:** 136/136 pass (14 config + 21 llm/compliance + 16 base agent + 15 qa agent + 41 market data + 29 market agent), ruff clean.
+**Test/lint status:** 256/256 pass (14 config + 21 llm/compliance + 16 base agent + 15 qa agent + 41 market data + 29 market agent + 49 portfolio metrics + 47 holdings/analysis + 24 portfolio agent), ruff clean.
 **Pushed:** `f48e533` on `origin/master`.
 
 **Index:** 2,000 chunks in `data/indexes` (Chroma collection `finnie_kb`), built 2026-11-08.
@@ -65,7 +66,13 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 
 **Phase 6 notes.** `src/data/market.py` owns *what the number is*; `src/agents/market.py` owns *what to say about it*. Four-tier degradation (live → fresh cache → stale cache → mock) with the provenance label travelling on the `Quote`. Two rules learned the hard way on 2026-11-08: a feed **raising** means an outage (retry, then degrade), a feed **answering cleanly with nothing** means no such symbol (reject, never mock) — conflating them made AAPL return an invented ₹593. And `get_trends` has **no mock tier at all**: a labelled fake price is honest, a fake trend line is an invented narrative. Symbol extraction is a tested pure function, not an LLM call.
 
-**Phase 7 is next:** Portfolio Analysis Agent (Day 2).
+**Phase 7 notes.** Three layers, each testable without the one above it: `portfolio/metrics.py` is pure arithmetic checked against hand calculations (every expected value is worked out in the test, never copied from output); `portfolio/holdings.py` validates untrusted input and *collects* errors rather than raising, so a 20-row CSV with one typo still values the other 19; `portfolio/analysis.py` assembles the finished dict from holdings plus a price map passed in, so the whole assembly runs offline.
+
+Three judgement calls to be able to defend: **HHI** for concentration (standard, citable) because a holding count is blind to a 97% position; **diversification_score** is Finnie's own composite of evenness, breadth and class spread, documented as a heuristic — evenness alone would score three equally-weighted IT stocks 100/100; **risk_band** is structural, derived from asset-class weights rather than volatility, so it works on turn one with no price history and is explainable in a sentence.
+
+A holding with no price is **excluded and named**, never valued at zero — a portfolio silently worth less than it is would be the most damaging quiet failure in the system. Non-traded holdings (funds, SGBs, cash) get no `.NS` suffix and carry a user-supplied price; suffixing them would send yfinance after a listing that does not exist. And per constraint 3, this agent logs counts only — `tests/test_portfolio_agent.py` asserts no symbol, quantity or value reaches the log or the trace.
+
+**Phase 8 is next:** Goal Planning Agent (Day 3).
 
 ---
 
