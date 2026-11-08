@@ -40,9 +40,11 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 | 5 | Finance Q&A Agent | ✅ Complete — `src/agents/qa.py`, 15 tests |
 | 6 | Market data layer + Market Analysis Agent | ✅ Complete — `src/data/market.py` (4-tier degradation, trends), `src/agents/market.py`, 70 tests |
 | 7 | Portfolio Analysis Agent | ✅ Complete — `src/portfolio/` (metrics, holdings, analysis) + `src/agents/portfolio.py`, 120 tests |
-| 8–13 | (see ROADMAP) | Pending |
+| 8 | Goal Planning Agent | ✅ Complete — `src/goals/projections.py` + `src/agents/goal.py`, 91 tests |
+| 9 | News Synthesizer + Tax Education | ✅ Complete — `src/data/news.py`, `src/agents/news.py`, `src/agents/tax.py`, 66 tests. **All six agents exist.** |
+| 10–13 | (see ROADMAP) | Pending |
 
-**Test/lint status:** 256/256 pass (14 config + 21 llm/compliance + 16 base agent + 15 qa agent + 41 market data + 29 market agent + 49 portfolio metrics + 47 holdings/analysis + 24 portfolio agent), ruff clean.
+**Test/lint status:** 414/414 pass, ruff clean. (14 config · 21 llm/compliance · 16 base agent · 15 qa · 41 market data · 29 market agent · 49 portfolio metrics · 47 holdings/analysis · 24 portfolio agent · 45 goal maths · 46 goal agent · 24 tax · 42 news + 1 regression file)
 **Pushed:** `f48e533` on `origin/master`.
 
 **Index:** 2,000 chunks in `data/indexes` (Chroma collection `finnie_kb`), built 2026-11-08.
@@ -72,7 +74,15 @@ Three judgement calls to be able to defend: **HHI** for concentration (standard,
 
 A holding with no price is **excluded and named**, never valued at zero — a portfolio silently worth less than it is would be the most damaging quiet failure in the system. Non-traded holdings (funds, SGBs, cash) get no `.NS` suffix and carry a user-supplied price; suffixing them would send yfinance after a listing that does not exist. And per constraint 3, this agent logs counts only — `tests/test_portfolio_agent.py` asserts no symbol, quantity or value reaches the log or the trace.
 
-**Phase 8 is next:** Goal Planning Agent (Day 3).
+**Phases 8–9 notes.** `goals/projections.py` is the same pure-maths discipline as the portfolio metrics, with every expectation evaluated from the closed form longhand. Two conventions to be able to defend: **annuity due** (contributions at the start of each month, worth ₹1,268 on one year of a ₹10,000 SIP against the end-of-month form) and **i = annual/12** rather than the effective monthly rate, because that is what AMFI, Groww and Zerodha show and an unexplained mismatch reads as a bug in Finnie. The required SIP is sized against the **inflation-adjusted** target: ₹50 lakh in 12 years needs ₹1.006 crore, so ₹33,586/mo rather than ₹16,691.
+
+`TaxEducationAgent` subclasses `FinanceQAAgent` — PRD §7.1 drew it that way, and a parallel implementation would mean two places to fix the next retrieval bug. It adds a fixed `category="tax"` filter (the one agent where that is right, since the router has already established the topic), a prompt pinning the post-July-2024 rates, and an assessment year **computed** from the date and appended in code. A hardcoded AY is right for five months and wrong thereafter.
+
+`data/news.py` parses **both** yfinance news payload shapes (flat pre-0.2.40, nested under `content` from ~0.2.50), because pinning to one means a version bump returns zero headlines, which is indistinguishable from a quiet news day.
+
+**Known gap:** Yahoo's news endpoint was down on 2026-11-08 — `Ticker.news` raised "YAHOO! FINANCE IS CURRENTLY DOWN" while quotes worked fine. So the news parsing is verified against fixtures, not a live response, and **the live path must be re-checked before the Day 6 video**. FR-014 is P1 and already on the cut list if it stays down; the outage path degrades to an honest message with no LLM call.
+
+**Phase 10 is next: the LangGraph workflow (Day 4)** — and with it, moving `check_and_wrap` out of the UI and into the terminal compliance node (PRD §7.5 / D1).
 
 ---
 

@@ -22,7 +22,7 @@ pieces the chain is built from.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 from langchain_core.documents import Document
 from langchain_core.language_models import BaseChatModel
@@ -46,6 +46,13 @@ class FinanceQAAgent(BaseAgent):
     """Answers general financial-education questions from the knowledge base."""
 
     name = "finance_qa"
+
+    #: The system prompt, as a class attribute so a specialised subclass can
+    #: supply its own without reimplementing `handle()`. The Tax agent is exactly
+    #: that: the same retrieve-then-generate mechanics over a filtered category,
+    #: with extra rules about assessment years and not computing liabilities.
+    system_prompt: ClassVar[str] = RAG_SYSTEM_PROMPT
+
     description = (
         "Answers general questions about personal finance concepts, instruments and "
         "Indian tax rules using the curated knowledge base — what a SIP is, how PPF "
@@ -97,7 +104,7 @@ class FinanceQAAgent(BaseAgent):
             }
 
         messages = [
-            SystemMessage(content=RAG_SYSTEM_PROMPT.format(context=format_context(docs))),
+            SystemMessage(content=self.system_prompt.format(context=format_context(docs))),
             HumanMessage(content=RAG_USER_TEMPLATE.format(question=question)),
         ]
         response = self.llm.invoke(messages)
