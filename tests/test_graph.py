@@ -471,30 +471,61 @@ def test_the_streamlit_app_does_not_call_the_compliance_guard():
     each caller remembering. The docstring mentioning the move is allowed; a call
     is not.
     """
-    import re
-    from pathlib import Path
-
-    source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
-    code_lines = [
-        line
-        for line in source.splitlines()
-        # Crude but sufficient: drop comment lines and prose inside docstrings.
-        if not line.lstrip().startswith("#") and not re.match(r"^\s{4,}\w.*\.$", line)
-    ]
-    code = "\n".join(code_lines)
-
-    assert "check_and_wrap(" not in code, "the UI must not apply compliance itself"
-    assert "from core.compliance import" not in code
+    for path, code in _ui_sources():
+        assert "check_and_wrap(" not in code, f"{path.name} must not apply compliance itself"
+        assert "from core.compliance import" not in code, f"{path.name} imports the guard"
 
 
-def test_the_streamlit_app_goes_through_the_graph():
+def test_the_ui_goes_through_the_graph():
     """The other half of D1: the UI must use the workflow, not the raw RAG chain.
 
     Calling `build_rag_chain()` directly would skip the router, every agent but
-    one, and the compliance node.
+    one, and the compliance node. Exactly one place in the UI may build the
+    graph — `web_app/session.py` — so there is one cached instance and one way
+    for a tab to ask a question.
     """
+
+    builders = [path.name for path, code in _ui_sources() if "build_production_graph" in code]
+    assert builders == ["session.py"], f"the graph is built in {builders}"
+
+    for path, code in _ui_sources():
+        assert "build_rag_chain" not in code, f"{path.name} bypasses the graph"
+
+
+def test_every_tab_asks_through_the_one_shared_helper():
+    """Four tabs assembling their own state updates would be four chances to
+    forget to clear last turn's market data or to drop the profile — and the bug
+    would show in one tab only, which is the hardest kind to notice."""
     from pathlib import Path
 
-    source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
-    assert "build_production_graph" in source
-    assert "build_rag_chain" not in source
+    tabs = Path(__file__).resolve().parents[1] / "src" / "web_app" / "tabs"
+    for path in tabs.glob("*.py"):
+        code = path.read_text(encoding="utf-8")
+        if ".invoke(" in code:
+            raise AssertionError(f"{path.name} invokes the graph directly; use session.run_turn")
+
+
+def _ui_sources() -> list[tuple[object, str]]:
+    """Every file in the UI layer, with comment lines and docstring prose dropped.
+
+    The UI is no longer one file: `app.py` is a shell and the work is in
+    `src/web_app/`. A guard that checks only `app.py` would pass while a tab
+    quietly applied the disclaimer a second time.
+    """
+    import re
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    paths = [root / "app.py", *sorted((root / "src" / "web_app").rglob("*.py"))]
+
+    sources = []
+    for path in paths:
+        text = path.read_text(encoding="utf-8")
+        lines = [
+            line
+            for line in text.splitlines()
+            # Crude but sufficient: drop comments and sentence-shaped prose lines.
+            if not line.lstrip().startswith("#") and not re.match(r"^\s{0,8}\S.*\.$", line)
+        ]
+        sources.append((path, "\n".join(lines)))
+    return sources

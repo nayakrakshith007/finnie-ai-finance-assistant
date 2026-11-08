@@ -43,9 +43,10 @@ Capstone project for Applied Agentic AI. The goal is to finish it **while learni
 | 8 | Goal Planning Agent | ✅ Complete — `src/goals/projections.py` + `src/agents/goal.py`, 91 tests |
 | 9 | News Synthesizer + Tax Education | ✅ Complete — `src/data/news.py`, `src/agents/news.py`, `src/agents/tax.py`, 66 tests. **All six agents exist.** |
 | 10 | LangGraph workflow | ✅ Complete — `src/workflow/{registry,router,graph}.py`, 75 tests. Router gate **95% strict / 100% lenient** on the 40-query set |
-| 11–13 | (see ROADMAP) | Pending |
+| 11 | Streamlit 4-tab app | ✅ Complete — `app.py` shell + `src/web_app/`, 100 UI tests, all four tabs verified in the browser |
+| 12–13 | (see ROADMAP) | Pending |
 
-**Test/lint status:** 491/491 pass, ruff clean.
+**Test/lint status:** 593/593 pass, ruff clean.
 **Pushed:** `f48e533` on `origin/master`.
 
 **Index:** 2,000 chunks in `data/indexes` (Chroma collection `finnie_kb`), built 2026-11-08.
@@ -99,7 +100,22 @@ A holding with no price is **excluded and named**, never valued at zero — a po
 
 **The general lesson, now three times over:** data belongs in the data block as flags and figures, instructions belong in the rules, and prose written into a data block gets quoted back at the user. The equity-cap flag was rewritten from a sentence into `Horizon equity cap: applied / not applied` for exactly this reason.
 
-**Phase 11 is next:** the Streamlit 4-tab app per PRD §6.5a (Day 5).
+**Phase 11 notes — the UI.** `app.py` is a shell; the work is in `src/web_app/`: `formatting.py` (Indian digit grouping), `charts.py` (pure Plotly builders), `session.py` (state plus the one `run_turn()` every tab calls), and `tabs/`. This resolves PRD §7.5 / D3 — the entry point stays at the root because Streamlit Cloud wants a main file path, and the code lives in the package.
+
+**The testable core is separated from the Streamlit parts on purpose.** Formatting and charts are pure functions over the agents' state dicts, so FR-063's "every chart titled and axis-labelled" and NFR-07's "no colour-only encoding" are *tests*, not intentions. 100 of the 593 tests cover the UI without rendering a single widget.
+
+**Five defects found in the browser on 2026-11-08, none visible to 585 passing tests:**
+1. **`st.tabs` runs every tab's body on every rerun.** Streamlit shows one tab and executes them all — so the Market tab fetched a quote and spent an LLM call on a bare page load, and the Portfolio tab re-analysed on every sidebar slider nudge. Every tab is now click-gated, and Portfolio keys its auto-run on a change of holdings.
+2. **`KeyError: 'content'` on every chat turn.** `run_turn` produced `answer`; the renderer read `content`. Now built by `user_message()` / `assistant_message()`, with `tests/test_web_session.py` parsing `chat.py` with `ast` to prove the producer writes every key the consumer reads.
+3. **The price chart filled to ₹0**, rendering NIFTY's real 8% month as a flat line. Autoscaled with padding now; a non-zero baseline is standard for a price series, and the range annotation carries the absolute context.
+4. **Western grouping on the chart axes** — the metric read ₹17.91 lakh while the axis beside it read ₹1,500,000. Plotly's `tickformat` is d3-format and has no Indian mode, so ticks are computed and labelled with Finnie's own formatter.
+5. **The sidebar rendered before the tabs**, so the cost meter showed "Turns 0" directly under a freshly generated answer. `with st.sidebar:` places content by container, not by position, so the sidebar block now sits at the bottom of `app.py`.
+
+**Two fixed along the way:** `format_inr` used Python's banker's rounding (`round(1234.5)` is 1234), so displayed money rounded the way statistics does rather than the way a reader expects; and `CostMeterCallback` matched `"gpt-4o-mini".startswith("gpt-4o")` in dict order, billing **every router call at the full gpt-4o rate** — a 31× over-estimate on the highest-frequency call in the app. The meter also now accumulates, which is what makes the sidebar's token and cost figures real (FR-075).
+
+**Dev-loop note:** Streamlit does not reliably hot-reload modules under `src/`. Two "the fix didn't work" moments were stale modules — restart the server after editing anything outside `app.py`.
+
+**Phase 12 is next (Day 6), and it is the non-negotiable one:** tests to ≥80% coverage, README + DESIGN.md + Mermaid diagrams, Dockerfile, deploy — and **the safety-take demo video, recorded complete without MCP**.
 
 ---
 

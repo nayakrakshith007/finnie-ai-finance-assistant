@@ -1,251 +1,144 @@
-"""Finnie — Streamlit chat interface for the RAG agent.
+"""Finnie — Streamlit entry point (PRD §6.5a).
 
-Run from the ai_finance_assistant/ directory:
     streamlit run app.py
+
+This file is deliberately thin: page config, the sidebar, the always-on
+disclaimer banner, and four `st.tabs` that each delegate to a module in
+`src/web_app/tabs/`. No business logic, no arithmetic, no prompt text.
+
+Why the entry point stays at the repository root (PRD §7.5 / D3, resolved here)
+------------------------------------------------------------------------------
+Streamlit Cloud asks for a main file path and the documented local command is
+`streamlit run app.py`, so a root entry point is the least surprising thing for
+anyone who clones this. The *implementation* lives in `src/web_app/`, which is
+what `src/web_app/` being empty was previously hiding. One file at the root, the
+code in the package, and the Dockerfile and the deploy config agree.
+
+What this file must never do
+----------------------------
+Import `core.compliance`. The disclaimer is appended by a terminal graph node
+(PRD §7.5 / D1), and a second application here would double it — the exact defect
+found live on 2026-11-08. Two tests in `tests/test_graph.py` assert that this
+file does not call the guard.
 """
 
 from __future__ import annotations
 
 import sys
-import time
 from pathlib import Path
 
-# ── make src/ importable ───────────────────────────────────────────────────────
+# src/ on the path before any Finnie import. One import convention everywhere:
+# `from core.x import ...`, never `src.core.x`.
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-import streamlit as st
+import streamlit as st  # noqa: E402
 
-# ── page config (must be first Streamlit call) ─────────────────────────────────
 st.set_page_config(
-    page_title="Finnie — Finance Assistant",
+    page_title="Finnie — AI Finance Assistant",
     page_icon="💰",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# ── lazy imports (after sys.path is set) ───────────────────────────────────────
-@st.cache_resource(show_spinner="Loading Finnie…")
-def load_graph():
-    """The compiled LangGraph workflow: router -> agent(s) -> compliance.
+from web_app import session  # noqa: E402
+from web_app.formatting import format_inr_compact  # noqa: E402
+from web_app.session import KNOWLEDGE_LEVELS, RISK_LEVELS  # noqa: E402
+from web_app.tabs import chat, goals, market, portfolio  # noqa: E402
 
-    Note what this module no longer imports: `core.compliance`. Until Day 4 the
-    UI appended the disclaimer itself, which meant FR-006's guarantee held only
-    because the UI happened to be the single caller — the MCP server in Phase 13
-    would have bypassed it entirely. Compliance is now a terminal node inside the
-    graph, so the UI cannot forget it and cannot apply it twice (PRD §7.5 / D1).
-    """
-    from workflow.graph import build_production_graph
-    return build_production_graph()
+session.init_session()
+# Before the tabs run, from the values the widgets stored last time. The widgets
+# themselves are created at the bottom of this file — see why there.
+session.sync_profile()
 
 
-def _render_trace(trace: list[dict]) -> None:
-    """The "how I answered this" expander (FR-007).
+# ── the always-on banner (§6.5a) ───────────────────────────────────────────────
 
-    Shows which nodes ran, in what order, and how long each took — so the
-    supervisor's routing decision, a composed two-agent turn, and a degraded
-    price are all visible rather than inferred from the prose.
-    """
-    with st.expander(f"🔍 How I answered this ({len(trace)} steps)", expanded=False):
-        for step in trace:
-            icon = "✅" if step["status"] == "ok" else "⚠️"
-            st.markdown(
-                f"{icon} **{step['agent']}** · {step['latency_ms']:.0f} ms"
-                f"<br><span style='color:grey;font-size:0.85em'>{step['detail']}</span>",
-                unsafe_allow_html=True,
-            )
+st.warning(
+    "**Educational information only — not financial advice.** Finnie explains how "
+    "things work and what the numbers say. It never recommends a trade, and it "
+    "cannot know your full circumstances.",
+    icon="⚠️",
+)
 
 
-# ── session state init ─────────────────────────────────────────────────────────
-def _init_state() -> None:
-    if "messages" not in st.session_state:
-        st.session_state.messages = []           # list of {role, content, sources, latency}
-    if "query_count" not in st.session_state:
-        st.session_state.query_count = 0
-    if "total_latency" not in st.session_state:
-        st.session_state.total_latency = 0.0
-    if "category" not in st.session_state:
-        st.session_state.category = None
-    if "graph_state" not in st.session_state:
-        # The conversation as the graph sees it: LangChain messages, the user
-        # profile and the per-turn working data. Kept separate from `messages`,
-        # which is only what Streamlit renders. The graph owns memory (FR-004);
-        # the UI owns presentation.
-        from workflow.state import new_state
-        st.session_state.graph_state = new_state("")
-        st.session_state.graph_state["messages"] = []
+# ── tabs ───────────────────────────────────────────────────────────────────────
+
+chat_tab, portfolio_tab, market_tab, goals_tab = st.tabs(
+    ["💬 Chat", "📊 Portfolio", "📈 Market", "🎯 Goals"]
+)
+
+with chat_tab:
+    chat.render()
+
+with portfolio_tab:
+    portfolio.render()
+
+with market_tab:
+    market.render()
+
+with goals_tab:
+    goals.render()
 
 
-_init_state()
-
-# ── sidebar ────────────────────────────────────────────────────────────────────
-# ── warm up chain at startup so the first message is fast ─────────────────────
-with st.spinner("Loading Finnie… (first load only)"):
-    try:
-        _graph = load_graph()
-    except Exception as _startup_err:
-        st.error(
-            f"⚠️ Could not start Finnie: {_startup_err}"
-            "\n\nCheck that `OPENAI_API_KEY` is set in `.env`, and that the index "
-            "has been built with `python scripts/build_index.py`."
-        )
-        st.stop()
-
-CATEGORIES = [
-    "All topics",
-    "basics",
-    "behavioural",
-    "bonds",
-    "diversification",
-    "etfs",
-    "fixed-income",
-    "insurance",
-    "investing",
-    "mutual-funds",
-    "personal-finance",
-    "retirement",
-    "risk",
-    "stocks",
-    "tax",
-]
+# ── sidebar, rendered last ─────────────────────────────────────────────────────
+#
+# `with st.sidebar:` places content in the sidebar wherever it appears in the
+# script, so the *position in the file* is free — and it has to be last. The
+# session meter counts a turn that one of the tabs above has just run; rendered
+# first, it read the counters before that turn happened and showed "Turns 0"
+# directly beneath a freshly generated answer. Spotted in the browser on
+# 2026-11-08.
+#
+# The profile widgets can safely be created down here: the tabs read
+# `st.session_state.profile_*`, which holds whatever the widget stored on the
+# previous interaction, and `init_session()` seeds the defaults.
 
 with st.sidebar:
-    st.title("⚙️ Settings")
+    st.markdown("## 💰 Finnie")
+    st.caption("An AI finance assistant for Indian investors. Education, not advice.")
+    st.divider()
 
-    selected = st.selectbox(
-        "Knowledge base category",
-        CATEGORIES,
-        index=0,
-        help="Filter retrieval to one topic, or search everything.",
+    st.markdown("##### Your profile")
+    st.select_slider(
+        "Risk appetite",
+        options=list(RISK_LEVELS),
+        key="profile_risk",
+        help="Sets the assumed return the Goal agent plans with.",
     )
-    st.session_state.category = None if selected == "All topics" else selected
+    st.number_input("Horizon (years)", min_value=1, max_value=50, step=1, key="profile_horizon")
+    st.selectbox("Knowledge level", options=list(KNOWLEDGE_LEVELS), key="profile_knowledge")
+    session.sync_profile()
 
     st.divider()
-    st.subheader("📊 Session stats")
-    st.metric("Queries asked", st.session_state.query_count)
-    if st.session_state.query_count:
-        avg_ms = st.session_state.total_latency / st.session_state.query_count * 1000
-        st.metric("Avg response time", f"{avg_ms:.0f} ms")
+    st.markdown("##### This session")
+    usage = session.session_usage()
+    left, right = st.columns(2)
+    left.metric("Turns", usage["turns"])
+    right.metric("Avg latency", f"{usage['avg_latency']:.1f}s" if usage["turns"] else "—")
 
-    st.divider()
-    if st.button("🗑️ Clear chat", use_container_width=True):
-        st.session_state.messages = []
-        st.session_state.query_count = 0
-        st.session_state.total_latency = 0.0
+    if usage["tokens"]:
+        left, right = st.columns(2)
+        left.metric("Tokens", f"{usage['tokens']:,}")
+        right.metric("Est. cost", f"${usage['cost_usd']:.4f}")
+    else:
+        st.caption("Token meter starts after the first answer.")
+
+    if st.button("Clear conversation", use_container_width=True):
+        session.clear_conversation()
+        for key in ("portfolio_result", "market_result", "goal_result", "goal_inputs"):
+            st.session_state.pop(key, None)
         st.rerun()
+
+    holdings = session.holdings()
+    if holdings:
+        total = session.analysis().get("total_value")
+        st.caption(
+            f"{len(holdings)} holdings saved"
+            + (f" · {format_inr_compact(total)}" if total else "")
+        )
 
     st.divider()
     st.caption(
-        "Finnie is an **educational** AI. It never recommends trades. "
-        "Always verify with a licensed financial adviser."
+        "Prices come from yfinance (Yahoo), which redistributes the exchange feed "
+        "with a delay of roughly 15 minutes. Fit for learning, not for trading."
     )
-
-# ── header ─────────────────────────────────────────────────────────────────────
-st.title("💰 Finnie — Personal Finance Assistant")
-st.caption(
-    "Ask anything about investing, taxes, mutual funds, ETFs, bonds, or risk. "
-    "Finnie answers from the Zerodha Varsity knowledge base."
-)
-
-# ── render existing messages ───────────────────────────────────────────────────
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-        if msg["role"] == "assistant" and msg.get("sources"):
-            with st.expander(f"📚 Sources ({len(msg['sources'])} chunks retrieved)", expanded=False):
-                for i, src in enumerate(msg["sources"], 1):
-                    cat   = src.get("category", "—")
-                    sec   = src.get("section", "—")
-                    title = src.get("title", "—")
-                    dist  = src.get("distance")
-                    dist_str = f"{dist:.3f}" if dist is not None else "—"
-                    st.markdown(
-                        f"**{i}.** `{cat}` › {title} › {sec} &nbsp; "
-                        f"<span style='color:grey;font-size:0.85em'>dist={dist_str}</span>",
-                        unsafe_allow_html=True,
-                    )
-        if msg["role"] == "assistant" and msg.get("trace"):
-            _render_trace(msg["trace"])
-        if msg.get("latency"):
-            st.caption(f"⏱ {msg['latency']*1000:.0f} ms")
-
-# ── chat input ─────────────────────────────────────────────────────────────────
-if prompt := st.chat_input("Ask a finance question…"):
-    # show user bubble
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    # generate answer
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking…"):
-            from langchain_core.messages import HumanMessage
-
-            answer, sources, trace, latency = "", [], [], 0.0
-            try:
-                graph = load_graph()
-                state = st.session_state.graph_state
-                state["messages"] = [*state.get("messages", []), HumanMessage(content=prompt)]
-
-                # Per-turn working data is cleared first, so last turn's quote or
-                # portfolio analysis cannot be rendered beside this turn's answer.
-                # `messages` and `user_profile` deliberately survive: they are the
-                # conversation memory (FR-004).
-                for key in ("retrieved_docs", "market_data", "portfolio", "route", "error"):
-                    if key == "portfolio":
-                        # Keep the user's holdings; drop only the computed analysis.
-                        held = state.get("portfolio") or {}
-                        held.pop("analysis", None)
-                        state["portfolio"] = held
-                    else:
-                        state.pop(key, None)
-                state["agent_trace"] = []
-
-                t0 = time.perf_counter()
-                state = graph.invoke(state)
-                latency = time.perf_counter() - t0
-
-                st.session_state.graph_state = state
-                answer = str(state["messages"][-1].content)
-                sources = state.get("retrieved_docs") or []
-                trace = state.get("agent_trace") or []
-
-            except Exception as exc:
-                # Only the graph itself failing reaches here: every agent has its
-                # own error boundary and the compliance node never raises.
-                answer = (
-                    f"❌ Something went wrong before I could answer: {exc}"
-                    "\n\nIf this is the first run, check `OPENAI_API_KEY` in `.env` "
-                    "and that the index is built (`python scripts/build_index.py`)."
-                )
-
-        st.markdown(answer)
-
-        if trace:
-            _render_trace(trace)
-
-        if sources:
-            with st.expander(f"📚 Sources ({len(sources)} chunks retrieved)", expanded=False):
-                for i, src in enumerate(sources, 1):
-                    cat   = src.get("category", "—")
-                    sec   = src.get("section", "—")
-                    title = src.get("title", "—")
-                    dist  = src.get("distance")
-                    dist_str = f"{dist:.3f}" if dist is not None else "—"
-                    st.markdown(
-                        f"**{i}.** `{cat}` › {title} › {sec} &nbsp; "
-                        f"<span style='color:grey;font-size:0.85em'>dist={dist_str}</span>",
-                        unsafe_allow_html=True,
-                    )
-
-        st.caption(f"⏱ {latency*1000:.0f} ms")
-
-    # persist to session state
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": answer,
-        "sources": sources,
-        "trace": trace,
-        "latency": latency,
-    })
-    st.session_state.query_count += 1
-    st.session_state.total_latency += latency

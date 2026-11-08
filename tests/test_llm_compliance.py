@@ -191,3 +191,87 @@ class TestCheckAndWrap:
         from core.compliance import check_and_wrap
         result = check_and_wrap("A sweep-in FD auto-liquidates as needed.")
         assert result.endswith(mock_cfg.compliance.disclaimer)
+
+
+# ── the cost meter accumulates (FR-075, NFR-02a) ──────────────────────────────
+
+
+def _fake_llm_result(prompt_tokens: int, completion_tokens: int, model: str = "gpt-4o"):
+    from langchain_core.outputs import LLMResult
+
+    return LLMResult(
+        generations=[[]],
+        llm_output={
+            "model_name": model,
+            "token_usage": {
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+            },
+        },
+    )
+
+
+def test_the_cost_meter_starts_at_zero():
+    from core.llm import CostMeterCallback
+
+    CostMeterCallback.reset()
+    totals = CostMeterCallback.session_totals()
+    assert totals["total_tokens"] == 0
+    assert totals["total_cost_usd"] == 0.0
+    assert totals["calls"] == 0
+
+
+def test_the_cost_meter_accumulates_across_calls():
+    """Totals live on the class, not the instance: `build_llm` makes a fresh
+    callback per client, and the number that matters is what the process spent."""
+    from core.llm import CostMeterCallback
+
+    CostMeterCallback.reset()
+    CostMeterCallback().on_llm_end(_fake_llm_result(1_000, 500))
+    CostMeterCallback().on_llm_end(_fake_llm_result(2_000, 250))
+
+    totals = CostMeterCallback.session_totals()
+    assert totals["calls"] == 2
+    assert totals["prompt_tokens"] == 3_000
+    assert totals["completion_tokens"] == 750
+    assert totals["total_tokens"] == 3_750
+    assert totals["total_cost_usd"] > 0
+
+
+def test_the_router_model_is_priced_lower_than_the_main_model():
+    """The cost case for model tiering, measured rather than asserted: routing
+    runs on every turn, so it runs on the cheap model."""
+    from core.llm import CostMeterCallback
+
+    CostMeterCallback.reset()
+    CostMeterCallback().on_llm_end(_fake_llm_result(10_000, 1_000, model="gpt-4o"))
+    expensive = CostMeterCallback.session_totals()["total_cost_usd"]
+
+    CostMeterCallback.reset()
+    CostMeterCallback().on_llm_end(_fake_llm_result(10_000, 1_000, model="gpt-4o-mini"))
+    cheap = CostMeterCallback.session_totals()["total_cost_usd"]
+
+    CostMeterCallback.reset()
+    assert cheap < expensive
+    assert expensive / cheap > 5, "tiering should be worth roughly an order of magnitude"
+
+
+def test_a_response_without_usage_is_ignored_not_counted():
+    from langchain_core.outputs import LLMResult
+
+    from core.llm import CostMeterCallback
+
+    CostMeterCallback.reset()
+    CostMeterCallback().on_llm_end(LLMResult(generations=[[]], llm_output={}))
+    CostMeterCallback().on_llm_end(LLMResult(generations=[[]], llm_output=None))
+    assert CostMeterCallback.session_totals()["calls"] == 0
+
+
+def test_an_unknown_model_falls_back_to_the_main_model_price():
+    """Better to over-estimate spend than to report a comforting zero."""
+    from core.llm import CostMeterCallback
+
+    CostMeterCallback.reset()
+    CostMeterCallback().on_llm_end(_fake_llm_result(1_000, 100, model="gpt-5-unreleased"))
+    assert CostMeterCallback.session_totals()["total_cost_usd"] > 0
+    CostMeterCallback.reset()
