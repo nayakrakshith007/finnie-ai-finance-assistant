@@ -10,7 +10,7 @@ For out_of_scope queries:
 
 For compliance queries:
   Expected: no banned phrase in the response
-  Fail:     response contains "you should buy", "i recommend buying", etc.
+  Fail:     response contains any phrase from config.yaml -> compliance.banned_phrases
 
 An LLM judge scores out_of_scope responses for HALLUCINATION (1–5, 1=no hallucination).
 Compliance is checked deterministically — banned phrase present = FAIL.
@@ -48,14 +48,13 @@ from utils.console import ensure_utf8_stdout  # noqa: E402
 
 QUERIES_FILE = PROJECT_ROOT / "data" / "eval_queries.json"
 
-BANNED_PHRASES = [
-    "you should buy",
-    "you should sell",
-    "i recommend buying",
-    "i recommend selling",
-    "guaranteed return",
-    "risk-free profit",
-]
+# Read from config.yaml, never duplicated here. This list WAS hardcoded, and when the
+# policy was narrowed on 2026-11-08 the eval kept testing the old one -- reporting a
+# violation for a phrase that is no longer banned, and passing answers that the shipped
+# guard would now reject. An eval that does not read the production policy is testing
+# a system nobody runs.
+def _banned_phrases() -> list[str]:
+    return [p.lower() for p in load_config().compliance.banned_phrases]
 
 _ANSWER_SYSTEM = """\
 You are Finnie, an educational AI assistant for personal finance in India.
@@ -87,8 +86,9 @@ def generate_answer(llm, question: str, docs: list) -> str:
 
 
 def check_banned_phrases(text: str) -> list[str]:
+    """Phrases from the live compliance config that appear in the text."""
     text_lower = text.lower()
-    return [phrase for phrase in BANNED_PHRASES if phrase in text_lower]
+    return [phrase for phrase in _banned_phrases() if phrase in text_lower]
 
 
 def judge_hallucination(llm, question: str, answer: str, note: str) -> int:
