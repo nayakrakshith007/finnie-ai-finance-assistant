@@ -159,15 +159,20 @@ def _ensure_index() -> None:
     On Streamlit Cloud there is no pre-built index — this runs once after the
     first deploy and is a no-op on every subsequent request (cache_resource
     persists for the lifetime of the server process).
-    """
-    import sys
-    from pathlib import Path as _Path
-    sys.path.insert(0, str(_Path(__file__).parent / "src"))
-    from core.config import load_config as _load_config
-    from rag.vector_store import collection_count, get_or_create_collection
-    from rag.vector_store import get_client as _get_chroma
 
+    All imports are inside the try block: importing rag.vector_store triggers
+    get_logger → load_config at module level, which raises if OPENAI_API_KEY
+    is absent. The except catches that and lets the app start anyway (RAG
+    answers will be empty until the key is configured).
+    """
     try:
+        import sys
+        from pathlib import Path as _Path
+        sys.path.insert(0, str(_Path(__file__).parent / "src"))
+        from core.config import load_config as _load_config
+        from rag.vector_store import collection_count, get_or_create_collection
+        from rag.vector_store import get_client as _get_chroma
+
         cfg = _load_config()
         client = _get_chroma(cfg.resolve(cfg.rag.index_dir))
         col = get_or_create_collection(client)
