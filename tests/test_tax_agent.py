@@ -127,16 +127,17 @@ def test_the_prompt_states_the_assessment_year():
     assert current_assessment_year() in TaxEducationAgent.system_prompt
 
 
-def test_the_prompt_forbids_computing_a_liability():
-    """"Explains rules, never computes a user's tax liability" (FR-015).
+def test_the_prompt_frames_computation_as_education():
+    """Computation is a worked example, not final tax advice (FR-015).
 
-    The distinction is the whole agent: "LTCG above ₹1.25 lakh is taxed at 12.5%"
-    is education; "you owe ₹18,750" is tax advice, and wrong, because Finnie
-    cannot see the rest of someone's return.
+    The prompt was updated to invite users to share their numbers so the agent
+    can walk through the calculation as an educational example with explicit
+    caveats — rather than refusing to do maths at all. The test checks that
+    the educational framing and caveat requirement are present.
     """
     lowered = TaxEducationAgent.system_prompt.lower()
-    assert "liability" in lowered
-    assert "never compute" in lowered or "do not compute" in lowered
+    assert "worked example" in lowered or "step by step" in lowered
+    assert "caveat" in lowered or "note:" in lowered or "does not account" in lowered
 
 
 def test_the_prompt_names_the_post_2024_capital_gains_rules():

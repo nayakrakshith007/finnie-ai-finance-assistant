@@ -132,11 +132,13 @@ def test_both_sip_figures_are_reported():
 
 
 def test_assumptions_are_recorded_not_implied():
+    # moderate allocation: equity 50%, debt 35%, gold 10%, cash 5%
+    # blended = 0.50*0.12 + 0.35*0.07 + 0.10*0.08 + 0.05*0.04 = 0.0945
     plan = agent().run(state_with("I need 10 lakh in 10 years"))["goal_params"]
 
-    assert plan["assumed_return"] == 0.11, "moderate, from config.yaml"
+    assert plan["assumed_return"] == 0.0945, "moderate blended from allocation"
     assert plan["assumed_inflation"] == 0.06
-    assert plan["real_return"] == 0.0472  # (1.11 / 1.06) - 1
+    assert plan["real_return"] == 0.0325  # round((1.0945/1.06) - 1, 4)
 
 
 def test_risk_appetite_comes_from_the_user_profile():
@@ -146,7 +148,9 @@ def test_risk_appetite_comes_from_the_user_profile():
     plan = update["goal_params"]
 
     assert plan["risk_appetite"] == "aggressive"
-    assert plan["assumed_return"] == 0.14, "aggressive, from config.yaml"
+    # aggressive allocation: equity 75%, debt 15%, gold 5%, cash 5%
+    # blended = 0.75*0.12 + 0.15*0.07 + 0.05*0.08 + 0.05*0.04 = 0.1065
+    assert plan["assumed_return"] == 0.1065, "aggressive blended from allocation"
 
 
 def test_a_higher_assumed_return_needs_a_smaller_sip():
@@ -277,7 +281,7 @@ def test_the_assumed_return_is_stated_to_the_user_by_code():
     forecast, and that is the one thing this agent must never produce."""
     update = agent(responses=["Plain answer."]).run(state_with("I need 10 lakh in 10 years"))
     body = update["messages"][0].content
-    assert "11" in body and "6" in body, "assumed return and inflation both stated"
+    assert "9" in body and "6" in body, "blended return (~9.45%) and inflation (6%) both stated"
 
 
 # ── trace ──────────────────────────────────────────────────────────────────────

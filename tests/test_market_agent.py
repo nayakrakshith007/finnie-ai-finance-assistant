@@ -101,6 +101,10 @@ def test_agent_declares_name_and_description():
         ("bank nifty", ["^NSEBANK"]),
         ("Compare TCS and INFY", ["TCS", "INFY"]),
         ("HDFCBANK.NS quote", ["HDFCBANK.NS"]),
+        # Jio Financial Services — the only listed Jio entity (demerged Aug 2023)
+        ("what about jio?", ["JIOFIN"]),
+        ("What is the JIO price?", ["JIOFIN"]),
+        ("jio financial services share price", ["JIOFIN"]),
     ],
 )
 def test_symbols_are_extracted_from_the_question(question, expected):

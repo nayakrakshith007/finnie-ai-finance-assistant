@@ -247,6 +247,71 @@ def price_trend_line(
     return _base_layout(figure, title)
 
 
+def stock_price_history_chart(symbol: str, dates: list[str], closes: list[float]) -> go.Figure:
+    """6-month daily close price with MA20 / MA50 overlay for the Deep Dive panel."""
+    title = f"{symbol} · 6-month price history"
+    if not closes or not dates:
+        return _empty(title, f"No price history available for {symbol}")
+
+    colour = ACCENT if closes[-1] >= closes[0] else WARNING
+    n = len(closes)
+
+    traces: list[Any] = [
+        go.Scatter(
+            x=dates, y=closes,
+            mode="lines", name="Close",
+            line={"color": colour, "width": 2},
+            hovertemplate="%{x}<br>₹%{y:,.2f}<extra></extra>",
+        )
+    ]
+
+    if n >= 20:
+        ma20 = [None] * 19 + [
+            round(sum(closes[i - 19: i + 1]) / 20, 2) for i in range(19, n)
+        ]
+        traces.append(go.Scatter(
+            x=dates, y=ma20,
+            mode="lines", name="MA20",
+            line={"color": "rgba(255,255,255,0.45)", "width": 1, "dash": "dot"},
+            hovertemplate="MA20 ₹%{y:,.2f}<extra></extra>",
+        ))
+
+    if n >= 50:
+        ma50 = [None] * 49 + [
+            round(sum(closes[i - 49: i + 1]) / 50, 2) for i in range(49, n)
+        ]
+        traces.append(go.Scatter(
+            x=dates, y=ma50,
+            mode="lines", name="MA50",
+            line={"color": "rgba(255,200,80,0.55)", "width": 1, "dash": "dash"},
+            hovertemplate="MA50 ₹%{y:,.2f}<extra></extra>",
+        ))
+
+    figure = go.Figure(data=traces)
+
+    low, high = min(closes), max(closes)
+    padding = max((high - low) * 0.08, high * 0.002)
+    pct_change = round((closes[-1] - closes[0]) / closes[0] * 100, 2) if closes[0] else 0
+    figure.add_annotation(
+        text=f"{'+' if pct_change >= 0 else ''}{pct_change}% over 6 months",
+        showarrow=False,
+        xref="paper", yref="paper", x=0.0, y=1.08, xanchor="left",
+        font={"size": 12, "color": colour},
+    )
+    figure.update_xaxes(title_text="Date")
+    figure.update_yaxes(
+        title_text="Price (₹)",
+        range=[low - padding, high + padding],
+        **_rupee_ticks(low - padding, high + padding, compact=False),
+    )
+    figure.update_layout(
+        showlegend=True,
+        legend={"orientation": "h", "y": -0.22, "font": {"size": 11}},
+        height=340,
+    )
+    return _base_layout(figure, title)
+
+
 # ── goals ──────────────────────────────────────────────────────────────────────
 
 
@@ -299,5 +364,87 @@ def goal_projection_area(projection: list[dict[str, Any]], *, target: float) -> 
     top = max([*(p["value"] for p in projection), target or 0])
     figure.update_yaxes(
         title_text="Corpus (₹)", **_rupee_ticks(0, top, compact=True)
+    )
+    return _base_layout(figure, title)
+
+
+# Asset-class CAGR assumptions (mirrored from goals.projections for chart legends).
+_ASSET_CAGR: dict[str, float] = {
+    "equity": 0.12, "debt": 0.07, "gold": 0.08, "cash": 0.04,
+}
+
+_ASSET_COLOURS: dict[str, str] = {
+    "equity": "#0F766E",
+    "debt":   "#0E7490",
+    "gold":   "#A16207",
+    "cash":   "#15803D",
+}
+
+
+def goal_asset_projection_lines(plan: dict[str, Any]) -> go.Figure:
+    """Multi-line corpus projection by asset class + overall total.
+
+    Each line shows how the per-class allocation of the monthly SIP grows at that
+    class's historical CAGR. The overall total is plotted separately so the chart
+    makes compounding across the mix visible.
+
+    Legend labels carry the CAGR assumption so the reader can see what rate each
+    line is built on — the same 'assumption not forecast' discipline as everywhere
+    else in Goals.
+    """
+    title = "Projected corpus by asset class"
+    asset_proj = plan.get("asset_projections") or {}
+    overall = plan.get("projection") or []
+    if not overall:
+        return _empty(title, "Set a target and a horizon to see the projection")
+
+    figure = go.Figure()
+
+    for cls, series in asset_proj.items():
+        if not series:
+            continue
+        cagr = _ASSET_CAGR.get(cls, 0.07)
+        colour = _ASSET_COLOURS.get(cls, CATEGORY_COLOURS[0])
+        figure.add_trace(
+            go.Scatter(
+                x=[p["year"] for p in series],
+                y=[p["value"] for p in series],
+                name=f"{cls.capitalize()} ({cagr:.0%} CAGR)",
+                mode="lines+markers",
+                line={"color": colour, "width": 2, "dash": "dot"},
+                marker={"size": 4},
+                hovertemplate=f"{cls.capitalize()}<br>Year %{{x}}<br>₹%{{y:,.0f}}<extra></extra>",
+            )
+        )
+
+    figure.add_trace(
+        go.Scatter(
+            x=[p["year"] for p in overall],
+            y=[p["value"] for p in overall],
+            name=f"Overall ({plan.get('assumed_return', 0):.1%} blended)",
+            mode="lines+markers",
+            line={"color": "#7E22CE", "width": 3},
+            marker={"size": 5, "symbol": "diamond"},
+            hovertemplate="Overall<br>Year %{x}<br>₹%{y:,.0f}<extra></extra>",
+        )
+    )
+
+    target = plan.get("inflation_adjusted_target")
+    if target:
+        figure.add_hline(
+            y=target,
+            line={"color": "grey", "width": 1, "dash": "dash"},
+            annotation_text=f"Target {format_inr_compact(target)}",
+            annotation_position="top left",
+        )
+
+    figure.update_layout(
+        showlegend=True,
+        legend={"orientation": "h", "y": -0.25, "font": {"size": 11}},
+    )
+    figure.update_xaxes(title_text="Years from now", dtick=max(1, len(overall) // 10))
+    top = max(p["value"] for p in overall) if overall else (target or 1)
+    figure.update_yaxes(
+        title_text="Projected amount (₹)", **_rupee_ticks(0, top, compact=True)
     )
     return _base_layout(figure, title)

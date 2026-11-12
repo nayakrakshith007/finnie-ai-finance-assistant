@@ -109,7 +109,7 @@
       ],
       "strict": true,
       "lenient": true,
-      "resolved": "Where is the NIFTY 50 trading?",
+      "resolved": "What is the current trading price of the NIFTY 50?",
       "why": "An index quote. NIFTY 50 must resolve to the symbol ^NSEI, which is why the index aliases live in the market agent rather than in the router."
     },
     {
@@ -123,7 +123,7 @@
       ],
       "strict": true,
       "lenient": true,
-      "resolved": "What are the share prices of HDFCBANK and ICICIBANK?",
+      "resolved": "What are the share prices of HDFC Bank and ICICI Bank?",
       "why": "Two tickers, one agent: the market agent handles up to three symbols in a turn."
     },
     {
@@ -301,10 +301,10 @@
         "tax_education"
       ],
       "actual": [
-        "tax_education"
+        "finance_qa"
       ],
-      "strict": true,
-      "lenient": true,
+      "strict": false,
+      "lenient": false,
       "resolved": "How much can I claim under section 80C?",
       "why": "A named section of the Income Tax Act."
     },
@@ -361,7 +361,7 @@
       ],
       "strict": true,
       "lenient": true,
-      "resolved": "Any news on Reliance?",
+      "resolved": "What is the latest news on Reliance?",
       "why": "Explicit request for news on a named company."
     },
     {
@@ -389,7 +389,7 @@
       ],
       "strict": true,
       "lenient": true,
-      "resolved": "Why did INFY fall today?",
+      "resolved": "Why did Infosys fall today?",
       "why": "'Why' needs headlines; the price alone cannot answer it. A market+news chain is also defensible."
     },
     {
@@ -465,7 +465,7 @@
       ],
       "strict": true,
       "lenient": true,
-      "resolved": "What is the TCS price and what is the recent news about TCS?",
+      "resolved": "What is the TCS price and any recent news about it?",
       "why": "Two distinct asks about one ticker; neither subsumes the other."
     },
     {
@@ -513,7 +513,7 @@
       ],
       "strict": true,
       "lenient": true,
-      "resolved": "What is the current price of the NIFTY 50 index and what should I know about index funds?",
+      "resolved": "What is the current NIFTY 50 index value and what should I know about index funds?",
       "why": "A quote plus a concept. Independent, so either order works, but quote-then-concept reads better."
     },
     {
@@ -537,10 +537,10 @@
         "finance_qa"
       ],
       "actual": [
-        "market_analysis"
+        "stock_deep_dive"
       ],
       "strict": false,
-      "lenient": true,
+      "lenient": false,
       "resolved": "Should I buy Reliance?",
       "why": "Advice-seeking. Q&A explains how to think about a decision; answering with a live price implies the price is the answer. Compliance blocks the advice framing on either route."
     },
@@ -565,15 +565,85 @@
         "finance_qa"
       ],
       "actual": [
-        "finance_qa"
+        "market_analysis"
+      ],
+      "strict": false,
+      "lenient": false,
+      "resolved": "What is the TCS price?",
+      "why": "Scored with no history, so there is no referent to resolve. With history the supervisor rewrites it first and routes on the rewrite \u2014 which is the behaviour tested in test_router.py, not here."
+    },
+    {
+      "id": "r41",
+      "query": "Give me a detailed analysis of Reliance Industries",
+      "expected": [
+        "stock_deep_dive"
+      ],
+      "actual": [
+        "stock_deep_dive"
       ],
       "strict": true,
       "lenient": true,
-      "resolved": "What about the second one?",
-      "why": "Scored with no history, so there is no referent to resolve. With history the supervisor rewrites it first and routes on the rewrite \u2014 which is the behaviour tested in test_router.py, not here."
+      "resolved": "Give me a detailed analysis of Reliance Industries.",
+      "why": "'Detailed analysis' of a named stock: PE, RSI, fundamentals and analyst outlook \u2014 the deep dive agent's exact brief."
+    },
+    {
+      "id": "r42",
+      "query": "Deep dive on TCS stock \u2014 fundamentals, technicals, everything",
+      "expected": [
+        "stock_deep_dive"
+      ],
+      "actual": [
+        "stock_deep_dive"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Deep dive on TCS stock \u2014 fundamentals, technicals, everything",
+      "why": "'Deep dive' is the trigger phrase and 'fundamentals and technicals' maps precisely to what the agent returns."
+    },
+    {
+      "id": "r43",
+      "query": "What are the fundamentals and valuation of INFY?",
+      "expected": [
+        "stock_deep_dive"
+      ],
+      "actual": [
+        "stock_deep_dive"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What are the fundamentals and valuation of Infosys (INFY)?",
+      "why": "Valuation plus fundamentals on a named ticker: P/E, analyst rating, RSI \u2014 not just a live price, so market_analysis is not enough."
+    },
+    {
+      "id": "r44",
+      "query": "Analyse HDFCBANK \u2014 PE ratio, RSI, analyst recommendation",
+      "expected": [
+        "stock_deep_dive"
+      ],
+      "actual": [
+        "stock_deep_dive"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "Analyse HDFC Bank for its PE ratio, RSI, and analyst recommendation.",
+      "why": "Explicit request for the three metrics the deep-dive agent computes: PE, RSI and analyst consensus."
+    },
+    {
+      "id": "r45",
+      "query": "What is the technical and fundamental outlook for Infosys?",
+      "expected": [
+        "stock_deep_dive"
+      ],
+      "actual": [
+        "stock_deep_dive"
+      ],
+      "strict": true,
+      "lenient": true,
+      "resolved": "What is the technical and fundamental outlook for Infosys?",
+      "why": "Combined technical (RSI) and fundamental (PE, analyst) outlook on one stock is the deep-dive agent's core task."
     }
   ],
-  "total": 40,
-  "strict_accuracy": 0.95,
-  "lenient_accuracy": 1.0
+  "total": 45,
+  "strict_accuracy": 0.9111111111111111,
+  "lenient_accuracy": 0.9333333333333333
 }

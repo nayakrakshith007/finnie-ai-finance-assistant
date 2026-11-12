@@ -30,6 +30,16 @@ data/cache/*
 logs/
 *.log
 
+# Runtime databases -- contain user data, never commit
+data/users.db
+data/memory.db
+data/memory.db-shm
+data/memory.db-wal
+data/deep_dive_cache.json
+
+# Streamlit local secrets (use Streamlit Cloud secrets UI instead)
+.streamlit/secrets.toml
+
 # OS / editor noise
 .DS_Store
 Thumbs.db

@@ -145,20 +145,27 @@ class BaseAgent(ABC):
 
     # ── shared helpers ────────────────────────────────────────────────────────
 
-    @staticmethod
-    def _latest_question(state: AgentState) -> str:
+    def _latest_question(self, state: AgentState) -> str:
         """The question this agent should answer.
 
-        Prefers `resolved_question` -- the supervisor's rewrite, which has had
-        references like "the second one" resolved into explicit names. Falls back
-        to scanning backwards for the last human message, which is what happens
-        when an agent is invoked directly (tests, the Portfolio tab's button) with
-        no router ahead of it.
+        Priority order:
+        1. This agent's targeted sub-query from the supervisor's decomposition.
+           A news agent might get "US Iran war India markets 2026" while a RAG
+           agent in the same turn gets "how geopolitical risk affects equities".
+           These are purpose-built for each data source, so they beat the generic
+           resolved question.
+        2. `resolved_question` — the supervisor's rewrite, which has resolved
+           references like "the second one" into explicit names.
+        3. The last raw human message — fallback for direct invocation (tests,
+           Portfolio tab button) with no router in front.
 
-        Scanning backwards rather than taking messages[-1]: by the time a second
-        agent runs in a composed turn (FR-003), the last message is the first
-        agent's output, not the user's question.
+        Scanning messages backwards rather than taking messages[-1]: by the time
+        a second agent runs in a composed turn (FR-003), the last message is the
+        first agent's output, not the user's question.
         """
+        sub_q = (state.get("sub_queries") or {}).get(self.name, "").strip()
+        if sub_q:
+            return sub_q
         resolved = (state.get("resolved_question") or "").strip()
         if resolved:
             return resolved

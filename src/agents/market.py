@@ -56,8 +56,9 @@ MAX_SYMBOLS = 3
 
 NO_SYMBOL_REPLY = (
     "I can look up prices for NSE and BSE listed companies and for the Indian "
-    "indices — NIFTY 50, SENSEX and BANK NIFTY. Which one would you like? You can "
-    "give me a name (Reliance, TCS) or a ticker (RELIANCE.NS)."
+    "indices — NIFTY 50, SENSEX, BANK NIFTY, NIFTY IT, NIFTY MIDCAP 50 and "
+    "NIFTY NEXT 50. Which one would you like? You can give me a name (Reliance, "
+    "TCS) or a ticker (RELIANCE.NS, ^NSEI)."
 )
 
 # Spoken forms of the Indian indices. Longest first, so "bank nifty" is not
@@ -65,11 +66,16 @@ NO_SYMBOL_REPLY = (
 INDEX_ALIASES: tuple[tuple[str, str], ...] = (
     ("bank nifty", "^NSEBANK"),
     ("nifty bank", "^NSEBANK"),
+    ("nifty midcap 50", "^NSEMDCP50"),
+    ("midcap 50", "^NSEMDCP50"),
+    ("nifty next 50", "^CRSLDX"),
+    ("next 50", "^CRSLDX"),
     ("nifty it", "^CNXIT"),
     ("nifty 50", "^NSEI"),
     ("nifty50", "^NSEI"),
     ("sensex", "^BSESN"),
     ("bse sensex", "^BSESN"),
+    ("india vix", "^INDIAVIX"),
     ("nifty", "^NSEI"),
 )
 
@@ -91,7 +97,7 @@ NAME_LEXICON: dict[str, str] = {
     "wipro": "WIPRO",
     "airtel": "BHARTIARTL",
     "bharti airtel": "BHARTIARTL",
-    "tata motors": "TATAMOTORS",
+    "tata motors": "TMCV",
     "tata steel": "TATASTEEL",
     "maruti": "MARUTI",
     "asian paints": "ASIANPAINT",
@@ -100,9 +106,16 @@ NAME_LEXICON: dict[str, str] = {
     "axis bank": "AXISBANK",
     "kotak": "KOTAKBANK",
     "bajaj finance": "BAJFINANCE",
+    "bajaj auto": "BAJAJ-AUTO",
+    "bajajauto": "BAJAJ-AUTO",
     "adani": "ADANIENT",
     "zomato": "ZOMATO",
     "paytm": "PAYTM",
+    # Jio Financial Services (JIOFIN.NS) — demerged from Reliance, listed Aug 2023.
+    # Jio the telecom arm is not separately listed; JIOFIN is the only listed Jio entity.
+    "jio financial services": "JIOFIN",
+    "jio financial": "JIOFIN",
+    "jio": "JIOFIN",
 }
 
 # Upper-case words that are finance vocabulary, not tickers. Without this list
@@ -116,11 +129,16 @@ NOT_TICKERS = frozenset(
         "LTCG", "NAV", "NFO", "NPS", "NRI", "NSE", "OK", "PE", "PPF", "RBI", "ROI",
         "SEBI", "SIP", "STCG", "TDS", "UPI", "USA", "USD", "VPF", "XIRR", "INR",
         "UK", "EU", "WHO", "WHY", "HOW",
+        # JIO as all-caps is blocked here so the lexicon pass resolves it to JIOFIN
+        # instead of sending yfinance after the non-existent JIO.NS listing.
+        "JIO",
     }
 )
 
 # A ticker-shaped token: 2–12 upper-case letters/digits, optional exchange suffix.
-_TICKER_RE = re.compile(r"\b([A-Z][A-Z0-9&]{1,11}(?:\.(?:NS|BO))?)\b")
+# The first alternative captures ^-prefixed index tickers (^NSEI, ^NSEMDCP50, ^CRSLDX…)
+# that _TICKER_RE would otherwise strip the ^ from at a \b boundary.
+_TICKER_RE = re.compile(r"(\^[A-Z][A-Z0-9]{1,11}|\b[A-Z][A-Z0-9&]{1,11}(?:-[A-Z0-9]{1,6})?(?:\.(?:NS|BO))?\b)")
 
 MARKET_SYSTEM_PROMPT = """You are Finnie's market analyst, explaining Indian \
 market data to a beginner.
@@ -143,6 +161,23 @@ percentage on a small base is not comparable to one on a large base.
 6. Do NOT write a disclaimer or closing caveat. One is appended automatically.
 7. Plain English, no jargon without a gloss. Four to six sentences, or a short \
 bullet per company when several are compared.
+8. If the user's question hints at a personal decision (mentions "should I", "my \
+shares", "is it a good time", "worth buying/selling"), after explaining the data \
+ask one clarifying question to understand their actual need. Examples: "Are you \
+trying to understand this move in the context of a holding you already have, or \
+are you considering whether to start a position?" or "What specifically about \
+the trend is useful for you — the direction, the magnitude, or how it compares \
+to the index?" One question only; do not ask if the question is purely factual.
+
+FORMAT — apply to every answer:
+- **Lead with the price and day's change in bold** on the very first line \
+(e.g. "**TCS — ₹3,420 | +1.2% today**"). Skip this only when no price was found.
+- When comparing two or more symbols, use a Markdown table: one row per symbol, \
+columns for price, day change, 30d trend, 90d trend.
+- Bullet points for the interpretation — one bullet per insight, not a paragraph.
+- **Bold** every figure the user will act on: price, change %, trend direction.
+- 4–6 sentences of narration max (or the equivalent in bullets). Be concise.
+- No filler openers or closing summaries. Lead with the data, end with the insight.
 
 Data:
 {data}"""
@@ -158,7 +193,8 @@ class MarketAnalysisAgent(BaseAgent):
         "Looks up prices (via yfinance, delayed), daily percentage change and "
         "30/90-day trends for "
         "NSE and BSE listed companies and for the Indian indices (NIFTY 50, SENSEX, "
-        "BANK NIFTY), then explains what the movement means. Use this whenever a "
+        "BANK NIFTY, NIFTY IT, NIFTY MIDCAP 50, NIFTY NEXT 50), then explains "
+        "what the movement means. Use this whenever a "
         "specific company or index is named and the user wants its price, "
         "performance or recent direction. Do NOT use it for a user's own holdings "
         "(that is portfolio analysis) or for how an instrument works in general "
@@ -228,6 +264,10 @@ class MarketAnalysisAgent(BaseAgent):
         # Provenance is appended here rather than trusted to the model (FR-033).
         body += "\n\n" + " · ".join(
             f"{sym} — {q.freshness_label()}" for sym, (q, _) in quotes.items()
+        )
+        body += (
+            "\n\n---\n💡 **For a full deep dive** — price chart, 30/90-day trends, "
+            "volume, and stock-specific analysis — head to the **Market tab**."
         )
 
         return {"messages": [AIMessage(content=body)], "market_data": market_data}

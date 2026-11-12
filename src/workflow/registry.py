@@ -20,12 +20,14 @@ from agents.market import MarketAnalysisAgent
 from agents.news import NewsSynthesizerAgent
 from agents.portfolio import PortfolioAnalysisAgent
 from agents.qa import FinanceQAAgent
+from agents.stock import StockDeepDiveAgent
 from agents.tax import TaxEducationAgent
 
 # Order matters only for the router prompt's readability: the general-purpose
 # agent goes last so the specific ones are read first.
 AGENT_CLASSES: tuple[type[BaseAgent], ...] = (
     MarketAnalysisAgent,
+    StockDeepDiveAgent,
     PortfolioAnalysisAgent,
     GoalPlanningAgent,
     TaxEducationAgent,
@@ -40,10 +42,11 @@ AGENT_NAMES: tuple[str, ...] = tuple(cls.name for cls in AGENT_CLASSES)
 # nothing relevant, and says so (FR-002).
 DEFAULT_AGENT = FinanceQAAgent.name
 
-# A turn runs at most this many agents. FR-003 asks for a two-agent chain; the cap
-# exists because each agent is at least one LLM call, and an unbounded route is an
-# unbounded bill.
-MAX_AGENTS_PER_TURN = 2
+# A turn runs at most this many agents. FR-003 asked for two; raised to three so
+# that "current event + portfolio + goal" questions can chain all three in one
+# turn without a second round trip. Each agent is at least one LLM call, so this
+# is still a hard upper bound — an unbounded route is an unbounded bill.
+MAX_AGENTS_PER_TURN = 3
 
 
 def agent_catalogue() -> str:

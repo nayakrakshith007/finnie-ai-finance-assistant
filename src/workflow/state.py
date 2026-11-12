@@ -14,11 +14,15 @@ Every node reads from and writes to this one dict. Two things make that safe:
 
    - `messages` uses `add_messages`, which appends and handles message IDs, so
      conversation history accumulates instead of each node clobbering the last.
-   - `agent_trace` uses `operator.add`, so every agent appends its own entry and
-     we end up with the full execution path rather than only the last hop.
+   - `agent_trace` uses `_trace_reducer`: within a turn it appends (like
+     `operator.add`), but passing `None` as the value resets the list to `[]`.
+     The session layer passes `None` at the start of each turn so a new turn
+     always begins with a clean trace — critical when the graph has a SQLite
+     checkpointer, which persists agent_trace across browser sessions.
 
    A node returning `{"agent_trace": [entry]}` therefore *appends* one entry. This
    is why `BaseAgent.run` returns a single-element list.
+   The router/session reset by returning `{"agent_trace": None}`.
 
 Partial updates are the rule: a node returns only the keys it changed, never the
 whole state.
@@ -26,11 +30,22 @@ whole state.
 
 from __future__ import annotations
 
-import operator
 from typing import Annotated, Any, Literal, TypedDict
 
 from langchain_core.messages import AnyMessage
 from langgraph.graph.message import add_messages
+
+
+def _trace_reducer(existing: list, incoming: list | None) -> list:
+    """Append within a turn; reset when `None` is passed.
+
+    `None` is the per-turn reset sentinel. The session layer sends it at the
+    start of every turn so the trace does not accumulate across sessions when
+    the graph uses a checkpointer.
+    """
+    if incoming is None:
+        return []
+    return existing + incoming
 
 TraceStatus = Literal["ok", "error"]
 
@@ -50,11 +65,23 @@ class TraceEntry(TypedDict):
 
 
 class UserProfile(TypedDict, total=False):
-    """Persists across turns; set from the sidebar controls."""
+    """Persists across turns; set from the sidebar controls and onboarding wizard."""
 
     risk_appetite: Literal["conservative", "moderate", "aggressive"]
     horizon_years: int
     knowledge_level: Literal["beginner", "intermediate", "advanced"]
+    # Financial profile fields (from onboarding wizard)
+    age_range: str
+    life_stage: str
+    employment_type: str
+    monthly_investable: str
+    emergency_fund_months: str
+    debt_band: str
+    insurance_status: str
+    tax_regime: str
+    investment_experience: str
+    primary_goal: str
+    loss_behaviour: str
 
 
 class AgentState(TypedDict, total=False):
@@ -86,8 +113,32 @@ class AgentState(TypedDict, total=False):
     portfolio: dict[str, Any]
     goal_params: dict[str, Any]
 
-    # Execution path. Appended to by every agent.
-    agent_trace: Annotated[list[TraceEntry], operator.add]
+    # Execution path. Appended to by every agent; reset per turn via None sentinel.
+    agent_trace: Annotated[list[TraceEntry], _trace_reducer]
+
+    # Rolling summary of older conversation turns, managed by memory_manager_node.
+    # Injected into the router's prompt so context is preserved beyond the verbatim
+    # window without sending the whole history on every turn.
+    session_summary: str
+
+    # Targeted search/retrieval queries, one per agent in the route.
+    # Supervisor writes these; each agent reads its own entry instead of the
+    # raw question. A news agent gets "US Iran war India markets 2026"; a RAG
+    # agent gets the concept to look up. Agents not listed here use the
+    # resolved_question fallback.
+    sub_queries: dict[str, str]
+
+    # Non-empty when the supervisor needs more context before routing.
+    # The clarification node emits it as a question; agents don't run that turn.
+    # Cleared by the clarification node after it emits the question.
+    pending_clarification: str
+
+    # Retry loop control. Set by the evaluator node when the answer is incomplete;
+    # read by the edge after evaluator to decide whether to loop back to supervisor.
+    # Cleared at the start of each new user turn via TRANSIENT_KEYS in session.py.
+    needs_retry: bool
+    iteration_count: int  # counts how many evaluation retries have happened this turn
+    retry_hint: str       # e.g. "news_synthesizer had no results; try finance_qa"
 
     # Set by the fallback path; a non-empty value means something degraded.
     error: str

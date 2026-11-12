@@ -68,6 +68,16 @@ DEFAULT_ALLOCATIONS: dict[str, dict[str, float]] = {
 
 FALLBACK_RISK = "moderate"
 
+# Long-run return assumptions per exposure class (Indian market, INR).
+# Used to compute a blended return when the user specifies a custom allocation.
+# Conservative values — the goal planner's job is to avoid under-saving.
+ASSET_RETURN_ASSUMPTIONS: dict[str, float] = {
+    "equity": 0.12,  # Nifty 50 ~12% CAGR over 20 years
+    "debt": 0.07,    # Indian bond/debt fund average
+    "gold": 0.08,    # Indian gold INR long-run average
+    "cash": 0.04,    # Savings account / liquid fund
+}
+
 # Horizon ceilings on equity. The one place the template overrides a stated risk
 # appetite, because equity needs time and an appetite does not create any: over
 # two years, sequence-of-returns risk dominates expected return. Under 3 years
@@ -217,6 +227,44 @@ def equity_was_capped(risk_appetite: str, horizon_years: float) -> bool:
     """
     base = DEFAULT_ALLOCATIONS.get(risk_appetite) or DEFAULT_ALLOCATIONS[FALLBACK_RISK]
     return allocation_template(risk_appetite, horizon_years)["equity"] < base["equity"]
+
+
+def blended_return(allocation: dict[str, float]) -> float:
+    """Weighted-average return from a percentage-based allocation dict.
+
+    Normalises by the actual total so small rounding errors (99.9 instead of 100)
+    do not distort the result. Unknown classes fall back to the debt rate.
+    """
+    total = sum(allocation.values())
+    if not total:
+        return ASSET_RETURN_ASSUMPTIONS["debt"]
+    return round(
+        sum(ASSET_RETURN_ASSUMPTIONS.get(k, ASSET_RETURN_ASSUMPTIONS["debt"]) * v / total
+            for k, v in allocation.items()),
+        4,
+    )
+
+
+def asset_class_projections(
+    monthly_sip: float, allocation: dict[str, float], years: float
+) -> dict[str, list[dict[str, Any]]]:
+    """Year-by-year corpus projection broken down by asset class.
+
+    Each class gets its share of the monthly SIP and grows at its own rate from
+    ASSET_RETURN_ASSUMPTIONS. Used by the multi-line projection chart so the
+    reader can see how equity and debt diverge over time.
+
+    Returns a dict of {class_name: projection_series(...)}.
+    """
+    total_pct = sum(allocation.values())
+    if not total_pct:
+        return {}
+    result: dict[str, list[dict[str, Any]]] = {}
+    for cls, pct in allocation.items():
+        cls_rate = ASSET_RETURN_ASSUMPTIONS.get(cls, ASSET_RETURN_ASSUMPTIONS["debt"])
+        cls_monthly = monthly_sip * (pct / total_pct)
+        result[cls] = projection_series(cls_monthly, cls_rate, years)
+    return result
 
 
 def allocation_template(risk_appetite: str, horizon_years: float) -> dict[str, float]:

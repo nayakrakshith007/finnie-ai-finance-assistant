@@ -46,7 +46,13 @@ logger = get_logger(__name__)
 
 # Indian index symbols yfinance understands. Passed through untouched: an index has
 # no exchange suffix, and appending one produces a lookup that silently fails.
-INDEX_SYMBOLS = {"^NSEI", "^BSESN", "^NSEBANK", "^CNXIT", "^NSMIDCP"}
+INDEX_SYMBOLS = {
+    "^NSEI", "^BSESN", "^NSEBANK", "^CNXIT",
+    "^NSMIDCP",    # Nifty Midcap 100
+    "^NSEMDCP50",  # Nifty Midcap 50
+    "^CRSLDX",     # Nifty Next 50 (^NSENXT50 is delisted on Yahoo)
+    "^INDIAVIX",
+}
 
 MAX_ATTEMPTS = 3
 BASE_BACKOFF_SECONDS = 0.5

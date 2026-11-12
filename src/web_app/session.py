@@ -27,11 +27,17 @@ import time
 from typing import Any
 
 import streamlit as st
+from langchain_core.messages import AIMessage, HumanMessage
 
 # Per-turn working keys. Cleared before each turn so last turn's quote or
 # analysis cannot be rendered beside this turn's answer. `messages` and
 # `user_profile` are deliberately absent: they are the memory (FR-004).
-TRANSIENT_KEYS = ("retrieved_docs", "market_data", "route", "resolved_question", "error")
+TRANSIENT_KEYS = (
+    "retrieved_docs", "market_data", "route", "resolved_question",
+    "sub_queries", "pending_clarification",
+    "needs_retry", "iteration_count", "retry_hint",  # evaluator loop — reset each new user turn
+    "error",
+)
 
 RISK_LEVELS = ("conservative", "moderate", "aggressive")
 KNOWLEDGE_LEVELS = ("beginner", "intermediate", "advanced")
@@ -65,6 +71,8 @@ def init_session() -> None:
     st.session_state.setdefault("profile_risk", "moderate")
     st.session_state.setdefault("profile_horizon", 10)
     st.session_state.setdefault("profile_knowledge", "beginner")
+    st.session_state.setdefault("financial_profile", {})
+    st.session_state.setdefault("goal_chat_messages", [])
 
 
 def clear_conversation() -> None:
@@ -90,16 +98,18 @@ def clear_conversation() -> None:
 
 
 def sync_profile() -> None:
-    """Push the sidebar controls into the state the agents read.
+    """Push the sidebar controls and financial profile into the state the agents read.
 
     FR-064's acceptance criterion is that changing risk appetite demonstrably
     changes the Goal agent's output — it does, because the assumed return comes
     from `config.yaml: goals.risk_profiles[risk_appetite]`.
     """
+    financial = st.session_state.get("financial_profile") or {}
     st.session_state.graph_state["user_profile"] = {
         "risk_appetite": st.session_state.profile_risk,
         "horizon_years": int(st.session_state.profile_horizon),
         "knowledge_level": st.session_state.profile_knowledge,
+        **{k: v for k, v in financial.items() if v},  # only non-empty values
     }
 
 
@@ -134,6 +144,58 @@ def goal_params() -> dict[str, Any]:
 # ── the one way to ask ─────────────────────────────────────────────────────────
 
 
+def load_user_history() -> None:
+    """After login, restore the user's previous conversation from the checkpointer.
+
+    Rebuilds both `graph_state` (what the agents read) and `ui_messages` (what
+    the Chat tab renders). Historical messages have no sources/trace stored, so
+    those fields default to empty — the user sees the text, not the metadata.
+    """
+    user_id = st.session_state.get("user_id")
+    if not user_id:
+        return
+
+    graph = load_graph()
+    if not hasattr(graph, "get_state"):
+        return  # graph compiled without a checkpointer
+
+    config = {"configurable": {"thread_id": user_id}}
+    try:
+        snapshot = graph.get_state(config)
+    except Exception:  # noqa: BLE001 - no history is a valid starting point
+        return
+
+    if not snapshot or not snapshot.values:
+        return  # first login, nothing to restore
+
+    state = dict(snapshot.values)
+    # Restore holdings so the Portfolio tab sees them too.
+    st.session_state.graph_state = state
+    messages = state.get("messages") or []
+    st.session_state.ui_messages = _ui_messages_from_history(messages)
+    st.session_state.turn_count = sum(
+        1 for m in messages if isinstance(m, HumanMessage)
+    )
+
+
+def _ui_messages_from_history(messages: list) -> list[dict[str, Any]]:
+    """Convert LangChain message history into the shape the Chat tab renders."""
+    result = []
+    for msg in messages:
+        if isinstance(msg, HumanMessage):
+            result.append({"role": "user", "content": str(msg.content)})
+        elif isinstance(msg, AIMessage):
+            result.append({
+                "role": "assistant",
+                "content": str(msg.content),
+                "sources": [],
+                "trace": [],
+                "latency": 0.0,
+                "error": None,
+            })
+    return result
+
+
 def run_turn(question: str, *, record_in_chat: bool = True) -> dict[str, Any]:
     """Put a question through the graph and return what came back.
 
@@ -143,26 +205,50 @@ def run_turn(question: str, *, record_in_chat: bool = True) -> dict[str, Any]:
             False for a tab's own button — pressing "Analyse my portfolio"
             should not silently inject a message the user never typed.
 
+    When a user is logged in, the graph is called with their `thread_id` so the
+    LangGraph checkpointer saves the conversation to SQLite. Each turn only
+    passes the NEW human message; the checkpointer merges it with the full
+    history. Without a login (anonymous) the existing in-memory approach is kept.
+
     Returns a dict of answer/sources/trace/latency/error. Never raises: the
     agents have their own error boundaries and the compliance node never raises,
     so the only thing left is the graph failing to start, which is reported as
     the answer.
     """
-    from langchain_core.messages import HumanMessage
-
     sync_profile()
-    state = st.session_state.graph_state
-    state["messages"] = [*state.get("messages", []), HumanMessage(content=question)]
-    for key in TRANSIENT_KEYS:
-        state.pop(key, None)
-    held = state.get("portfolio") or {}
-    held.pop("analysis", None)  # keep the holdings, drop the stale analysis
-    state["portfolio"] = held
-    state["agent_trace"] = []
+
+    user_id: str | None = st.session_state.get("user_id")
+    graph = load_graph()
 
     started = time.perf_counter()
     try:
-        state = load_graph().invoke(state)
+        if user_id:
+            # ── authenticated path: checkpointer owns history ──────────────────
+            # Only the new message + current profile/portfolio are passed.
+            # add_messages reducer merges this with the checkpoint's history.
+            config: dict[str, Any] = {"configurable": {"thread_id": user_id}}
+            increment: dict[str, Any] = {
+                "messages": [HumanMessage(content=question)],
+                "user_profile": st.session_state.graph_state.get("user_profile", {}),
+                "portfolio": st.session_state.graph_state.get("portfolio", {"holdings": []}),
+                "agent_trace": None,   # None sentinel resets per-turn trace
+                "needs_retry": False,  # clear evaluator loop state from previous turn
+                "iteration_count": 0,
+                "retry_hint": "",
+            }
+            state = graph.invoke(increment, config=config)
+        else:
+            # ── anonymous path: in-memory accumulation (original behaviour) ───
+            state = st.session_state.graph_state
+            state["messages"] = [*state.get("messages", []), HumanMessage(content=question)]
+            for key in TRANSIENT_KEYS:
+                state.pop(key, None)
+            held = state.get("portfolio") or {}
+            held.pop("analysis", None)
+            state["portfolio"] = held
+            state["agent_trace"] = []
+            state = graph.invoke(state)
+
         st.session_state.graph_state = state
         result = {
             "answer": str(state["messages"][-1].content),
@@ -185,6 +271,20 @@ def run_turn(question: str, *, record_in_chat: bool = True) -> dict[str, Any]:
     result["latency"] = time.perf_counter() - started
     st.session_state.turn_count += 1
     st.session_state.total_latency += result["latency"]
+
+    # Persist which agents ran this turn to the user's profile (no LLM call needed).
+    if user_id:
+        try:
+            from web_app.auth import update_user_topics
+            agent_names = [
+                entry["agent"]
+                for entry in (result.get("trace") or [])
+                if entry.get("agent") not in ("supervisor", "compliance", "memory_manager")
+            ]
+            if agent_names:
+                update_user_topics(user_id, agent_names)
+        except Exception:  # noqa: BLE001 - topic tracking must not break the turn
+            pass
 
     if record_in_chat:
         st.session_state.ui_messages.append(user_message(question))

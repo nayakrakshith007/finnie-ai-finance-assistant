@@ -34,6 +34,26 @@ from rag.prompt import RAG_SYSTEM_PROMPT, RAG_USER_TEMPLATE, format_context
 from rag.retriever import build_retriever
 from workflow.state import AgentState
 
+CLARIFYING_SYSTEM_PROMPT = """\
+You are Finnie, an AI financial literacy assistant for Indian investors.
+
+The user asked a question about their personal financial situation, but you need \
+more context to give a genuinely useful answer. Generate up to 5 short, specific \
+clarifying questions that would help you answer well.
+
+Rules:
+- Ask only what you genuinely need. If 2 questions are enough, ask 2.
+- Number them (1., 2., …).
+- Keep each question under 15 words.
+- Do NOT answer the original question yet.
+- Do NOT write a disclaimer — one is added automatically.
+- End with: "Once you share these details, I can give you a much more useful answer."
+"""
+
+_PERSONAL_TRIGGERS = ("my ", " i ", "should i", "what should", "my portfolio",
+                       "my investment", "my money", "my savings", "pull out",
+                       "exit", "redeem", "switch", "i have")
+
 logger = get_logger(__name__)
 
 # Matches the refusal wording the system prompt instructs the model to use, so a
@@ -94,9 +114,18 @@ class FinanceQAAgent(BaseAgent):
         sources = [self._as_source(d) for d in docs]
 
         if not docs:
-            # Refuse before generating. Nothing in an empty context block can ground
-            # an answer, so a completion here would be an invitation to hallucinate
-            # and a charge for the privilege.
+            if self._is_personal_question(question):
+                # Ask clarifying questions so the next turn can be answered well.
+                logger.info("No context, personal question — generating clarifying questions for %r", question[:60])
+                clarifying = self.llm.invoke([
+                    SystemMessage(content=CLARIFYING_SYSTEM_PROMPT),
+                    HumanMessage(content=question),
+                ])
+                return {
+                    "messages": [AIMessage(content=clarifying.content)],
+                    "retrieved_docs": [],
+                }
+            # Pure knowledge question with no KB match — refuse without LLM call.
             logger.info("No context retrieved for %r; refusing without an LLM call", question[:60])
             return {
                 "messages": [AIMessage(content=NO_CONTEXT_REPLY)],
@@ -122,6 +151,12 @@ class FinanceQAAgent(BaseAgent):
         return f"{len(sources)} docs retrieved, best distance {best:.2f}"
 
     # ── helpers ───────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _is_personal_question(question: str) -> bool:
+        """True when the question is about the user's own situation, not pure knowledge."""
+        q = question.lower()
+        return any(trigger in q for trigger in _PERSONAL_TRIGGERS)
 
     @staticmethod
     def _as_source(d: Document) -> dict[str, Any]:

@@ -18,6 +18,7 @@ from typing import Any
 import streamlit as st
 
 from web_app import session
+from web_app.charts import stock_price_history_chart
 
 SUGGESTIONS = (
     "What is a SIP and how is it different from a lump sum?",
@@ -25,6 +26,38 @@ SUGGESTIONS = (
     "Is PPF better than ELSS?",
     "What tax do I pay if I sell shares after 2 years?",
 )
+
+# Navigation hints shown after the latest assistant message so the user knows
+# which tab has the full interactive version of what was just answered.
+_AGENT_TAB_HINTS: dict[str, str] = {
+    "market_analysis":   "📈 Open the **Market** tab for the full price chart and 30-day trend.",
+    "stock_deep_dive":   "📊 Open the **Portfolio** tab → add the stock → click **🔍 Deep Dive** for the full panel with live charts.",
+    "portfolio_analysis":"📊 Open the **Portfolio** tab to see your full allocation charts and holdings table.",
+    "goal_planning":     "🎯 Open the **Goals** tab for the interactive SIP calculator and projections chart.",
+    "news_synthesizer":  "📰 Open the **News** tab to browse all headlines across your holdings.",
+    "tax_education":     "🧾 Open the **Tax** tab for the full tax rules reference.",
+}
+
+
+def _get_dd_price_history(symbol: str) -> tuple[list[str], list[float]]:
+    """6-month daily closes for symbol, using the shared session_state cache."""
+    cache_key = f"dd_price_{symbol}"
+    cached = st.session_state.get(cache_key)
+    if cached:
+        return cached
+    try:
+        import yfinance as yf
+        from data.market import normalise_symbol
+        ticker_sym = normalise_symbol(symbol)
+        hist = yf.Ticker(ticker_sym).history(period="6mo")
+        if hist.empty:
+            return [], []
+        dates = [str(d.date()) for d in hist.index]
+        closes = [round(float(c), 2) for c in hist["Close"]]
+        st.session_state[cache_key] = (dates, closes)
+        return dates, closes
+    except Exception:
+        return [], []
 
 
 def render_trace(trace: list[dict[str, Any]]) -> None:
@@ -66,30 +99,78 @@ def render() -> None:
     history = st.session_state.ui_messages
 
     if not history:
-        st.markdown("#### Ask me something")
-        st.caption(
-            "I can explain how an instrument works, look up a live price, analyse "
-            "holdings you enter in the Portfolio tab, work out what a goal needs "
-            "monthly, or explain an Indian tax rule."
-        )
+        with st.chat_message("assistant"):
+            st.markdown(
+                "👋 Hi! I'm **Finnie**, your AI-powered personal finance assistant "
+                "for Indian investors.\n\n"
+                "Here's what I can help you with:\n"
+                "- 💬 **Finance Q&A** — explain SIPs, PPF, ELSS, NPS and other instruments\n"
+                "- 📈 **Market data** — live prices and trends for NSE/BSE stocks and indices\n"
+                "- 🔬 **Stock deep dive** — fundamentals, technicals, analyst outlook and sentiment\n"
+                "- 📊 **Portfolio analysis** — value, P&L, diversification and fees on your holdings\n"
+                "- 🎯 **Goal planning** — SIP calculator to reach any financial goal\n"
+                "- 🧾 **Tax education** — LTCG, STCG, 80C, old vs new regime and more\n"
+                "- 📰 **Market news** — latest headlines on companies and themes\n\n"
+                "How can I help you today?"
+            )
+        st.caption("Or try one of these to get started:")
         columns = st.columns(2)
         for index, suggestion in enumerate(SUGGESTIONS):
             if columns[index % 2].button(suggestion, use_container_width=True):
                 session.run_turn(suggestion)
                 st.rerun()
 
-    for message in history:
-        # `.get`, not `[...]`: a transcript lives in session state and can outlive
-        # a code change during development, so a message written by an older
-        # shape must render blank rather than take the whole page down with a
-        # KeyError. That is exactly what happened on 2026-11-08.
+    # Index of the last assistant message — tab hints are shown only there so
+    # old messages in the transcript don't accumulate a banner each.
+    last_asst_idx = max(
+        (i for i, m in enumerate(history) if m.get("role") == "assistant"),
+        default=-1,
+    )
+
+    for idx, message in enumerate(history):
         with st.chat_message(message.get("role", "assistant")):
-            st.markdown(message.get("content") or "_(no content)_")
             if message["role"] == "assistant":
-                render_trace(message.get("trace") or [])
+                trace = message.get("trace") or []
+
+                # ── price-history chart for deep-dive answers ─────────────────
+                # Rendered before the text so the chart leads, matching the
+                # layout in the Portfolio tab's own deep-dive panel.
+                dd_step = next(
+                    (s for s in trace if s.get("agent") == "stock_deep_dive"), None
+                )
+                if dd_step:
+                    detail = dd_step.get("detail", "")
+                    # detail format: "RELIANCE.NS — P/E 21.85, RSI 72, …"
+                    # " — " is present only on a successful fetch, never on the
+                    # "no symbol found" fallback, so this is safe to split on.
+                    if " — " in detail:
+                        symbol = detail.split(" — ")[0].split(".")[0].strip()
+                        if symbol:
+                            with st.spinner(f"Loading {symbol} price history…"):
+                                dates, closes = _get_dd_price_history(symbol)
+                            st.plotly_chart(
+                                stock_price_history_chart(symbol, dates, closes),
+                                use_container_width=True,
+                            )
+
+                st.markdown(message.get("content") or "_(no content)_")
+                render_trace(trace)
                 render_sources(message.get("sources") or [])
                 if message.get("latency"):
                     st.caption(f"⏱ {message['latency'] * 1000:.0f} ms")
+
+                # ── tab navigation hints (latest message only) ────────────────
+                if idx == last_asst_idx:
+                    agent_names = {s.get("agent") for s in trace}
+                    hints = [
+                        _AGENT_TAB_HINTS[a]
+                        for a in _AGENT_TAB_HINTS
+                        if a in agent_names
+                    ]
+                    if hints:
+                        st.info("  \n".join(hints))
+            else:
+                st.markdown(message.get("content") or "_(no content)_")
 
     if prompt := st.chat_input("Ask a finance question…"):
         session.run_turn(prompt)

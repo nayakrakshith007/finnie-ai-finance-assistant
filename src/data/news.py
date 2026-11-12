@@ -1,23 +1,30 @@
 """Headline feed for the News Synthesizer (PRD FR-014).
 
-Why two payload shapes
-----------------------
+Feed hierarchy
+--------------
+`build_news_feed()` returns a `ChainedNewsFeed(GoogleNewsFeed(), YFinanceNewsFeed())`.
+Google News RSS is tried first — it is free, requires no API key, and has an
+India edition (`hl=en-IN&gl=IN`). yfinance's news endpoint falls back second; it
+was down on 2026-11-08 while quotes kept working.
+
+Why two yfinance payload shapes
+--------------------------------
 yfinance's news response changed between versions. Up to roughly 0.2.40 each item
 was flat — `title`, `publisher`, `link`, `providerPublishTime` as an epoch. From
 roughly 0.2.50 it is nested under `content`, with `pubDate` as an ISO string and
 the publisher under `provider.displayName`. The installed version here is 0.2.66,
 but pinning to one shape means an upgrade silently returns zero headlines, and
 "no news today" is indistinguishable from "the adapter broke". So `_normalise`
-reads both and `tests/test_news_feed.py` has a fixture of each.
+reads both and `tests/test_news.py` has a fixture of each.
 
 Verification status, honestly
 -----------------------------
 On 2026-11-08 Yahoo's news endpoint was down: `Ticker.news` raised
 "YAHOO! FINANCE IS CURRENTLY DOWN", and `Search(...).news` returned an empty
-list, while quotes kept working normally. So the two shapes come from yfinance's
-own source and changelog rather than from a live response, and the outage path is
-the one that was observed. **Re-check the live path before recording the demo**
-(PRD risk R11); FR-014 is P1 and already on the cut list if it stays down.
+list, while quotes kept working normally. `GoogleNewsFeed` was added on 2026-11-08
+as the primary source; it was not verified live that day either, so both feeds
+carry the same caveat: **re-check the live path before recording the demo**
+(PRD risk R11).
 
 That is also why `headlines()` never raises. A news outage must degrade to "I
 could not fetch headlines" rather than taking down a turn that the other agents
@@ -121,6 +128,134 @@ def _normalise(raw: dict[str, Any]) -> Headline | None:
     )
 
 
+class GoogleNewsFeed:
+    """Headlines from Google News RSS — free, no API key, India edition.
+
+    URL template:
+        https://news.google.com/rss/search?q={query}&hl=en-IN&gl=IN&ceid=IN:en
+
+    Uses stdlib only (urllib + xml.etree + email.utils) so no extra dependency
+    is needed. The RSS <source> element carries the publisher name; when it is
+    absent the " - Publisher" suffix often appended to Google News titles is
+    split off instead.
+    """
+
+    _BASE = "https://news.google.com/rss/search"
+    _TIMEOUT = 8
+
+    def headlines(self, query: str, limit: int = DEFAULT_LIMIT) -> list[Headline]:
+        """Up to `limit` headlines. Returns [] on any failure."""
+        if not query or not query.strip():
+            return []
+
+        raw = self._fetch_raw(query.strip(), limit * 2)  # fetch extra to cover dedup loss
+
+        seen: set[str] = set()
+        unique: list[Headline] = []
+        for item in raw:
+            if item.url in seen:
+                continue
+            seen.add(item.url)
+            unique.append(item)
+            if len(unique) >= limit:
+                break
+        return unique
+
+    def _fetch_raw(self, query: str, limit: int) -> list[Headline]:
+        import urllib.parse
+        import urllib.request
+        import xml.etree.ElementTree as ET
+
+        params = urllib.parse.urlencode({"q": query, "hl": "en-IN", "gl": "IN", "ceid": "IN:en"})
+        url = f"{self._BASE}?{params}"
+        try:
+            req = urllib.request.Request(
+                url, headers={"User-Agent": "Finnie/1.0 (personal-finance-assistant)"}
+            )
+            with urllib.request.urlopen(req, timeout=self._TIMEOUT) as resp:
+                xml_bytes = resp.read()
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Google News RSS unavailable for %r: %s: %s", query, type(exc).__name__, exc)
+            return []
+
+        try:
+            root = ET.fromstring(xml_bytes)
+        except ET.ParseError as exc:
+            logger.warning("Google News RSS parse error for %r: %s", query, exc)
+            return []
+
+        items: list[Headline] = []
+        for el in root.findall(".//item"):
+            h = self._parse_item(el)
+            if h:
+                items.append(h)
+                if len(items) >= limit:
+                    break
+        return items
+
+    @staticmethod
+    def _parse_item(item) -> Headline | None:  # noqa: ANN001 - ET.Element
+
+        title_text = (item.findtext("title") or "").strip()
+        link = (item.findtext("link") or "").strip()
+        pub_date_str = (item.findtext("pubDate") or "").strip()
+
+        source_el = item.find("source")
+        publisher = (source_el.text or "").strip() if source_el is not None else ""
+
+        # Google News titles are often "Headline - Publisher Name"; split as a fallback.
+        if not publisher and " - " in title_text:
+            head, _, tail = title_text.rpartition(" - ")
+            title_text = head.strip()
+            publisher = tail.strip()
+
+        if not title_text or not link:
+            return None
+
+        return Headline(
+            title=title_text,
+            publisher=publisher or "unknown source",
+            url=link,
+            published=GoogleNewsFeed._rfc2822_to_iso(pub_date_str),
+        )
+
+    @staticmethod
+    def _rfc2822_to_iso(date_str: str) -> str:
+        """RFC 2822 pubDate → ISO 8601, or "" on failure."""
+        if not date_str:
+            return ""
+        from email.utils import parsedate_to_datetime
+
+        try:
+            return parsedate_to_datetime(date_str).isoformat()
+        except Exception:  # noqa: BLE001
+            return ""
+
+
+class ChainedNewsFeed:
+    """Try feeds in order; return the first non-empty result.
+
+    Google News is tried first; yfinance is the fallback. Both can be down
+    simultaneously (the agent returns NEWS_UNAVAILABLE_REPLY in that case), but
+    the chain means Yahoo's periodic outages are invisible to the user so long as
+    Google is up.
+    """
+
+    def __init__(self, *feeds: NewsFeed) -> None:
+        self._feeds = feeds
+
+    def headlines(self, query: str, limit: int = DEFAULT_LIMIT) -> list[Headline]:
+        for feed in self._feeds:
+            try:
+                items = feed.headlines(query, limit)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Feed %s failed: %s: %s", type(feed).__name__, type(exc).__name__, exc)
+                items = []
+            if items:
+                return items
+        return []
+
+
 class YFinanceNewsFeed:
     """Headlines from Yahoo, by ticker or by free-text theme.
 
@@ -172,4 +307,4 @@ class YFinanceNewsFeed:
 
 def build_news_feed() -> NewsFeed:
     """The feed the agent uses in production. Swapped for a double in tests."""
-    return YFinanceNewsFeed()
+    return ChainedNewsFeed(GoogleNewsFeed(), YFinanceNewsFeed())

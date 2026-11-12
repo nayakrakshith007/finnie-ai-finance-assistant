@@ -269,9 +269,9 @@ def test_every_agent_has_a_router_description():
         assert len(cls.description) > 40, f"{cls.name} needs a usable description"
 
 
-def test_all_six_agents_are_registered():
-    assert len(AGENT_NAMES) == 6
-    assert len(set(AGENT_NAMES)) == 6, "names must be unique; they are the routing keys"
+def test_all_seven_agents_are_registered():
+    assert len(AGENT_NAMES) == 7
+    assert len(set(AGENT_NAMES)) == 7, "names must be unique; they are the routing keys"
 
 
 def test_building_the_agents_needs_no_api_key_or_index():

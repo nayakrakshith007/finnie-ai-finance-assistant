@@ -20,7 +20,7 @@ from langchain_core.messages import AIMessage
 
 from agents.news import NEWS_UNAVAILABLE_REPLY, NO_TOPIC_REPLY, NewsSynthesizerAgent
 from core.llm import build_fake_llm
-from data.news import Headline, YFinanceNewsFeed, _normalise
+from data.news import ChainedNewsFeed, GoogleNewsFeed, Headline, YFinanceNewsFeed, _normalise
 from workflow.state import new_state
 
 NOW = datetime(2026, 11, 8, 12, 0, tzinfo=UTC)
@@ -274,10 +274,13 @@ def test_the_prompt_requires_sentiment_to_be_flagged_uncertain():
     assert "uncertain" in lowered or "not reliable" in lowered
 
 
-def test_the_prompt_caps_the_bullets_at_five():
+def test_the_prompt_caps_bullets():
+    # Prompt now allows up to eight bullets to accommodate multi-query fan-out
+    # results; "five" was the old single-query limit.
     from agents.news import NEWS_SYSTEM_PROMPT
 
-    assert "five" in NEWS_SYSTEM_PROMPT.lower() or "5 " in NEWS_SYSTEM_PROMPT
+    lowered = NEWS_SYSTEM_PROMPT.lower()
+    assert any(n in lowered for n in ("five", "eight", "ten", "5 ", "8 ", "10 "))
 
 
 def test_the_prompt_forbids_prediction():
@@ -404,3 +407,195 @@ def test_a_short_horizon_states_that_equity_was_capped():
     )
     prompt = " ".join(str(m.content) for m in captured[0])
     assert "Horizon equity cap: applied" in prompt
+
+
+# ── GoogleNewsFeed ─────────────────────────────────────────────────────────────
+
+GOOGLE_RSS_FIXTURE = b"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Reliance - Google News</title>
+    <item>
+      <title>Reliance Q2 profit surges on retail and digital</title>
+      <link>https://news.google.com/rss/articles/abc123</link>
+      <pubDate>Sat, 08 Nov 2026 09:00:00 GMT</pubDate>
+      <source url="https://economictimes.indiatimes.com">The Economic Times</source>
+      <description>Summary text here.</description>
+    </item>
+    <item>
+      <title>RIL share hits 52-week high ahead of AGM - Business Standard</title>
+      <link>https://news.google.com/rss/articles/def456</link>
+      <pubDate>Fri, 07 Nov 2026 14:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>No link item</title>
+    </item>
+  </channel>
+</rss>"""
+
+
+def _mock_urlopen(fixture: bytes):
+    """Return a context manager that yields the fixture bytes."""
+
+    class _Resp:
+        def read(self):
+            return fixture
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            pass
+
+    def _open(req, timeout=None):
+        return _Resp()
+
+    return _open
+
+
+def test_google_feed_parses_rss_with_source_element(monkeypatch):
+    monkeypatch.setattr("urllib.request.urlopen", _mock_urlopen(GOOGLE_RSS_FIXTURE))
+    items = GoogleNewsFeed().headlines("RELIANCE.NS", limit=5)
+    assert len(items) == 2
+    assert items[0].title == "Reliance Q2 profit surges on retail and digital"
+    assert items[0].publisher == "The Economic Times"
+    assert items[0].url == "https://news.google.com/rss/articles/abc123"
+
+
+def test_google_feed_splits_publisher_from_title_when_source_absent(monkeypatch):
+    monkeypatch.setattr("urllib.request.urlopen", _mock_urlopen(GOOGLE_RSS_FIXTURE))
+    items = GoogleNewsFeed().headlines("RELIANCE.NS", limit=5)
+    assert items[1].title == "RIL share hits 52-week high ahead of AGM"
+    assert items[1].publisher == "Business Standard"
+
+
+def test_google_feed_drops_items_with_no_link(monkeypatch):
+    monkeypatch.setattr("urllib.request.urlopen", _mock_urlopen(GOOGLE_RSS_FIXTURE))
+    items = GoogleNewsFeed().headlines("RELIANCE.NS", limit=5)
+    assert all(item.url for item in items)
+
+
+def test_google_feed_parses_rfc2822_date(monkeypatch):
+    monkeypatch.setattr("urllib.request.urlopen", _mock_urlopen(GOOGLE_RSS_FIXTURE))
+    items = GoogleNewsFeed().headlines("RELIANCE.NS", limit=5)
+    assert items[0].published.startswith("2026-11-08")
+
+
+def test_google_feed_returns_empty_on_network_error(monkeypatch):
+    def boom(req, timeout=None):
+        raise OSError("connection refused")
+
+    monkeypatch.setattr("urllib.request.urlopen", boom)
+    assert GoogleNewsFeed().headlines("RELIANCE.NS") == []
+
+
+def test_google_feed_returns_empty_on_bad_xml(monkeypatch):
+    def bad_xml(req, timeout=None):
+        class _R:
+            def read(self):
+                return b"not xml at all ><"
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                pass
+
+        return _R()
+
+    monkeypatch.setattr("urllib.request.urlopen", bad_xml)
+    assert GoogleNewsFeed().headlines("query") == []
+
+
+def test_google_feed_respects_limit(monkeypatch):
+    monkeypatch.setattr("urllib.request.urlopen", _mock_urlopen(GOOGLE_RSS_FIXTURE))
+    items = GoogleNewsFeed().headlines("RELIANCE.NS", limit=1)
+    assert len(items) == 1
+
+
+def test_google_feed_returns_empty_for_blank_query(monkeypatch):
+    # urlopen must not be called at all for a blank query
+    called = []
+
+    def boom(req, timeout=None):
+        called.append(True)
+        raise AssertionError("should not reach network for blank query")
+
+    monkeypatch.setattr("urllib.request.urlopen", boom)
+    assert GoogleNewsFeed().headlines("   ") == []
+    assert not called
+
+
+def test_google_feed_deduplicates_by_url(monkeypatch):
+    duplicate_rss = b"""<?xml version="1.0"?>
+<rss><channel>
+  <item><title>T1</title><link>https://g.co/1</link><pubDate>Sat, 08 Nov 2026 09:00:00 GMT</pubDate></item>
+  <item><title>T2</title><link>https://g.co/1</link><pubDate>Sat, 08 Nov 2026 10:00:00 GMT</pubDate></item>
+  <item><title>T3</title><link>https://g.co/2</link><pubDate>Sat, 08 Nov 2026 11:00:00 GMT</pubDate></item>
+</channel></rss>"""
+    monkeypatch.setattr("urllib.request.urlopen", _mock_urlopen(duplicate_rss))
+    items = GoogleNewsFeed().headlines("query", limit=5)
+    assert len(items) == 2
+    assert items[0].url == "https://g.co/1"
+    assert items[1].url == "https://g.co/2"
+
+
+# ── ChainedNewsFeed ────────────────────────────────────────────────────────────
+
+
+class _Feed:
+    def __init__(self, items=None, raises=None):
+        self._items = items or []
+        self._raises = raises
+        self.called = False
+
+    def headlines(self, query, limit=5):
+        self.called = True
+        if self._raises:
+            raise self._raises
+        return self._items[:limit]
+
+
+def test_chained_feed_returns_first_non_empty():
+    h = Headline("T", "P", "https://e.com")
+    primary = _Feed(items=[h])
+    fallback = _Feed(items=[Headline("T2", "P", "https://e2.com")])
+    result = ChainedNewsFeed(primary, fallback).headlines("q")
+    assert result == [h]
+    assert not fallback.called
+
+
+def test_chained_feed_falls_back_when_primary_returns_empty():
+    h = Headline("T", "P", "https://e.com")
+    primary = _Feed(items=[])
+    fallback = _Feed(items=[h])
+    result = ChainedNewsFeed(primary, fallback).headlines("q")
+    assert result == [h]
+    assert fallback.called
+
+
+def test_chained_feed_falls_back_when_primary_raises():
+    h = Headline("T", "P", "https://e.com")
+    primary = _Feed(raises=RuntimeError("yahoo down"))
+    fallback = _Feed(items=[h])
+    result = ChainedNewsFeed(primary, fallback).headlines("q")
+    assert result == [h]
+
+
+def test_chained_feed_returns_empty_when_all_feeds_empty():
+    result = ChainedNewsFeed(_Feed(), _Feed()).headlines("q")
+    assert result == []
+
+
+def test_chained_feed_returns_empty_when_all_feeds_raise():
+    primary = _Feed(raises=RuntimeError("google down"))
+    fallback = _Feed(raises=RuntimeError("yahoo down"))
+    result = ChainedNewsFeed(primary, fallback).headlines("q")
+    assert result == []
+
+
+def test_build_news_feed_returns_a_chained_feed():
+    from data.news import build_news_feed
+
+    feed = build_news_feed()
+    assert isinstance(feed, ChainedNewsFeed)

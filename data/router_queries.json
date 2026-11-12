@@ -9,7 +9,7 @@
       "also_acceptable": "Other routes that are defensible for a genuinely ambiguous query. Scored separately as lenient accuracy, so the strict number is never quietly inflated.",
       "why": "The reason for the label, so a disagreement is about the reasoning rather than about taste."
     },
-    "balance": "5 per agent across the 6 agents (30), 6 compound two-agent queries, 4 edge cases.",
+    "balance": "5 per agent across the 7 agents (35), 6 compound two-agent queries, 4 edge cases.",
     "honesty_note": "These were written by the same author as the agent descriptions the router reads, so they are a fair test of the routing logic and a weaker test of whether the descriptions themselves are well chosen. A disagreement found during review is therefore a useful signal about the descriptions, not just about a label."
   },
 
@@ -60,6 +60,12 @@
     {"id": "r37", "query": "What is the capital of France?", "expected": ["finance_qa"], "why": "Out of scope. Routes to the only agent that refuses honestly, by retrieving nothing and saying so (FR-002's unknown-intent rule)."},
     {"id": "r38", "query": "Should I buy Reliance?", "expected": ["finance_qa"], "why": "Advice-seeking. Q&A explains how to think about a decision; answering with a live price implies the price is the answer. Compliance blocks the advice framing on either route.", "also_acceptable": [["market_analysis"]]},
     {"id": "r39", "query": "Hi", "expected": ["finance_qa"], "why": "No intent to classify. The default agent handles it without a wasted data call."},
-    {"id": "r40", "query": "What about the second one?", "expected": ["finance_qa"], "why": "Scored with no history, so there is no referent to resolve. With history the supervisor rewrites it first and routes on the rewrite — which is the behaviour tested in test_router.py, not here."}
+    {"id": "r40", "query": "What about the second one?", "expected": ["finance_qa"], "why": "Scored with no history, so there is no referent to resolve. With history the supervisor rewrites it first and routes on the rewrite — which is the behaviour tested in test_router.py, not here."},
+
+    {"id": "r41", "query": "Give me a detailed analysis of Reliance Industries", "expected": ["stock_deep_dive"], "why": "'Detailed analysis' of a named stock: PE, RSI, fundamentals and analyst outlook — the deep dive agent's exact brief."},
+    {"id": "r42", "query": "Deep dive on TCS stock — fundamentals, technicals, everything", "expected": ["stock_deep_dive"], "why": "'Deep dive' is the trigger phrase and 'fundamentals and technicals' maps precisely to what the agent returns."},
+    {"id": "r43", "query": "What are the fundamentals and valuation of INFY?", "expected": ["stock_deep_dive"], "why": "Valuation plus fundamentals on a named ticker: P/E, analyst rating, RSI — not just a live price, so market_analysis is not enough."},
+    {"id": "r44", "query": "Analyse HDFCBANK — PE ratio, RSI, analyst recommendation", "expected": ["stock_deep_dive"], "why": "Explicit request for the three metrics the deep-dive agent computes: PE, RSI and analyst consensus."},
+    {"id": "r45", "query": "What is the technical and fundamental outlook for Infosys?", "expected": ["stock_deep_dive"], "why": "Combined technical (RSI) and fundamental (PE, analyst) outlook on one stock is the deep-dive agent's core task."}
   ]
 }

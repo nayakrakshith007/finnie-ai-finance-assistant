@@ -96,6 +96,7 @@ class MarketConfig(BaseModel):
 class PortfolioConfig(BaseModel):
     concentration_warning_pct: float = Field(25.0, gt=0, le=100)
     risk_weights: dict[str, int] = {}
+    allocation_targets: dict[str, dict[str, int]] = {}
 
 
 class RiskProfile(BaseModel):
@@ -111,6 +112,7 @@ class GoalsConfig(BaseModel):
 class MemoryConfig(BaseModel):
     max_recent_messages: int = Field(10, gt=0)
     summarise_after_turns: int = Field(10, gt=0)
+    keep_verbatim_turns: int = Field(5, gt=0)
 
 
 class ComplianceConfig(BaseModel):

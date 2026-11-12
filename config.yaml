@@ -12,7 +12,7 @@ llm:
   model: gpt-4o                     # user-facing generation
   router_model: gpt-4o-mini         # intent classification only -- runs on every turn
   temperature: 0.2                  # low: consistency matters more than variety here
-  max_tokens: 1200
+  max_tokens: 2000
   timeout_seconds: 60
   max_retries: 3
 
@@ -62,6 +62,24 @@ portfolio:
     mutual_fund: 3
     stock: 4
     crypto: 5
+  # Target asset-class allocations by risk profile (percentages, sum to 100).
+  # Used by the portfolio agent to explain structural gaps educationally.
+  allocation_targets:
+    conservative:
+      equity: 25
+      debt: 60
+      gold: 10
+      cash_liquid: 5
+    moderate:
+      equity: 55
+      debt: 35
+      gold: 7
+      cash_liquid: 3
+    aggressive:
+      equity: 75
+      debt: 20
+      gold: 5
+      cash_liquid: 0
 
 goals:
   inflation_rate: 0.06
@@ -73,6 +91,7 @@ goals:
 memory:
   max_recent_messages: 10           # kept verbatim; older turns get summarised
   summarise_after_turns: 10
+  keep_verbatim_turns: 5
 
 compliance:
   disclaimer: >

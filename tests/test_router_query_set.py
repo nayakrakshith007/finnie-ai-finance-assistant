@@ -31,7 +31,7 @@ from workflow.registry import AGENT_NAMES, MAX_AGENTS_PER_TURN
 
 QUERY_FILE = Path(__file__).resolve().parents[1] / "data" / "router_queries.json"
 
-EXPECTED_TOTAL = 40
+EXPECTED_TOTAL = 45  # 40 original + 5 stock_deep_dive queries added 2026-11-12
 PER_AGENT = 5
 COMPOUND = 6
 EDGE_CASES = 4

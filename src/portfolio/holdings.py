@@ -106,7 +106,12 @@ class Holding:
 
 def _clean_asset_class(raw: Any) -> str:
     """'  Mutual Fund ' -> 'mutual_fund'. Users type labels, not identifiers."""
-    text = str(raw or "").strip().lower().replace(" ", "_").replace("-", "_")
+    if raw is None:
+        return DEFAULT_ASSET_CLASS
+    # NaN from a pandas float64 column (data_editor with no value set) — raw != raw is True only for NaN
+    if isinstance(raw, float) and raw != raw:
+        return DEFAULT_ASSET_CLASS
+    text = str(raw).strip().lower().replace(" ", "_").replace("-", "_")
     return text or DEFAULT_ASSET_CLASS
 
 

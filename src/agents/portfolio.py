@@ -1,12 +1,14 @@
-"""Portfolio Analysis Agent — values holdings and explains them (PRD FR-012).
+"""Portfolio Analysis Agent — values holdings and delivers CA-level structural analysis.
 
-How thin this deliberately is
------------------------------
+How this works
+--------------
 Four steps: read holdings from state, get a price for each, hand both to the pure
-`analyse()`, narrate the result. No arithmetic happens here. Every percentage,
-score and rupee figure comes from `portfolio/metrics.py`, where each one is
-checked against a hand calculation — because these are the numbers a user will
-act on, and "the model worked it out" is not a standard of proof.
+`analyse()`, then narrate the result with sector concentration, asset-class gaps,
+and an educational comparison to target allocations for the user's risk profile.
+
+No arithmetic happens here. Every percentage, score and rupee figure comes from
+`portfolio/metrics.py`, where each one is checked against a hand calculation —
+because these are the numbers a user will act on.
 
 Where prices come from
 ----------------------
@@ -35,6 +37,10 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from agents.base import BaseAgent
 from core.config import load_config
 from core.logging_setup import get_logger
+
+# Module-level cache: base symbol → sector string.
+# Avoids repeated yfinance info calls for the same ticker within a session.
+_sector_cache: dict[str, str] = {}
 from data.market import MarketDataService, OutOfScopeError
 from portfolio.analysis import analyse
 from portfolio.holdings import MARKET_TRADED_CLASSES, Holding, parse_holdings
@@ -51,29 +57,131 @@ NO_HOLDINGS_REPLY = (
     "to see what the analysis looks like."
 )
 
-PORTFOLIO_SYSTEM_PROMPT = """You are Finnie's portfolio analyst, explaining a \
-beginner's own holdings to them.
+# Sector mapping for common NSE-listed equities. Used to build sector
+# concentration data without a live yfinance info call per holding.
+_NSE_SECTOR_MAP: dict[str, str] = {
+    "RELIANCE": "Energy / Consumer",
+    "TCS": "Information Technology",
+    "HDFCBANK": "Banking & Finance",
+    "INFY": "Information Technology",
+    "ICICIBANK": "Banking & Finance",
+    "HINDUNILVR": "FMCG",
+    "SBIN": "Banking & Finance",
+    "BHARTIARTL": "Telecommunications",
+    "KOTAKBANK": "Banking & Finance",
+    "WIPRO": "Information Technology",
+    "LT": "Infrastructure",
+    "AXISBANK": "Banking & Finance",
+    "BAJFINANCE": "Banking & Finance (NBFC)",
+    "SUNPHARMA": "Pharmaceuticals",
+    "MARUTI": "Automobile",
+    "NESTLEIND": "FMCG",
+    "NTPC": "Power & Energy",
+    "POWERGRID": "Power & Energy",
+    "ULTRACEMCO": "Cement",
+    "TMCV": "Automobile",
+    "TATASTEEL": "Steel & Metals",
+    "ONGC": "Oil & Gas",
+    "BPCL": "Oil & Gas",
+    "CIPLA": "Pharmaceuticals",
+    "DRREDDY": "Pharmaceuticals",
+    "ADANIPORTS": "Infrastructure",
+    "ADANIENT": "Diversified",
+    "M&M": "Automobile",
+    "TECHM": "Information Technology",
+    "HCLTECH": "Information Technology",
+    "ASIANPAINT": "Paints & Chemicals",
+    "INDUSINDBK": "Banking & Finance",
+    "JSWSTEEL": "Steel & Metals",
+    "TITAN": "Luxury Goods & Jewellery",
+    "BAJAJFINSV": "Banking & Finance",
+    "COALINDIA": "Mining",
+    "HINDALCO": "Metals & Mining",
+    "GRASIM": "Diversified",
+    "VEDL": "Metals & Mining",
+    "HEROMOTOCO": "Automobile",
+    "EICHERMOT": "Automobile",
+    "APOLLOHOSP": "Healthcare",
+    "DIVISLAB": "Pharmaceuticals",
+    "SBILIFE": "Insurance",
+    "HDFCLIFE": "Insurance",
+    "ICICIPRULI": "Insurance",
+    "ITC": "FMCG",
+    "TATACONSUM": "FMCG",
+    "PIDILITIND": "Paints & Chemicals",
+    "DMART": "Retail",
+    "ZOMATO": "Consumer Tech",
+    "PAYTM": "Fintech",
+    "NYKAA": "Consumer Tech",
+    "IRFC": "Banking & Finance",
+    "HAL": "Defence & Aerospace",
+    "BHEL": "Capital Goods",
+    "SAIL": "Steel & Metals",
+    "NHPC": "Power & Energy",
+    "RECLTD": "Banking & Finance",
+    "PFC": "Banking & Finance",
+}
 
-Every figure below has already been calculated. Use those numbers exactly as \
-given and do no arithmetic of your own.
+# Asset class keywords → canonical portfolio category for gap analysis
+_EQUITY_CLASSES = frozenset({"stock", "etf"})
+_DEBT_CLASSES = frozenset({"bond", "mutual_fund"})
+_GOLD_KEYWORDS = frozenset({"gold", "sgb", "goldbeees", "goldetf", "sovereign gold"})
+_LIQUID_CLASSES = frozenset({"cash"})
+_REAL_ESTATE_KEYWORDS = frozenset({"reit", "real estate", "property"})
 
-Rules:
-1. Describe what the portfolio *is*, not what to do about it. You may say a \
-portfolio is concentrated in one holding, heavily weighted to equity, or paying \
-a certain amount in fund fees. You may not tell them to buy, sell, switch or \
-rebalance, and you must not recommend a target allocation. Explaining what \
-concentration means is education; telling someone to reduce it is advice.
-2. Never invent a number. Every figure in your answer must appear in the data.
-3. Lead with the total value and the single most notable structural fact.
-4. Explain one metric in plain words rather than listing them all. The \
-diversification score and effective-holdings count mean nothing to a beginner \
-unless you say what they measure.
-5. If any price is marked stale, sample or user-supplied, say so and say which \
-holdings it affects. If any holding could not be priced, state that the total \
-excludes it.
-6. Do NOT write a disclaimer or closing caveat. One is appended automatically.
-7. Six sentences at most, or a short bullet per point. Plain English, no jargon \
-without a gloss.
+PORTFOLIO_SYSTEM_PROMPT = """You are Finnie's Senior Portfolio Analyst — think like \
+a CFA charterholder, CA, and experienced Indian hedge fund risk manager rolled into one.
+
+Your job: deliver a thorough, structured portfolio review. You may describe structural \
+characteristics, explain what they mean, compare the portfolio to typical allocations \
+for the user's risk profile, and highlight gaps — all in educational terms.
+
+**What you MAY do (education):**
+- State what the portfolio IS structurally (100% equity, 3 sectors, no debt, no gold)
+- Compare to typical Indian portfolio allocations for the stated risk profile
+- Explain the purpose of each asset class (what debt provides, what gold hedges)
+- Name sector concentration risks (60% IT is a sector-cycle risk)
+- Highlight tax-efficiency considerations (LTCG thresholds, dividend tax, ELSS benefits)
+- Say what a well-structured portfolio of this risk profile typically includes
+- Note if the portfolio lacks liquidity buffers, inflation hedges, or downside cushions
+
+**What you must NOT do (advice):**
+- Tell the user to buy, sell, switch or rebalance any specific holding
+- Recommend a specific fund, scheme, or instrument by name
+- Promise or project any return
+- Write a disclaimer (one is appended automatically)
+
+**Analysis structure — cover ALL of these:**
+1. **Portfolio Overview**: Total value, holding count, risk band, 1-line structural summary
+2. **Asset Allocation vs Target**: Compare current allocation to the target for \
+the user's risk profile. Be specific: "You hold X% equity vs a typical Y% for a \
+moderate investor."
+3. **Sector Concentration** (equity holdings only): Name dominant sectors, \
+flag any sector above 30% of equity, explain what sector concentration means
+4. **What's Missing**: Identify absent asset classes (debt, gold, liquid/cash, \
+international, REITs) and explain what each typically provides in an Indian portfolio
+5. **Tax Efficiency**: Comment on the tax character of the portfolio \
+(LTCG vs STCG, dividend income, ELSS/PPF wrappers if present, expense ratios)
+6. **Risk & Diversification**: HHI, effective holdings, concentration flags
+7. **One Follow-up Question**: Offer to drill into whichever area the data \
+makes most interesting
+
+LENGTH & FORMAT — apply to every answer:
+- **Very first line — always**: print this note exactly as shown (replace nothing): \
+> ⚠️ _For accurate sector data, stock symbols must be valid on Yahoo Finance \
+(e.g. RELIANCE, TCS, HDFCBANK). Unknown symbols will show as "Other/Unknown"._
+- **Second line — portfolio snapshot in bold**: total value, number of holdings, \
+risk band (e.g. "**Portfolio: ₹X across N holdings — Moderate risk**").
+- Present the asset allocation as a Markdown table immediately after: \
+one row per asset class, columns for weight % and typical target %.
+- Use `###` headers for each of the 7 analysis sections — mandatory, every time.
+- **Bold** every key figure: values, percentages, HHI, diversification score.
+- Bullets within each section — no prose paragraphs longer than 2 sentences.
+- Sector concentration: use a table (sector | % of equity | flag).
+- Gaps section: one bullet per missing class with a 1-line explanation.
+- Be thorough within this structure — the user wants depth, not brevity.
+
+{risk_profile_context}
 
 Portfolio data:
 {data}"""
@@ -137,8 +245,23 @@ class PortfolioAnalysisAgent(BaseAgent):
             currency=cfg.market.currency,
         )
 
+        user_profile = state.get("user_profile") or {}
+        risk_appetite = str(user_profile.get("risk_appetite") or "moderate")
+        horizon_years = int(user_profile.get("horizon_years") or 10)
+
+        risk_profile_context = self._risk_profile_context(
+            risk_appetite, horizon_years, cfg.portfolio.allocation_targets
+        )
+        sector_data = self._sector_breakdown(analysis["holdings"])
+        gap_data = self._asset_class_gaps(analysis["class_breakdown"])
+
+        prompt_data = self._for_prompt(analysis, sector_data, gap_data)
+        system = PORTFOLIO_SYSTEM_PROMPT.format(
+            data=prompt_data,
+            risk_profile_context=risk_profile_context,
+        )
         messages = [
-            SystemMessage(content=PORTFOLIO_SYSTEM_PROMPT.format(data=self._for_prompt(analysis))),
+            SystemMessage(content=system),
             HumanMessage(content=PORTFOLIO_USER_TEMPLATE.format(question=self._question(state))),
         ]
         body = str(self.llm.invoke(messages).content).rstrip()
@@ -158,6 +281,11 @@ class PortfolioAnalysisAgent(BaseAgent):
             )
         if errors:
             body += f"\n\n{self._error_reply(errors)}"
+
+        body += (
+            "\n\n---\n💡 **For a full portfolio breakdown** — pie chart, asset-class bar, "
+            "per-stock Deep Dive buttons, and concentration flags — head to the **Portfolio tab**."
+        )
 
         return {
             "messages": [AIMessage(content=body)],
@@ -214,20 +342,145 @@ class PortfolioAnalysisAgent(BaseAgent):
 
     # ── helpers ───────────────────────────────────────────────────────────────
 
-    @staticmethod
-    def _question(state: AgentState) -> str:
+    def _question(self, state: AgentState) -> str:
         """The user's question, or a default when the UI invoked this directly.
 
         The Portfolio tab can run the analysis from a button rather than a typed
         question, in which case there is no HumanMessage to find.
         """
         try:
-            return BaseAgent._latest_question(state)
+            return self._latest_question(state)
         except ValueError:
             return "Analyse my portfolio."
 
     @staticmethod
-    def _for_prompt(analysis: dict[str, Any]) -> str:
+    def _fetch_sector_yfinance(ticker: str) -> str:
+        """Try to get the sector for a ticker from yfinance info.
+
+        Tries both .NS and .BO suffixes (NSE first). Returns the sector string
+        from yfinance, or "Other / Unknown" if unavailable or on any error.
+        Keeps the lookup out of the hot path — called only when the static map
+        has no entry.
+        """
+        import yfinance as yf  # noqa: PLC0415 — deferred import, only used here
+        for suffix in (".NS", ".BO"):
+            try:
+                info = yf.Ticker(ticker + suffix).info
+                sector = info.get("sector") or info.get("industryDisp") or ""
+                if sector:
+                    return sector
+            except Exception:  # noqa: BLE001
+                continue
+        return "Other / Unknown"
+
+    @staticmethod
+    def _sector_breakdown(holdings_rows: list[dict[str, Any]]) -> dict[str, float]:
+        """Compute sector weights as % of total equity value.
+
+        Static map (fast) → yfinance info (network, cached) → "Other / Unknown".
+        Only stock/ETF holdings are included; debt, gold, cash have no sector.
+        """
+        sector_values: dict[str, float] = {}
+        for row in holdings_rows:
+            if row.get("asset_class") not in ("stock", "etf"):
+                continue
+            ticker = row["symbol"].upper().split(".")[0]
+
+            if ticker in _NSE_SECTOR_MAP:
+                sector = _NSE_SECTOR_MAP[ticker]
+            elif ticker in _sector_cache:
+                sector = _sector_cache[ticker]
+            else:
+                sector = PortfolioAnalysisAgent._fetch_sector_yfinance(ticker)
+                _sector_cache[ticker] = sector
+                logger.info("Sector for %s resolved via yfinance: %s", ticker, sector)
+
+            sector_values[sector] = sector_values.get(sector, 0.0) + row["value"]
+
+        total = sum(sector_values.values())
+        if not total:
+            return {}
+        return {s: round(v / total * 100, 2) for s, v in sorted(
+            sector_values.items(), key=lambda x: -x[1]
+        )}
+
+    @staticmethod
+    def _asset_class_gaps(class_breakdown: dict[str, float]) -> dict[str, str]:
+        """Identify missing or underweight asset classes and explain what each provides.
+
+        Returns a dict of {gap_name: educational_explanation} for each gap found.
+        """
+        present = {k.lower() for k in class_breakdown}
+        gaps: dict[str, str] = {}
+
+        has_equity = any(c in present for c in _EQUITY_CLASSES)
+        has_debt = any(c in present for c in _DEBT_CLASSES)
+        has_gold = any(any(kw in c for kw in _GOLD_KEYWORDS) for c in present)
+        has_liquid = any(c in present for c in _LIQUID_CLASSES)
+        has_reit = any(any(kw in c for kw in _REAL_ESTATE_KEYWORDS) for c in present)
+
+        equity_pct = sum(v for k, v in class_breakdown.items() if k.lower() in _EQUITY_CLASSES)
+
+        if not has_debt:
+            gaps["Debt / Fixed Income"] = (
+                "No debt allocation detected. Debt instruments (government securities, "
+                "corporate bonds, debt mutual funds, PPF, NPS) provide capital preservation, "
+                "regular income, and reduce portfolio drawdowns during equity bear markets. "
+                "In Indian portfolios they also offer indexation benefits on LTCG."
+            )
+        if not has_gold:
+            gaps["Gold"] = (
+                "No gold allocation detected. Gold has historically had low or negative "
+                "correlation with Indian equities, acting as an inflation hedge and a "
+                "safe-haven asset during market stress. Sovereign Gold Bonds (SGBs) offer "
+                "2.5% annual interest + capital appreciation with no capital gains tax on maturity."
+            )
+        if not has_liquid:
+            gaps["Cash / Liquid Buffer"] = (
+                "No cash or liquid fund allocation detected. A liquid buffer of 3–6 months' "
+                "expenses prevents being forced to sell equity in a down market. Liquid mutual "
+                "funds deliver better returns than savings accounts with same-day redemption."
+            )
+        if not has_reit:
+            gaps["Real Estate / REITs"] = (
+                "No real-estate exposure detected. REITs (Real Estate Investment Trusts) "
+                "listed on NSE/BSE allow fractional ownership of commercial real estate "
+                "with SEBI-mandated 90% dividend distribution, providing income diversification."
+            )
+        if equity_pct > 90 and has_debt:
+            gaps["International Equity"] = (
+                "Portfolio is very equity-heavy (%.1f%% equity) but all in Indian markets. "
+                "International equity (via feeder funds or FoFs, within RBI LRS limits) "
+                "reduces home-country bias and adds currency diversification." % equity_pct
+            )
+
+        return gaps
+
+    @staticmethod
+    def _risk_profile_context(
+        risk_appetite: str,
+        horizon_years: int,
+        allocation_targets: dict[str, dict[str, int]],
+    ) -> str:
+        """Build the risk-profile section of the system prompt."""
+        targets = allocation_targets.get(risk_appetite, {})
+        if not targets:
+            return f"User risk profile: {risk_appetite}, {horizon_years}-year horizon."
+
+        target_text = ", ".join(f"{k.replace('_', ' ')} {v}%" for k, v in targets.items())
+        return (
+            f"User risk profile: {risk_appetite.upper()}, {horizon_years}-year investment horizon.\n"
+            f"Typical target allocation for a {risk_appetite} investor: {target_text}.\n"
+            "When comparing the user's current allocation to this target, name the gaps "
+            "explicitly (e.g. 'You hold X% equity but a typical moderate investor targets Y%')."
+        )
+
+    @staticmethod
+    def _for_prompt(
+        analysis: dict[str, Any],
+        sector_data: dict[str, float] | None = None,
+        gap_data: dict[str, str] | None = None,
+    ) -> str:
         """The data block the model sees. Finished numbers, provenance included."""
         a = analysis
         cur = a["currency"]
@@ -242,7 +495,7 @@ class PortfolioAnalysisAgent(BaseAgent):
         elif not a["cost_basis_complete"]:
             lines.append("Unrealised P&L: not available (purchase prices not given for every holding)")
 
-        lines.append("Asset classes: " + ", ".join(
+        lines.append("Asset class allocation: " + ", ".join(
             f"{name} {pct:.2f}%" for name, pct in a["class_breakdown"].items()
         ))
         lines.append(
@@ -268,10 +521,30 @@ class PortfolioAnalysisAgent(BaseAgent):
         else:
             lines.append("Fund fees: none of the holdings charge an expense ratio")
 
-        lines.append("Holdings:")
+        # Sector breakdown (equity only)
+        if sector_data:
+            lines.append("\nSector concentration (% of equity value):")
+            for sector, pct in sector_data.items():
+                flag = " ⚠ HIGH" if pct > 30 else ""
+                lines.append(f"  {sector}: {pct:.1f}%{flag}")
+        else:
+            lines.append("Sector breakdown: not available (no equity holdings mapped)")
+
+        # Asset class gaps
+        if gap_data:
+            lines.append("\nMissing / underweight asset classes:")
+            for asset_class, explanation in gap_data.items():
+                lines.append(f"  {asset_class}: {explanation}")
+        else:
+            lines.append("\nAsset class gaps: none detected (portfolio has equity, debt, gold and liquid)")
+
+        lines.append("\nHoldings:")
         for row in a["holdings"]:
+            ticker = row["symbol"].upper().split(".")[0]
+            sector_tag = _NSE_SECTOR_MAP.get(ticker, "")
+            sector_str = f", sector: {sector_tag}" if sector_tag else ""
             line = (
-                f"  {row['symbol']} ({row['name']}, {row['asset_class']}): "
+                f"  {row['symbol']} ({row['name']}, {row['asset_class']}{sector_str}): "
                 f"{row['quantity']:g} x {cur} {row['price']:,.2f} = "
                 f"{cur} {row['value']:,.2f}, {row['weight_pct']:.2f}% "
                 f"[price source: {row['source']}]"
