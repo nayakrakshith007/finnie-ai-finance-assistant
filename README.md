@@ -180,3 +180,9 @@ ai_finance_assistant/
 - **Education, not advice** — no agent suggests a specific trade. Compliance node appends the disclaimer exactly once.
 - **yfinance data** — prices come from Yahoo Finance (redistributed, ~15-min delayed). Fit for learning, not trading.
 - **Secrets in `.env` only** — `.env` is gitignored; `.env.example` is committed and never contains a real key.
+
+## Known limitations
+
+- **Ephemeral user database on Streamlit Cloud** — `data/users.db` and `data/memory.db` are SQLite files stored on the container's local filesystem. Every new deploy spins up a fresh container, so all user accounts and conversation history are wiped. Users need to re-register after a redeploy. For a production deployment, these would be migrated to a hosted database (e.g. Supabase, Turso, or any managed Postgres/SQLite service).
+- **Chroma index built at first boot** — the vector index is not committed to the repo (142 MB). It is built automatically on first deploy (~60 s, ~$0.02 in embedding API calls) and cached for the lifetime of the container process. A redeploy rebuilds it.
+- **10-message session cap** — each login session is capped at 10 chat turns to control API costs on the free deployment. Click "Clear conversation" in the sidebar to reset.
