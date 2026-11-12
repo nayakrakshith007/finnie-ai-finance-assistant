@@ -196,6 +196,9 @@ def _ui_messages_from_history(messages: list) -> list[dict[str, Any]]:
     return result
 
 
+MAX_TURNS = 10  # per session limit
+
+
 def run_turn(question: str, *, record_in_chat: bool = True) -> dict[str, Any]:
     """Put a question through the graph and return what came back.
 
@@ -215,6 +218,18 @@ def run_turn(question: str, *, record_in_chat: bool = True) -> dict[str, Any]:
     so the only thing left is the graph failing to start, which is reported as
     the answer.
     """
+    if st.session_state.get("turn_count", 0) >= MAX_TURNS:
+        return {
+            "answer": (
+                f"⚠️ You've reached the {MAX_TURNS}-message limit for this session. "
+                "Click **Clear conversation** in the sidebar to start a new one."
+            ),
+            "sources": [],
+            "trace": [],
+            "error": "turn_limit_reached",
+            "latency": 0.0,
+        }
+
     sync_profile()
 
     user_id: str | None = st.session_state.get("user_id")

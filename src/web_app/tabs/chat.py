@@ -172,6 +172,14 @@ def render() -> None:
             else:
                 st.markdown(message.get("content") or "_(no content)_")
 
-    if prompt := st.chat_input("Ask a finance question…"):
-        session.run_turn(prompt)
-        st.rerun()
+    at_limit = st.session_state.get("turn_count", 0) >= session.MAX_TURNS
+    if at_limit:
+        st.info(
+            f"⚠️ You've used all {session.MAX_TURNS} messages for this session. "
+            "Click **Clear conversation** in the sidebar to start a new one.",
+            icon="🔒",
+        )
+    else:
+        if prompt := st.chat_input("Ask a finance question…"):
+            session.run_turn(prompt)
+            st.rerun()
