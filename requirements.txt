@@ -6,6 +6,7 @@
 # --- LLM & orchestration ---
 openai>=1.59,<2
 langgraph>=0.2.60,<0.4
+langgraph-checkpoint-sqlite>=2.0,<3   # SqliteSaver for conversation persistence
 langchain-core>=0.3.28,<0.4
 langchain-openai>=0.2.14,<0.4
 tenacity>=9.0,<10            # retry with exponential backoff
