@@ -13,6 +13,7 @@ multi-agent architecture and showing one.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 import streamlit as st
@@ -132,28 +133,53 @@ def render() -> None:
             if message["role"] == "assistant":
                 trace = message.get("trace") or []
 
-                # ── price-history chart for deep-dive answers ─────────────────
-                # Rendered before the text so the chart leads, matching the
-                # layout in the Portfolio tab's own deep-dive panel.
+                # Resolve chart symbol from stock_deep_dive trace entry (if any).
                 dd_step = next(
                     (s for s in trace if s.get("agent") == "stock_deep_dive"), None
                 )
+                chart_symbol: str | None = None
                 if dd_step:
                     detail = dd_step.get("detail", "")
                     # detail format: "RELIANCE.NS — P/E 21.85, RSI 72, …"
-                    # " — " is present only on a successful fetch, never on the
-                    # "no symbol found" fallback, so this is safe to split on.
                     if " — " in detail:
-                        symbol = detail.split(" — ")[0].split(".")[0].strip()
-                        if symbol:
-                            with st.spinner(f"Loading {symbol} price history…"):
-                                dates, closes = _get_dd_price_history(symbol)
-                            st.plotly_chart(
-                                stock_price_history_chart(symbol, dates, closes),
-                                use_container_width=True,
-                            )
+                        chart_symbol = detail.split(" — ")[0].split(".")[0].strip() or None
 
-                st.markdown(message.get("content") or "_(no content)_")
+                content = message.get("content") or "_(no content)_"
+
+                # ── price-history chart placement ─────────────────────────────
+                # Multi-agent turns: the aggregator embeds [CHART:SYMBOL] inline
+                # right after the ## heading for the stock section. We split on
+                # that token and render the chart in position so it appears only
+                # within the stock deep-dive section, not at the top of the page.
+                # Single-agent stock_deep_dive: no token → chart leads the text
+                # (matching the Portfolio tab layout).
+                chart_token_re = re.compile(r"\[CHART:([A-Z0-9]+)\]")
+                token_match = chart_token_re.search(content)
+
+                if token_match:
+                    sym = token_match.group(1)
+                    before, after = content.split(token_match.group(0), 1)
+                    if before.strip():
+                        st.markdown(before)
+                    with st.spinner(f"Loading {sym} price history…"):
+                        dates, closes = _get_dd_price_history(sym)
+                    st.plotly_chart(
+                        stock_price_history_chart(sym, dates, closes),
+                        use_container_width=True,
+                    )
+                    if after.strip():
+                        st.markdown(after)
+                elif chart_symbol:
+                    # Single-agent deep-dive: chart before text
+                    with st.spinner(f"Loading {chart_symbol} price history…"):
+                        dates, closes = _get_dd_price_history(chart_symbol)
+                    st.plotly_chart(
+                        stock_price_history_chart(chart_symbol, dates, closes),
+                        use_container_width=True,
+                    )
+                    st.markdown(content)
+                else:
+                    st.markdown(content)
                 render_trace(trace)
                 render_sources(message.get("sources") or [])
                 if message.get("latency"):

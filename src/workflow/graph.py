@@ -327,12 +327,10 @@ def response_aggregator_node(state: AgentState) -> dict[str, Any]:
     sub_queries: dict[str, str] = state.get("sub_queries") or {}
     route: list[str] = state.get("route") or []
 
-    # Without sub_queries the supervisor didn't decompose the question, so we
-    # have no basis for structuring the response — pass through to compliance
-    # which will concatenate as usual. This also keeps graph tests (which use
-    # a FakeRouter that never writes sub_queries) deterministic.
-    if not sub_queries:
-        return {}
+    # sub_queries provides per-agent labels (what each agent was specifically
+    # asked). When empty the LLM still gets each agent's answer tagged with its
+    # name ([finance_qa], [stock_deep_dive], …) which is enough to structure the
+    # output. We only skip entirely if answers list is 1 (handled above).
 
     # Reconstruct the original question from the last HumanMessage.
     messages = state.get("messages") or []
@@ -341,6 +339,14 @@ def response_aggregator_node(state: AgentState) -> dict[str, Any]:
         if isinstance(m, HumanMessage):
             original_q = str(m.content)
             break
+
+    # Detect stock deep-dive so we can embed a chart token at the right position.
+    agent_trace = state.get("agent_trace") or []
+    dd_step = next((s for s in agent_trace if s.get("agent") == "stock_deep_dive"), None)
+    chart_symbol: str | None = None
+    if dd_step and " — " in (dd_step.get("detail") or ""):
+        raw = dd_step["detail"].split(" — ")[0].strip()
+        chart_symbol = raw.split(".")[0].strip()  # strip .NS suffix
 
     # Build the per-agent section text, keyed by route order.
     sections: list[str] = []
@@ -352,23 +358,41 @@ def response_aggregator_node(state: AgentState) -> dict[str, Any]:
 
     agents_text = "\n\n---\n\n".join(sections)
 
+    # Chart token instruction: tells the LLM exactly where to embed the token so
+    # the UI can render the price chart inline within the stock section.
+    chart_rule = ""
+    if chart_symbol:
+        chart_rule = (
+            f"\n6. The stock deep-dive section covers **{chart_symbol}**. "
+            f"Place exactly the token `[CHART:{chart_symbol}]` on its own line "
+            f"immediately after the ## heading for that section (before its content). "
+            f"Do not place it anywhere else."
+        )
+
     prompt = (
         "You received answers from multiple specialised financial agents for this question:\n"
         f'"{original_q}"\n\n'
         "Agent answers:\n"
         f"{agents_text}\n\n"
         "Your job: produce ONE clean, well-structured response.\n\n"
-        "Rules:\n"
+        "FORMATTING RULES:\n"
         "1. If the agent answers cover CLEARLY DIFFERENT topics (e.g. SIP investing vs "
-        "tax rates vs stock analysis), use a ## heading for each topic and remove any "
-        "duplication between sections.\n"
+        "tax rates vs stock analysis), use a ## heading for each topic. Each heading "
+        "must start with a relevant emoji followed by a short descriptive label, e.g.:\n"
+        "   ## 💰 SIP — How It Works\n"
+        "   ## 📈 Nifty 50 — Live Market Data\n"
+        "   ## 🧾 Tax — Old vs New Regime\n"
+        "   ## 🔬 RELIANCE — Stock Analysis\n"
+        "   After each section's content (except the last), add a `---` horizontal "
+        "rule on its own line to visually separate topics.\n"
         "2. If the agent answers are RELATED PARTS of one question (e.g. portfolio "
         "analysis feeding into goal planning), synthesise them into a single flowing "
-        "answer — no separate headers needed.\n"
+        "answer — no separate headers or horizontal rules.\n"
         "3. Keep ALL factual data intact: every number, rate, percentage, date, and "
         "named figure must appear in the output.\n"
         "4. Do NOT add any disclaimer — that is appended by a separate compliance step.\n"
         "5. Write in second person (you/your). Be concise but complete."
+        + chart_rule
     )
 
     try:
@@ -556,7 +580,12 @@ def fallback_node(state: AgentState) -> dict[str, Any]:
 # ── edge logic ─────────────────────────────────────────────────────────────────
 
 
-def _next_node(state: AgentState, known: frozenset[str]) -> str:
+def _next_node(
+    state: AgentState,
+    known: frozenset[str],
+    *,
+    has_aggregator: bool = False,
+) -> str:
     """The next agent to run, or the compliance node when the route is done.
 
     Two cases:
@@ -569,6 +598,10 @@ def _next_node(state: AgentState, known: frozenset[str]) -> str:
       doubling the output.  For parallel routes, return COMPLIANCE_NODE as soon as
       any agent has run; LangGraph deduplicates the multiple COMPLIANCE edges into
       a single compliance call after all agents finish.
+
+    has_aggregator: when True, multi-agent turns are routed through
+      AGGREGATOR_NODE before compliance. When False (default, used by tests that
+      don't wire the aggregator), they go straight to compliance.
     """
     ran = {entry["agent"] for entry in state.get("agent_trace", [])}
     route = state.get("route") or []
@@ -581,11 +614,11 @@ def _next_node(state: AgentState, known: frozenset[str]) -> str:
     )
 
     if len(valid_route) > 1 and not is_sequential:
-        # Parallel fan-out: any finishing agent → aggregator.
-        # LangGraph deduplicates the multiple edges into one aggregator call
-        # after all parallel agents finish, then aggregator → compliance.
+        # Parallel fan-out: any finishing agent → aggregator (or compliance when
+        # the aggregator is not wired). LangGraph deduplicates the multiple edges
+        # into a single node call after all parallel agents finish.
         if ran & known:
-            return AGGREGATOR_NODE
+            return AGGREGATOR_NODE if has_aggregator else COMPLIANCE_NODE
         return FALLBACK_NODE
 
     # Sequential chain: advance to the next unrun agent.
@@ -596,7 +629,7 @@ def _next_node(state: AgentState, known: frozenset[str]) -> str:
     if ran & known:
         # Multi-agent sequential chain also benefits from aggregation.
         if len(valid_route) > 1:
-            return AGGREGATOR_NODE
+            return AGGREGATOR_NODE if has_aggregator else COMPLIANCE_NODE
         return COMPLIANCE_NODE  # single agent — go straight to compliance
     return FALLBACK_NODE  # nothing ran and nothing can
 
@@ -657,6 +690,7 @@ def build_graph(
     agents: dict[str, Any] | None = None,
     router: Any | None = None,
     checkpointer: Any | None = None,
+    aggregator_fn: Any | None = None,
 ) -> Any:
     """Compile the workflow.
 
@@ -664,16 +698,23 @@ def build_graph(
         agents: name -> object with `.run(state)`. Defaults to the real six.
         router: object with `.route_node(state)` or `.route(state)`. Defaults to
             the real supervisor.
+        aggregator_fn: callable with the same signature as `response_aggregator_node`.
+            Pass `response_aggregator_node` for production. Omit (None) to skip the
+            aggregator entirely — multi-agent turns go straight to compliance.
+            Tests leave this None so they never trigger the real LLM.
 
-    Both are injectable so `tests/test_graph.py` can assert on the wiring with
-    doubles instead of six real agents and an API key. Compiling the real graph
-    is still cheap, because every agent's `__init__` is lazy.
+    Both agents and router are injectable so `tests/test_graph.py` can assert on
+    the wiring with doubles instead of six real agents and an API key. Compiling
+    the real graph is still cheap, because every agent's `__init__` is lazy.
     """
     agents = agents if agents is not None else build_agents()
     router = router if router is not None else SupervisorRouter()
     route_fn = getattr(router, "route_node", None) or router.route
 
     known = frozenset(agents)
+    # Whether the aggregator node is wired into this graph — drives routing.
+    has_aggregator = aggregator_fn is not None
+
     graph = StateGraph(AgentState)
 
     # ── nodes ──────────────────────────────────────────────────────────────────
@@ -681,7 +722,8 @@ def build_graph(
     graph.add_node(ROUTER_NAME, route_fn)
     for name, agent in agents.items():
         graph.add_node(name, agent.run)
-    graph.add_node(AGGREGATOR_NODE, response_aggregator_node)
+    if has_aggregator:
+        graph.add_node(AGGREGATOR_NODE, aggregator_fn)
     graph.add_node(COMPLIANCE_NODE, compliance_node)
     graph.add_node(EVALUATOR_NODE, evaluator_node)
     graph.add_node(FALLBACK_NODE, fallback_node)
@@ -692,7 +734,8 @@ def build_graph(
     graph.add_edge(MEMORY_NODE, ROUTER_NAME)
     graph.add_edge(CLARIFICATION_NODE, COMPLIANCE_NODE)
     graph.add_edge(FALLBACK_NODE, COMPLIANCE_NODE)
-    graph.add_edge(AGGREGATOR_NODE, COMPLIANCE_NODE)
+    if has_aggregator:
+        graph.add_edge(AGGREGATOR_NODE, COMPLIANCE_NODE)
     graph.add_edge(COMPLIANCE_NODE, EVALUATOR_NODE)
 
     # ── conditional edges ──────────────────────────────────────────────────────
@@ -715,12 +758,13 @@ def build_graph(
     # compliance (single-agent turns). LangGraph deduplicates the multiple
     # AGGREGATOR edges from parallel agents into one aggregator call.
     agent_destinations = {name: name for name in agents}
-    agent_destinations[AGGREGATOR_NODE] = AGGREGATOR_NODE
+    if has_aggregator:
+        agent_destinations[AGGREGATOR_NODE] = AGGREGATOR_NODE
     agent_destinations[COMPLIANCE_NODE] = COMPLIANCE_NODE
     agent_destinations[FALLBACK_NODE] = FALLBACK_NODE
 
     def after_agent(state: AgentState) -> str:
-        return _next_node(state, known)
+        return _next_node(state, known, has_aggregator=has_aggregator)
 
     for name in agents:
         graph.add_conditional_edges(name, after_agent, agent_destinations)
@@ -756,7 +800,7 @@ def build_production_graph() -> Any:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(db_path), check_same_thread=False)
     checkpointer = SqliteSaver(conn)
-    return build_graph(checkpointer=checkpointer)
+    return build_graph(checkpointer=checkpointer, aggregator_fn=response_aggregator_node)
 
 
 __all__ = [
