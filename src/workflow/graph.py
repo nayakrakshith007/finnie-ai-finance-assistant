@@ -52,6 +52,7 @@ MEMORY_NODE = "memory_manager"
 
 logger = get_logger(__name__)
 
+AGGREGATOR_NODE = "response_aggregator"
 COMPLIANCE_NODE = "compliance"
 DISPATCHER_NODE = "dispatcher"
 EVALUATOR_NODE = "evaluator"
@@ -293,6 +294,121 @@ def evaluator_node(state: AgentState) -> dict[str, Any]:
     return {"needs_retry": False, "retry_hint": ""}
 
 
+# ── the response aggregator node ─────────────────────────────────────────────
+
+
+def response_aggregator_node(state: AgentState) -> dict[str, Any]:
+    """Structure multi-agent answers into one coherent response.
+
+    When the supervisor fans out to 2-3 agents, each agent answers its own
+    sub-question independently. This node takes all their answers and either:
+
+    - Uses ## section headers for genuinely separate topics (e.g. SIP investing
+      + LTCG tax rates + TCS stock analysis in one message)
+    - Synthesises into a single flowing answer for related sub-tasks of one
+      question (e.g. portfolio analysis → goal planning)
+
+    How it knows which: sub_queries maps each agent to its specific question.
+    The LLM reads those and decides whether the questions are independent
+    topics or related parts of the same question.
+
+    Single-agent turns skip this — the conditional edge never routes here when
+    len(route) == 1.
+
+    Never raises: a failure passes the raw answers through unchanged so
+    compliance can still wrap them.
+    """
+    started = perf_counter()
+    answers = _this_turns_answers(state)
+
+    if len(answers) <= 1:
+        return {}  # nothing to aggregate
+
+    sub_queries: dict[str, str] = state.get("sub_queries") or {}
+    route: list[str] = state.get("route") or []
+
+    # Without sub_queries the supervisor didn't decompose the question, so we
+    # have no basis for structuring the response — pass through to compliance
+    # which will concatenate as usual. This also keeps graph tests (which use
+    # a FakeRouter that never writes sub_queries) deterministic.
+    if not sub_queries:
+        return {}
+
+    # Reconstruct the original question from the last HumanMessage.
+    messages = state.get("messages") or []
+    original_q = ""
+    for m in reversed(messages):
+        if isinstance(m, HumanMessage):
+            original_q = str(m.content)
+            break
+
+    # Build the per-agent section text, keyed by route order.
+    sections: list[str] = []
+    for i, msg in enumerate(answers):
+        agent_name = route[i] if i < len(route) else f"agent_{i + 1}"
+        sub_q = sub_queries.get(agent_name, "").strip()
+        label = f"[{agent_name}]" + (f" – {sub_q}" if sub_q else "")
+        sections.append(f"{label}\n{str(msg.content).strip()}")
+
+    agents_text = "\n\n---\n\n".join(sections)
+
+    prompt = (
+        "You received answers from multiple specialised financial agents for this question:\n"
+        f'"{original_q}"\n\n'
+        "Agent answers:\n"
+        f"{agents_text}\n\n"
+        "Your job: produce ONE clean, well-structured response.\n\n"
+        "Rules:\n"
+        "1. If the agent answers cover CLEARLY DIFFERENT topics (e.g. SIP investing vs "
+        "tax rates vs stock analysis), use a ## heading for each topic and remove any "
+        "duplication between sections.\n"
+        "2. If the agent answers are RELATED PARTS of one question (e.g. portfolio "
+        "analysis feeding into goal planning), synthesise them into a single flowing "
+        "answer — no separate headers needed.\n"
+        "3. Keep ALL factual data intact: every number, rate, percentage, date, and "
+        "named figure must appear in the output.\n"
+        "4. Do NOT add any disclaimer — that is appended by a separate compliance step.\n"
+        "5. Write in second person (you/your). Be concise but complete."
+    )
+
+    try:
+        from langchain_core.messages import SystemMessage as _Sys
+        from langchain_openai import ChatOpenAI
+
+        from core.config import load_config
+
+        cfg = load_config()
+        llm = ChatOpenAI(
+            model=cfg.llm.router_model,  # gpt-4o-mini — cheap, fast
+            temperature=0.0,
+            api_key=cfg.secrets.openai_api_key,
+        )
+        structured = str(llm.invoke([_Sys(content=prompt)]).content).strip()
+    except Exception as exc:  # noqa: BLE001 — aggregator failure must not lose the answer
+        logger.warning("Response aggregator failed (%s); passing raw answers through", type(exc).__name__)
+        return {}
+
+    # Replace all individual agent messages with the single structured one.
+    # Reuse the last answer's id so add_messages replaces rather than appends.
+    superseded = [m for m in answers[:-1] if getattr(m, "id", None)]
+    remove = [RemoveMessage(id=m.id) for m in superseded]
+
+    latency_ms = round((perf_counter() - started) * 1000, 1)
+    logger.info("Response aggregator: merged %d answers in %dms", len(answers), latency_ms)
+
+    return {
+        "messages": remove + [AIMessage(content=structured, id=answers[-1].id)],
+        "agent_trace": [
+            TraceEntry(
+                agent=AGGREGATOR_NODE,
+                status="ok",
+                latency_ms=latency_ms,
+                detail=f"merged {len(answers)} agent answers into structured response",
+            )
+        ],
+    }
+
+
 # ── the compliance node (FR-006) ───────────────────────────────────────────────
 
 
@@ -465,9 +581,11 @@ def _next_node(state: AgentState, known: frozenset[str]) -> str:
     )
 
     if len(valid_route) > 1 and not is_sequential:
-        # Parallel fan-out: any finishing agent → compliance.
+        # Parallel fan-out: any finishing agent → aggregator.
+        # LangGraph deduplicates the multiple edges into one aggregator call
+        # after all parallel agents finish, then aggregator → compliance.
         if ran & known:
-            return COMPLIANCE_NODE
+            return AGGREGATOR_NODE
         return FALLBACK_NODE
 
     # Sequential chain: advance to the next unrun agent.
@@ -476,7 +594,10 @@ def _next_node(state: AgentState, known: frozenset[str]) -> str:
             return name
 
     if ran & known:
-        return COMPLIANCE_NODE  # at least one agent ran; go and make it safe
+        # Multi-agent sequential chain also benefits from aggregation.
+        if len(valid_route) > 1:
+            return AGGREGATOR_NODE
+        return COMPLIANCE_NODE  # single agent — go straight to compliance
     return FALLBACK_NODE  # nothing ran and nothing can
 
 
@@ -560,6 +681,7 @@ def build_graph(
     graph.add_node(ROUTER_NAME, route_fn)
     for name, agent in agents.items():
         graph.add_node(name, agent.run)
+    graph.add_node(AGGREGATOR_NODE, response_aggregator_node)
     graph.add_node(COMPLIANCE_NODE, compliance_node)
     graph.add_node(EVALUATOR_NODE, evaluator_node)
     graph.add_node(FALLBACK_NODE, fallback_node)
@@ -570,6 +692,7 @@ def build_graph(
     graph.add_edge(MEMORY_NODE, ROUTER_NAME)
     graph.add_edge(CLARIFICATION_NODE, COMPLIANCE_NODE)
     graph.add_edge(FALLBACK_NODE, COMPLIANCE_NODE)
+    graph.add_edge(AGGREGATOR_NODE, COMPLIANCE_NODE)
     graph.add_edge(COMPLIANCE_NODE, EVALUATOR_NODE)
 
     # ── conditional edges ──────────────────────────────────────────────────────
@@ -588,11 +711,11 @@ def build_graph(
 
     graph.add_conditional_edges(ROUTER_NAME, after_supervisor, supervisor_destinations)
 
-    # Agent destinations: next unrun agent on the route, or compliance when done.
-    # Works identically for sequential chains AND parallel fan-out: parallel agents
-    # all finish with their entries in agent_trace, so _next_node returns compliance
-    # for every one of them — LangGraph deduplicates and compliance runs once.
+    # Agent destinations: next unrun agent, aggregator (multi-agent turns), or
+    # compliance (single-agent turns). LangGraph deduplicates the multiple
+    # AGGREGATOR edges from parallel agents into one aggregator call.
     agent_destinations = {name: name for name in agents}
+    agent_destinations[AGGREGATOR_NODE] = AGGREGATOR_NODE
     agent_destinations[COMPLIANCE_NODE] = COMPLIANCE_NODE
     agent_destinations[FALLBACK_NODE] = FALLBACK_NODE
 
@@ -638,6 +761,7 @@ def build_production_graph() -> Any:
 
 __all__ = [
     "AGENT_NAMES",
+    "AGGREGATOR_NODE",
     "CLARIFICATION_NODE",
     "COMPLIANCE_NODE",
     "EVALUATOR_NODE",
@@ -650,4 +774,5 @@ __all__ = [
     "evaluator_node",
     "fallback_node",
     "memory_manager_node",
+    "response_aggregator_node",
 ]
