@@ -47,6 +47,27 @@ def _trace_reducer(existing: list, incoming: list | None) -> list:
         return []
     return existing + incoming
 
+
+def _concat_docs(left: list, right: list) -> list:
+    """Merge retrieved_docs written by parallel agents.
+
+    When the supervisor fans out to 3 agents simultaneously via Send(), each
+    agent writes its own retrieved_docs list. Without this reducer LangGraph
+    raises INVALID_CONCURRENT_GRAPH_UPDATE because only one write per step is
+    allowed on a plain field. This concatenates all agents' docs so the UI
+    citation panel shows every source from every agent that ran.
+    """
+    return (left or []) + (right or [])
+
+
+def _merge_dict(left: dict, right: dict) -> dict:
+    """Merge dicts written by parallel agents; right wins on key conflicts.
+
+    Applied to market_data, portfolio, and goal_params so that any combination
+    of agents can run in parallel without racing on these fields.
+    """
+    return {**(left or {}), **(right or {})}
+
 TraceStatus = Literal["ok", "error"]
 
 
@@ -107,11 +128,12 @@ class AgentState(TypedDict, total=False):
     # it in preference to the raw message (see `BaseAgent._latest_question`).
     resolved_question: str
 
-    # Per-turn working data, written by whichever agent produced it.
-    retrieved_docs: list[dict[str, Any]]
-    market_data: dict[str, Any]
-    portfolio: dict[str, Any]
-    goal_params: dict[str, Any]
+    # Per-turn working data. Annotated with reducers so parallel agents (fan-out
+    # via Send()) can all write without triggering INVALID_CONCURRENT_GRAPH_UPDATE.
+    retrieved_docs: Annotated[list[dict[str, Any]], _concat_docs]
+    market_data: Annotated[dict[str, Any], _merge_dict]
+    portfolio: Annotated[dict[str, Any], _merge_dict]
+    goal_params: Annotated[dict[str, Any], _merge_dict]
 
     # Execution path. Appended to by every agent; reset per turn via None sentinel.
     agent_trace: Annotated[list[TraceEntry], _trace_reducer]
