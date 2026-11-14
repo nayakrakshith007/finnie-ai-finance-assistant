@@ -174,7 +174,8 @@ def load_user_history() -> None:
     messages = state.get("messages") or []
     st.session_state.ui_messages = _ui_messages_from_history(messages)
     st.session_state.turn_count = sum(
-        1 for m in messages if isinstance(m, HumanMessage)
+        1 for m in messages
+        if isinstance(m, HumanMessage) and getattr(m, "name", None) != "internal"
     )
 
 
@@ -183,6 +184,8 @@ def _ui_messages_from_history(messages: list) -> list[dict[str, Any]]:
     result = []
     for msg in messages:
         if isinstance(msg, HumanMessage):
+            if getattr(msg, "name", None) == "internal":
+                continue  # tab-triggered prompts never appear in the chat transcript
             result.append({"role": "user", "content": str(msg.content)})
         elif isinstance(msg, AIMessage):
             result.append({
@@ -218,7 +221,10 @@ def run_turn(question: str, *, record_in_chat: bool = True) -> dict[str, Any]:
     so the only thing left is the graph failing to start, which is reported as
     the answer.
     """
-    if st.session_state.get("turn_count", 0) >= MAX_TURNS:
+    # Internal tab calls (record_in_chat=False) are exempt from the turn limit —
+    # they never appear in the chat transcript, so they must not consume the
+    # user's message budget nor be blocked when the budget is exhausted.
+    if record_in_chat and st.session_state.get("turn_count", 0) >= MAX_TURNS:
         return {
             "answer": (
                 f"⚠️ You've reached the {MAX_TURNS}-message limit for this session. "
@@ -242,8 +248,14 @@ def run_turn(question: str, *, record_in_chat: bool = True) -> dict[str, Any]:
             # Only the new message + current profile/portfolio are passed.
             # add_messages reducer merges this with the checkpoint's history.
             config: dict[str, Any] = {"configurable": {"thread_id": user_id}}
+            # Tag internal messages so load_user_history can exclude them from
+            # the turn counter when restoring a session.
+            hm = HumanMessage(
+                content=question,
+                name="internal" if not record_in_chat else None,
+            )
             increment: dict[str, Any] = {
-                "messages": [HumanMessage(content=question)],
+                "messages": [hm],
                 "user_profile": st.session_state.graph_state.get("user_profile", {}),
                 "portfolio": st.session_state.graph_state.get("portfolio", {"holdings": []}),
                 "agent_trace": None,   # None sentinel resets per-turn trace
@@ -255,7 +267,11 @@ def run_turn(question: str, *, record_in_chat: bool = True) -> dict[str, Any]:
         else:
             # ── anonymous path: in-memory accumulation (original behaviour) ───
             state = st.session_state.graph_state
-            state["messages"] = [*state.get("messages", []), HumanMessage(content=question)]
+            hm = HumanMessage(
+                content=question,
+                name="internal" if not record_in_chat else None,
+            )
+            state["messages"] = [*state.get("messages", []), hm]
             for key in TRANSIENT_KEYS:
                 state.pop(key, None)
             held = state.get("portfolio") or {}
@@ -284,8 +300,9 @@ def run_turn(question: str, *, record_in_chat: bool = True) -> dict[str, Any]:
         }
 
     result["latency"] = time.perf_counter() - started
-    st.session_state.turn_count += 1
-    st.session_state.total_latency += result["latency"]
+    if record_in_chat:
+        st.session_state.turn_count += 1
+        st.session_state.total_latency += result["latency"]
 
     # Persist which agents ran this turn to the user's profile (no LLM call needed).
     if user_id:

@@ -228,7 +228,7 @@ def _stock_deep_dive_section() -> None:
                 f"Give me a full deep dive analysis on {symbol}",
                 record_in_chat=False,
             )
-            if result and result.get("answer"):
+            if result and result.get("answer") and not result.get("error"):
                 deep_dive_cache.set(symbol, result)   # write to file cache
                 st.session_state[dd_key] = result
             else:
